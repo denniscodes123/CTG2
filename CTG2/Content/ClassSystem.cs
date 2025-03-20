@@ -18,13 +18,69 @@ public class ClassSystem : ModPlayer
                 GiveClassItems();
                 break;
 
-            case 2: // Randomclass
+            case 2: // Ninja
                 Player.AddBuff(BuffID.Ironskin, 2);
                 GiveClassItems();
                 break;
 
-            case 3: // Randomclass
+            case 3: // Beast
                 Player.AddBuff(BuffID.MagicPower, 2);
+                GiveClassItems();
+                break;
+
+            case 4: // Gladiator
+                GiveClassItems();
+                break;
+                
+            case 5: // Paladin
+                GiveClassItems();
+                break;
+
+            case 6: // Jungle Man
+                GiveClassItems();
+                break;
+                
+            case 7: // Black Mage
+                GiveClassItems();
+                break;
+                
+            case 8: // Psychic
+                GiveClassItems();
+                break;
+                
+            case 9: // White Mage
+                GiveClassItems();
+                break;
+                
+            case 10: // Miner
+                GiveClassItems();
+                break;
+                
+            case 11: // Fish
+                GiveClassItems();
+                break;
+                
+            case 12: // Clown
+                GiveClassItems();
+                break;
+                
+            case 13: // Flame Bunny
+                GiveClassItems();
+                break;
+                
+            case 14: // Tiki Priest
+                GiveClassItems();
+                break;
+                
+            case 15: // Tree
+                GiveClassItems();
+                break;
+                
+            case 16: // Mutant
+                GiveClassItems();
+                break;
+
+            case 17: // Leech
                 GiveClassItems();
                 break;
         }
