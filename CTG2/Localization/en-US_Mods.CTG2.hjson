@@ -9,7 +9,7 @@ Items: {
 			Replacing this tooltip is duty 
 			It's snowing on Mt.Fuji
 			'''
-	}
+	},
 	ShardstonePickaxe: {
 		DisplayName: Shardstone Pickaxe
 		Tooltip:
