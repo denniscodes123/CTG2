@@ -10,4 +10,10 @@ Items: {
 			It's snowing on Mt.Fuji
 			'''
 	}
+	ShardstonePickaxe: {
+		DisplayName: Shardstone Pickaxe
+		Tooltip:
+			'''
+			'''
+	}
 }
