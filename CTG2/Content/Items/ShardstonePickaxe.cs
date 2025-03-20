@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 
 namespace CTG2.Content.Items
 {
-	public class idk : ModItem
+	public class ShardstonePickaxe : ModItem
 	{
 		public override void SetDefaults()
 		{
