@@ -2,7 +2,7 @@
 
 Items: {
 	idk: {
-		DisplayName: idk
+		DisplayName: "idk"
 		Tooltip:
 			'''
 			Template of an item
@@ -11,7 +11,7 @@ Items: {
 			'''
 	},
 	ShardstonePickaxe: {
-		DisplayName: Shardstone Pickaxe
+		DisplayName: "Shardstone Pickaxe"
 		Tooltip:
 			'''
 			'''
