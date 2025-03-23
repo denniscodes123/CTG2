@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System;
+using Terraria.Audio;
 
 namespace CTG2.Content.Accessories
 {
@@ -22,7 +23,7 @@ namespace CTG2.Content.Accessories
 	}
 
 	public class ArcherDashPlayer : ModPlayer {
-		public const int DashCooldown = 120; // Time (frames) between starting dashes. If this is shorter than DashDuration you can start a new dash before an old one has finished
+		public const int DashCooldown = 150; // Time (frames) between starting dashes. If this is shorter than DashDuration you can start a new dash before an old one has finished
 		public const int DashDuration = 13; // Duration of the dash afterimage effect in frames
 
 		public const float DashVelocity = 15f; // The initial velocity.  10 velocity is about 37.5 tiles/second or 50 mph
@@ -31,6 +32,7 @@ namespace CTG2.Content.Accessories
 
 		// The fields related to the dash accessory
 		public bool DashAccessoryEquipped;
+		private int lastDashDelay = 0;
 		public int DashDelay = 0; // frames remaining till we can dash again
 		public int DashTimer = 0; // frames remaining in the dash
 
@@ -44,13 +46,17 @@ namespace CTG2.Content.Accessories
 			if (recentlyEnded && DashTimer == 0) {
 				Vector2 newVelocity = Player.velocity;
 				newVelocity.Normalize();
-				newVelocity *= 3f;
+				newVelocity *= 4f;
 				Player.gravity = 0.4f;
 				Player.velocity = newVelocity;
 				recentlyEnded = false;
 			}
 
 			dashKeybindActive = (Player.controlHook) ? true : false;
+
+			if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.MaxMana);
+
+			lastDashDelay = DashDelay;
 		}
 
 
