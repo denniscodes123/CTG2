@@ -2,8 +2,8 @@ using Terraria;
 
 public class TileSnapshot
 {
-    public ushort? TileType; // null if no block
-    public ushort? WallType; // null if no wall
+    public ushort? TileType; 
+    public ushort? WallType; 
     public byte TileColor;   // for painted blocks
     public byte WallColor;   // for painted walls
 

@@ -21,7 +21,7 @@ namespace CTG2
                 Game.matchTimeLeft = reader.ReadInt32();
                 Game.preparationTimeLeft = reader.ReadInt32();
 
-                ModContent.GetInstance<CTG2>().Logger.Info("Your debug message here");
+                ModContent.GetInstance<CTG2>().Logger.Info("Packet received");
 
             }
         }

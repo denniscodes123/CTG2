@@ -26,6 +26,14 @@ namespace CTG2.Content
 
 public override void Action(CommandCaller caller, string input, string[] args)
 {
+    var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+if (!modPlayer.IsAdmin)
+{
+    caller.Reply("You must be an admin to use this command.", Color.Red);
+    return;
+}
+
+    
     GameUI.matchPrep=true;
     GameUI.matchTimer= (int)Main.GameUpdateCount/60+15;
 
@@ -36,13 +44,14 @@ int px = (int)(player.position.X / 16);
 int py = (int)(player.position.Y / 16);
 caller.Reply($"You are at tile ({px}, {py})", Color.Yellow);
 
+/* 
 WorldProperties.savedX = 1493;
 WorldProperties.savedY = 258;
 WorldProperties.savedRegion = WorldProperties.SaveRegion(1493, 258, 2013, 337);
 Main.NewText("Arena region saved.");
 
 
-/* WorldProperties.savedX = Main.maxTilesX / 2 - 606;
+WorldProperties.savedX = Main.maxTilesX / 2 - 606;
 WorldProperties.savedY = 10;
 WorldProperties.savedRegion = WorldProperties.SaveRegion(
     WorldProperties.savedX,

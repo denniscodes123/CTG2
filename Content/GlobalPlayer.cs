@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Terraria.Audio;
 using System.Collections.Generic;
 using Terraria.DataStructures;
-public class GlobalPlayer : ModPlayer
+public class GlobalPlayer : ModPlayer //this file will be used later for dash physics
 {
 
     public bool dashFeather = false;
