@@ -64,7 +64,7 @@ namespace CTG2.Content.Accessories
 
 			Vector2 newVelocity = Player.velocity;
 
-			if (dashKeybindActive && DashDelay == 0) {
+			if (dashKeybindActive && DashDelay == 0 && DashAccessoryEquipped) {
 
 				// Get the player's position
         		Vector2 playerPosition = Main.player[Main.myPlayer].Center;
