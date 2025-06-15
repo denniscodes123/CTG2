@@ -16,24 +16,123 @@ public class ClassSystem : ModPlayer
         switch (playerClass) //permabuffs are put here
         {
             case 1: // Archer
-                Player.AddBuff(BuffID.Shine, 2);
-                Player.AddBuff(BuffID.NightOwl, 2);
-                Player.AddBuff(BuffID.Dangersense, 2);
-                Player.AddBuff(BuffID.Hunter, 2);
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
                 GiveClassItems();
                 break;
 
-            case 2:
-                Player.AddBuff(BuffID.Ironskin, 2);
+            case 2: // Ninja
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
                 GiveClassItems();
                 break;
 
-            case 3:
-                Player.AddBuff(BuffID.MagicPower, 2);
+            case 3: // Beast
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
                 GiveClassItems();
                 break;
-            
+                
+            case 4: // Gladiator
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+                
+            case 5: // Paladin
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
 
+            case 6: // Jungle Man
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 7: // Black Mage
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+                
+            case 8: // Psychic
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 9: // White Mage
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 10: // Miner
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 11: // Fish
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 12: // Clown
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 13: // Flame Bunny
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+                
+            case 14: // Tiki Priest
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 15: // Tree
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+                
+            case 16: // Mutant
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
+
+            case 17: // Leech
+                Player.AddBuff(BuffID.Shine, 54000);
+                Player.AddBuff(BuffID.NightOwl, 54000);
+                Player.AddBuff(BuffID.Builder, 54000);
+                GiveClassItems();
+                break;
         }
     }
 
