@@ -10,127 +10,262 @@ public class ClassSystem : ModPlayer
 {
     public int playerClass = 0;
     private bool hasReceivedItems = false;
+    private bool hasHealed = false;
+    private bool hasClearedInv = false;
+
+
+    // CLASS HP
+    int archerHP = 160;
+    int ninjaHP = 160;
+    int beastHP = 160;
+    int gladiatorHP = 140;
+    int paladinHP = 160;
+    int jungleManHP = 140;
+    int blackMageHP = 160;
+    int psychicHP = 160;
+    int whiteMageHP = 160;
+    int minerHP = 180;
+    int fishHP = 150;
+    int clownHP = 120;
+    int flameBunnyHP = 160;
+    int tikiPriestHP = 160;
+    int treeHP = 160;
+    int mutantHP = 160;
+    int leechHP = 140;
 
     public override void ResetEffects()
     {
+
+        Player.AddBuff(BuffID.Shine, 54000);
+        Player.AddBuff(BuffID.NightOwl, 54000);
+        Player.AddBuff(BuffID.Builder, 54000);
+
+        if (!hasClearedInv)
+        {
+            for (int i = 0; i < Player.inventory.Length; i++) Player.inventory[i] = new Item();
+            hasClearedInv = true;
+        }
+
         switch (playerClass) //permabuffs are put here
         {
             case 1: // Archer
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = archerHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 2: // Ninja
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = ninjaHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+
                 GiveClassItems();
                 break;
 
             case 3: // Beast
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = beastHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+
                 GiveClassItems();
                 break;
-                
+
             case 4: // Gladiator
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = gladiatorHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
-                
+
             case 5: // Paladin
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+            
+                Player.statLifeMax2 = paladinHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 6: // Jungle Man
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = jungleManHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 7: // Black Mage
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = blackMageHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
-                
+
             case 8: // Psychic
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = psychicHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 9: // White Mage
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = whiteMageHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 10: // Miner
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = minerHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 11: // Fish
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = fishHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 12: // Clown
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = clownHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 13: // Flame Bunny
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = flameBunnyHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
-                
+
             case 14: // Tiki Priest
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = tikiPriestHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 15: // Tree
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = treeHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
-                
+
             case 16: // Mutant
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = mutantHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
 
             case 17: // Leech
-                Player.AddBuff(BuffID.Shine, 54000);
-                Player.AddBuff(BuffID.NightOwl, 54000);
-                Player.AddBuff(BuffID.Builder, 54000);
+
+                Player.statLifeMax2 = leechHP;
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 GiveClassItems();
                 break;
         }
@@ -142,35 +277,54 @@ public class ClassSystem : ModPlayer
         {
             switch (playerClass)
             {
+                case 1: //archer
+                    //format is (null, id, amount) or (null, ItemID.name, amount)
 
-                case 1:
-                    //fromat is (null, id, amount) or (null, ItemID.name, amount)
+                    Player.QuickSpawnItem(null, ModContent.ItemType<CTG2.Content.Items.ShardstonePickaxe>(), 1); // pickaxe
+                    Player.QuickSpawnItem(null, 215, 1); // whoopie cushion
+                    Player.QuickSpawnItem(null, ModContent.ItemType<CTG2.Content.Items.Rancor>(), 1); // archer's bow
+                    Player.QuickSpawnItem(null, 2, 50); // dirt
 
-                    //Defaults (Copy and paste these for new classes)
-                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
-                    Player.QuickSpawnItem(null, 2, 999); //dirt
-                    Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
-                    Player.armor[3] = new Item();
-                    Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
-
-
-
-                    Player.QuickSpawnItem(null, 494);
-                    Player.QuickSpawnItem(null, ItemID.TendonBow);
-                    Player.QuickSpawnItem(null, ItemID.DemonBow);
-                    Player.QuickSpawnItem(null, ItemID.HellfireArrow, 999);
+                    Player.QuickSpawnItem(null, ItemID.HellfireArrow, 9999);
 
                     Player.armor[0] = new Item();
-                    Player.armor[0].SetDefaults(ItemID.NecroHelmet);
+                    Player.armor[0].SetDefaults(ItemID.VulkelfEar);
 
                     Player.armor[1] = new Item();
                     Player.armor[1].SetDefaults(ItemID.NecroBreastplate);
 
                     Player.armor[2] = new Item();
-                    Player.armor[2].SetDefaults(ItemID.NecroGreaves);
+                    Player.armor[2].SetDefaults(ItemID.CactusLeggings);
 
                     Player.armor[3] = new Item();
                     Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
+
+                    Player.armor[4] = new Item();
+                    Player.armor[4].SetDefaults(ItemID.AnkletoftheWind);
+
+                    Player.armor[5] = new Item();
+                    Player.armor[5].SetDefaults(ItemID.LuckyCoin);
+
+                    Player.armor[6] = new Item();
+                    Player.armor[6].SetDefaults(ItemID.TsunamiInABottle);
+
+                    Player.armor[7] = new Item();
+                    Player.armor[7].SetDefaults(ItemID.Toolbox);
+
+                    Player.armor[10] = new Item();
+                    Player.armor[10].SetDefaults(ItemID.HerosHat);
+
+                    Player.armor[11] = new Item();
+                    Player.armor[11].SetDefaults(ItemID.HerosShirt);
+
+                    Player.armor[12] = new Item();
+                    Player.armor[12].SetDefaults(ItemID.HerosPants);
+
+                    Player.armor[13] = new Item();
+                    Player.armor[13].SetDefaults(ItemID.JungleRose);
+
+                    Player.armor[14] = new Item();
+                    Player.armor[14].SetDefaults(ItemID.HunterCloak);
 
                     break;
 
