@@ -36,7 +36,7 @@ namespace CTG2.Content.Items
 				}
 			}
 
-			return hooksOut < 3;
+			return hooksOut < 4;
 		}
 
 		// Old Web Slinger is 256, Amethyst Hook is 300
@@ -45,7 +45,7 @@ namespace CTG2.Content.Items
 		}
 
 		public override void NumGrappleHooks(Player player, ref int numHooks) {
-			numHooks = 3; // The amount of hooks that can latch onto blocks at once
+			numHooks = 4; // The amount of hooks that can latch onto blocks at once
 		}
 
 		// Draws the grappling hook's chain.
