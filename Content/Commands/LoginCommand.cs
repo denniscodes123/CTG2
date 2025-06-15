@@ -6,7 +6,7 @@ namespace CTG2.Content.Commands
 {
     public class LoginCommand : ModCommand
     {
-        private const string Password = "mysecret"; 
+        private const string Password = "neededuonthedefense"; 
 
         public override CommandType Type => CommandType.Chat;
         public override string Command => "login";

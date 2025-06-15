@@ -33,6 +33,8 @@ if (!modPlayer.IsAdmin)
     return;
 }
 
+SpawnPoints.TeleportPlayersToClassSelection();
+
     
     GameUI.matchPrep=true;
     GameUI.matchTimer= (int)Main.GameUpdateCount/60+15;

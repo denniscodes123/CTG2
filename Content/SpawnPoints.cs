@@ -111,6 +111,21 @@ namespace CTG2.Content
             }
         }
 
+        public static void TeleportPlayersToClassSelection()
+        {
+            var (red, blue) = MapSpawns[currentMap];
+
+            foreach (Player player in Main.player)
+            {
+                if (!player.active) continue;
+
+                if (player.team == 1)
+                    player.Teleport(new Vector2(1913 * 16, 381 * 16), 1);
+                else if (player.team == 3)
+                    player.Teleport(new Vector2(2184 * 16, 376 * 16), 1);
+            }
+        
+        }
         public override void OnRespawn()
         {
             var (red, blue) = MapSpawns[currentMap];

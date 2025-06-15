@@ -3,30 +3,37 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using CTG2.Content.Items;
 using CTG2.Content.Items.ModifiedWeps;
+using Microsoft.Xna.Framework; 
+
 
 public class ClassSystem : ModPlayer
 {
-    public int playerClass = 0; 
-    private bool hasReceivedItems = false; 
+    public int playerClass = 0;
+    private bool hasReceivedItems = false;
 
     public override void ResetEffects()
     {
-        switch (playerClass)
+        switch (playerClass) //permabuffs are put here
         {
             case 1: // Archer
-                Player.AddBuff(BuffID.Archery, 2);
+                Player.AddBuff(BuffID.Shine, 2);
+                Player.AddBuff(BuffID.NightOwl, 2);
+                Player.AddBuff(BuffID.Dangersense, 2);
+                Player.AddBuff(BuffID.Hunter, 2);
                 GiveClassItems();
                 break;
 
-            case 2: // Randomclass
+            case 2:
                 Player.AddBuff(BuffID.Ironskin, 2);
                 GiveClassItems();
                 break;
 
-            case 3: // Randomclass
+            case 3:
                 Player.AddBuff(BuffID.MagicPower, 2);
                 GiveClassItems();
                 break;
+            
+
         }
     }
 
@@ -36,17 +43,17 @@ public class ClassSystem : ModPlayer
         {
             switch (playerClass)
             {
-         
+
                 case 1:
                     //fromat is (null, id, amount) or (null, ItemID.name, amount)
-                   
+
                     //Defaults (Copy and paste these for new classes)
-                    Player.QuickSpawnItem(null, 1202); //titanium pickaxe
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
                     Player.armor[3] = new Item();
                     Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
-                    
+
 
 
                     Player.QuickSpawnItem(null, 494);
@@ -69,8 +76,20 @@ public class ClassSystem : ModPlayer
                     break;
 
 
-                case 2: 
-                    Player.QuickSpawnItem(null, 1202); //titanium pickaxe
+                case 2:
+                    SpawnCustomItem(
+                    itemID: 64,
+                    prefix: 39,            
+                    damage: 56,
+                    useTime: 10,
+                    useAnimation: 10,
+                    scale: 0f,
+                    knockBack: 3.75f,
+                    shoot: 93,
+                    shootSpeed: 10f,
+                    colorOverride: new Color(0, 0, 255) 
+                    );
+
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
                     Player.armor[3] = new Item();
@@ -82,8 +101,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 176, 999);
                     break;
 
-                case 3: 
-
+                case 3:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -96,7 +115,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 1836, 9999);
                     break;
 
-                case 4: 
+                case 4:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -106,7 +126,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 741);
                     break;
 
-                case 5: 
+                case 5:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -117,7 +138,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 165);
                     Player.QuickSpawnItem(null, 4760);
                     break;
-                case 6: 
+                case 6:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -125,7 +147,8 @@ public class ClassSystem : ModPlayer
                     Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
 
                     break;
-                case 7: 
+                case 7:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -136,7 +159,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 3103);
 
                     break;
-                case 8: 
+                case 8:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -146,7 +170,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 3476);
 
                     break;
-                case 9: 
+                case 9:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -157,7 +182,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 1266);
 
                     break;
-                case 10: 
+                case 10:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -168,7 +194,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 1313);
 
                     break;
-                case 11: 
+                case 11:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -178,7 +205,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 165);
 
                     break;
-                case 12: 
+                case 12:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -188,7 +216,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 5147);
 
                     break;
-                case 13: 
+                case 13:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -198,7 +227,8 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 119);
 
                     break;
-                case 14: 
+                case 14:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -209,7 +239,8 @@ public class ClassSystem : ModPlayer
 
                     break;
 
-                case 15: 
+                case 15:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -220,7 +251,8 @@ public class ClassSystem : ModPlayer
 
                     break;
 
-                case 16: 
+                case 16:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -231,7 +263,8 @@ public class ClassSystem : ModPlayer
 
                     break;
 
-                case 17: 
+                case 17:
+                    SpawnCustomItem(ItemID.TitaniumPickaxe, 39, 8, 7, 14, 0.75f);
                     Player.QuickSpawnItem(null, 1202); //titanium pickaxe
                     Player.QuickSpawnItem(null, 2, 999); //dirt
                     Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
@@ -243,17 +276,59 @@ public class ClassSystem : ModPlayer
 
                     break;
 
-                /*case 18: 
-                    Player.QuickSpawnItem(null, 1202); //titanium pickaxe
-                    Player.QuickSpawnItem(null, 2, 999); //dirt
-                    Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
-                    Player.armor[3] = new Item();
-                    Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
-//disabled right now
-                    Player.QuickSpawnItem(null, 113); */
+                    /*case 18: 
+                        Player.QuickSpawnItem(null, 1202); //titanium pickaxe
+                        Player.QuickSpawnItem(null, 2, 999); //dirt
+                        Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
+                        Player.armor[3] = new Item();
+                        Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
+    //disabled right now
+                        Player.QuickSpawnItem(null, 113); */
             }
 
             hasReceivedItems = true;
         }
     }
+
+   
+private void SpawnCustomItem(
+    int itemID,
+    int? prefix = null,
+    int? damage = null,
+    int? useTime = null,
+    int? useAnimation = null,
+    float? scale = null,
+    float? knockBack = null,
+    int? shoot = null,
+    float? shootSpeed = null,
+    Color? colorOverride = null
+)
+{
+    Item item = new Item();
+    item.SetDefaults(itemID);
+
+    if (prefix.HasValue)
+        item.Prefix(prefix.Value);
+    if (damage.HasValue)
+        item.damage = damage.Value;
+    if (useTime.HasValue)
+        item.useTime = useTime.Value;
+    if (useAnimation.HasValue)
+        item.useAnimation = useAnimation.Value;
+    if (scale.HasValue)
+        item.scale = scale.Value;
+    if (knockBack.HasValue)
+        item.knockBack = knockBack.Value;
+    if (shoot.HasValue)
+        item.shoot = shoot.Value;
+    if (shootSpeed.HasValue)
+        item.shootSpeed = shootSpeed.Value;
+    if (colorOverride.HasValue)
+        item.color = colorOverride.Value;
+
+    Player.QuickSpawnItem(null, item, 1);
+}
+
+
+
 }
