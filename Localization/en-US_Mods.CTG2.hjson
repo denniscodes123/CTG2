@@ -10,6 +10,41 @@ Items: {
 			It's snowing on Mt.Fuji
 			'''
 	}
+
+	Zen: {
+		Tooltip: ""
+		DisplayName: Zen
+	}
+
+	ShardstonePickaxe: {
+		Tooltip: ""
+		DisplayName: Shardstone Pickaxe
+	}
+
+	Rancor: {
+		Tooltip: ""
+		DisplayName: Rancor
+	}
+
+	MapSaveWand: {
+		Tooltip: ""
+		DisplayName: Map Save Wand
+	}
+
+	FoliageTendrils: {
+		Tooltip: ""
+		DisplayName: Foliage Tendrils
+	}
+
+	ArcherDash: {
+		Tooltip: ""
+		DisplayName: Archer Dash
+	}
 }
 
 NPCs.TimedNPC.DisplayName: Timed N P C
+
+Projectiles: {
+	FoliageTendrilsProjectile.DisplayName: Foliage Tendrils Projectile
+	ZenProjectile.DisplayName: Zen Projectile
+}

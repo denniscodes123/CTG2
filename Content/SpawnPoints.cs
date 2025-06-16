@@ -99,6 +99,11 @@ namespace CTG2.Content
                 player.Teleport(new Vector2(blue.X * 16, blue.Y * 16), 1);
         }
 
+        public static void TeleportToGameSpawn(Player player)
+        {
+            player.Teleport(GameUI.arenaCoords, 1);
+        }
+
         public static void TeleportAllPlayersToSpawn()
         {
             foreach (Player player in Main.player)

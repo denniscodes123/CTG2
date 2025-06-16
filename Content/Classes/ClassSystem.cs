@@ -332,7 +332,7 @@ public class ClassSystem : ModPlayer
                 case 2:
                     SpawnCustomItem(
                     itemID: 64,
-                    prefix: 39,            
+                    prefix: 39,
                     damage: 56,
                     useTime: 10,
                     useAnimation: 10,
@@ -340,7 +340,7 @@ public class ClassSystem : ModPlayer
                     knockBack: 3.75f,
                     shoot: 93,
                     shootSpeed: 10f,
-                    colorOverride: new Color(0, 0, 255) 
+                    colorOverride: new Color(0, 0, 255)
                     );
 
                     Player.QuickSpawnItem(null, 2, 999); //dirt
