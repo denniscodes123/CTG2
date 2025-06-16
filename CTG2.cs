@@ -2,33 +2,43 @@ using Terraria.ModLoader;
 using System.IO;
 using Terraria;
 using CTG2.Content;
-
+using CTG2.Content.ServerSide;
 	
-
 
 namespace CTG2
 {
     public class CTG2 : Mod
     {
-      /*  public override void HandlePacket(BinaryReader reader, int whoAmI)
+        public static GameManager GameManager { get; private set; }
+        public override void Load()
         {
-            byte packetType = reader.ReadByte();
-
-            if (packetType == 1) 
+            if (Main.dedServ)
             {
-                Game.matchStarted = reader.ReadBoolean();
-                Game.preparationPhase = reader.ReadBoolean();
-                Game.matchTimeLeft = reader.ReadInt32();
-                Game.preparationTimeLeft = reader.ReadInt32();
-
-                ModContent.GetInstance<CTG2>().Logger.Info("Packet received");
-
+                GameManager = new GameManager();
             }
         }
-		public override void Load()
-{
-    Logger.Info("[DEBUG] CTG2 Mod Loaded Successfully.");
-}
- */
+        
+        // Custom Packet IDs: 0 == Start Game, 1 == Stop Game
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            byte msgType = reader.ReadByte();
+            switch (msgType) {
+                case 0:
+                    GameManager.StartGame();
+                    break;
+                case 1:
+                    GameManager.EndGame();
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                default:
+                    Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
+                    break;
+            }
+        }
     }
 }
