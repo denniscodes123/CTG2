@@ -22,7 +22,7 @@ namespace CTG2.Content
     public class MatchStartCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
-        public override string Command => "matchstart";
+        public override string Command => "startmatch";
         public override string Description => "starts a match (equivalent to hosting a game in PG)";
 
         public override void Action(CommandCaller caller, string input, string[] args)

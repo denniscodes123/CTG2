@@ -22,7 +22,7 @@ namespace CTG2.Content
     public class MatchEndCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
-        public override string Command => "matchend";
+        public override string Command => "endmatch";
         public override string Description => "ends a match";
 
         public override void Action(CommandCaller caller, string input, string[] args)

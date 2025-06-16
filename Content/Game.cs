@@ -21,7 +21,7 @@ namespace CTG2.Content
     public class GameCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
-        public override string Command => "gamestart";
+        public override string Command => "game_start";
         public override string Description => "Creates a game (equivalent to hosting a game in PG)";
 
         public override void Action(CommandCaller caller, string input, string[] args)

@@ -86,15 +86,19 @@ namespace CTG2.Content
 
         public void StartMatch()
         {
-            this.match = new Match(this);
-
-
+            match = new Match(this);
             var allPlayersInMatch = match.players;
+
+            // Iterate through all players now in the match to update their state.
             foreach (Player p in allPlayersInMatch)
             {
-                p.Teleport(arenaCoords, 1);
-                p.GetModPlayer<MyPlayer>().EnterClassSelectionState();
+                // Get the player's custom instance.
+                var myPlayer = p.GetModPlayer<MyPlayer>();
 
+                myPlayer.EnterClassSelectionState();
+
+          
+                p.Teleport(arenaCoords, 1);
             }
         }
 
@@ -113,8 +117,9 @@ namespace CTG2.Content
         public void endGame()
         {
             this.EndMatch();
-            var allPlayersInMatch = match?.players ?? Enumerable.Empty<Player>();
-            foreach (Player p in allPlayersInMatch)
+            GameHandler.removeGameFromList(this);
+            var allPlayersinGame = this.players ?? Enumerable.Empty<Player>();
+            foreach (Player p in allPlayersinGame)
             {
                 p.team = 0;
                 p.GetModPlayer<MyPlayer>().EnterLobbyState();

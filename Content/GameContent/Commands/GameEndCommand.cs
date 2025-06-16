@@ -29,11 +29,7 @@ namespace CTG2.Content
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            if (args.Length == 0)
-            {
-                caller.Reply("Usage: " + Usage, Color.Red);
-                return;
-            }
+
           
 
             Game gameToEnd = caller.Player.GetModPlayer<AdminPlayer>().game;
@@ -51,7 +47,9 @@ namespace CTG2.Content
             }
 
             // Remove the game from the handler
+            caller.Player.GetModPlayer<AdminPlayer>().game = null;
             GameHandler.ActiveGames.Remove(gameToEnd);
+            gameToEnd.endGame();
             caller.Reply($"Successfully removed game:", Color.Orange);
         }
     }

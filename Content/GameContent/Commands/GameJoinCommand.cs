@@ -28,11 +28,7 @@ namespace CTG2.Content
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            if (args.Length == 0)
-            {
-                caller.Reply("Usage: " + Usage, Color.Red);
-                return;
-            }
+
             string hostName = args[0];
 
             Game targetGame = caller.Player.GetModPlayer<AdminPlayer>().game;

@@ -30,7 +30,7 @@ namespace CTG2.Content
 
             
             var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
-            if (!modPlayer.IsAdmin)
+            if (modPlayer.IsAdmin)
             {
                 caller.Reply("You must end the game to leave it", Color.Red);
                 return;
@@ -46,13 +46,13 @@ namespace CTG2.Content
             }
 
             Game gameToLeave = myPlayer.currentGame;
-
+            myPlayer.EnterLobbyState();
             // Remove player from the game's lists
             gameToLeave.players.Remove(caller.Player);
             gameToLeave.match?.removePlayer(caller.Player); // Safely remove from match if it exists
 
             // Transition the player back to the lobby state.
-            myPlayer.EnterLobbyState();
+            
 
             caller.Reply($"You have left the game.", Color.Orange);
         }

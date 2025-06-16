@@ -37,7 +37,7 @@ namespace CTG2.Content
 
             if (modPlayer.game != null)
             {
-                caller.Reply("Game in progress end it to start a new one", Color.Red);
+                caller.Reply("you are in a game end it to start a new one", Color.Red);
                 return;
             }
 

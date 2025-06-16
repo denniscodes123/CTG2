@@ -74,6 +74,7 @@ namespace CTG2.Content
                 return;
                 
             currentState = PlayerState.Active;
+            Main.NewText($"{Player.name} in active mode");
             classSelectionTimer = 0;
 
             Player.ghost = false;
