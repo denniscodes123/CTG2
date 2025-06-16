@@ -54,8 +54,6 @@ public class ClassSystem : ModPlayer
 
             Player.armor[d] = newItem;
         }
-
-        Player.inventory[27] = new Item(1567);
     }
 
 
@@ -115,105 +113,105 @@ public class ClassSystem : ModPlayer
                 case 3: // Beast
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("beast.json");
 
                     break;
 
                 case 4: // Gladiator
                     currentHP = 140;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("gladiator.json");
 
                     break;
 
                 case 5: // Paladin
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("paladin.json");
 
                     break;
 
                 case 6: // Jungle Man
                     currentHP = 140;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("jungleman.json");
 
                     break;
 
                 case 7: // Black Mage
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("blackmage.json");
 
                     break;
 
                 case 8: // Psychic
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("psychic.json");
 
                     break;
 
                 case 9: // White Mage
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("whitemage.json");
 
                     break;
 
                 case 10: // Miner
                     currentHP = 180;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("miner.json");
 
                     break;
 
                 case 11: // Fish
                     currentHP = 150;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("fish.json");
 
                     break;
 
                 case 12: // Clown
                     currentHP = 120;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("clown.json");
 
                     break;
 
                 case 13: // Flame Bunny
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("flamebunny.json");
 
                     break;
 
                 case 14: // Tiki Priest
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("tikipriest.json");
 
                     break;
 
                 case 15: // Tree
                     currentHP = 160;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("tree.json");
 
                     break;
 
                 case 16: // Mutant
                     currentHP = 100;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("rushmutant.json");
 
                     break;
 
                 case 17: // Leech
                     currentHP = 140;
 
-                    path = GetPathRelativeToSource("archer.json");
+                    path = GetPathRelativeToSource("leech.json");
 
                     break;
 
