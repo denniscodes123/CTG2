@@ -18,33 +18,7 @@ using System.Linq;
 
 namespace CTG2.Content
 {
-    public class GameCommand : ModCommand
-    {
-        public override CommandType Type => CommandType.Chat;
-        public override string Command => "game_start";
-        public override string Description => "Creates a game (equivalent to hosting a game in PG)";
 
-        public override void Action(CommandCaller caller, string input, string[] args)
-        {
-
-            var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
-            if (!modPlayer.IsAdmin)
-            {
-                caller.Reply("You must be an admin to use this command.", Color.Red);
-                return;
-            }
-            if (GameUI.gameStarted)
-            {
-                caller.Reply("A game is already in progress!", Color.Red);
-                return;
-            }
-            GameUI.host = modPlayer;
-            GameUI.players.Add(caller.Player);
-            SpawnPoints.TeleportToGameSpawn(caller.Player);
-
-
-        }
-    }
 
 
     public class StartCommand : ModCommand
@@ -154,44 +128,7 @@ namespace CTG2.Content
 
         }
     }
-    public class AddPlayer : ModCommand
-    {
-        public override CommandType Type => CommandType.Chat;
-        public override string Command => "j";
-        public override string Usage => "/j <host_name>";
-        public override string Description => "Restore the map state after the game ends";
-
-        public override void Action(CommandCaller caller, string input, string[] args)
-        {
-            if (args.Length < 2)
-            {
-                caller.Reply("Usage: /j <host_name>", Color.Red);
-                return;
-            }
-
-            string targetName = args[0].ToLower();
-
-
-            Player target = Main.player.FirstOrDefault(p => p.active && p.name.ToLower() == targetName);
-
-            if (target == null)
-            {
-                caller.Reply($"Player '{targetName}' not found.", Color.Red);
-                return;
-            }
-
-            if (target.GetModPlayer<AdminPlayer>() == GameUI.host)
-            {
-                // add the player to the game 
-                GameUI.players.Add(caller.Player);
-                SpawnPoints.TeleportToGameSpawn(caller.Player);
-            }
-            else
-            {
-                return;
-            }
-        }
-    }
+    
 
     public class GameUI : ModSystem
     {
