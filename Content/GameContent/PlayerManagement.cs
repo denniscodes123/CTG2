@@ -53,7 +53,7 @@ namespace CTG2.Content
 
         public void EnterClassSelectionState()
         {
-            if (currentState != PlayerState.Spectator && currentState != PlayerState.Active)
+            if (currentState == PlayerState.Spectator || currentState == PlayerState.Active)
                 return;
                 
             currentState = PlayerState.ClassSelection;

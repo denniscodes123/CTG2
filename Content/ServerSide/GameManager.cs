@@ -18,15 +18,14 @@ public class GameManager : ModSystem
         
     public Gem BlueGem { get; private set; }
     public Gem RedGem { get; private set; }
-    
-    public GameManager()
+
+    public override void OnWorldLoad()
     {
+        Players = Main.player;                     
+        BlueGem  = new Gem(new Vector2(0,0));     
+        RedGem   = new Gem(new Vector2(0,0));
         IsGameActive = false;
-        HasRoundStarted = false;
-        MatchTime = 0;
-        Players = [];
-        BlueGem = new Gem(new Vector2(0, 0));
-        RedGem = new Gem(new Vector2(0, 0));
+        MatchTime    = 0;
     }
     
     public void StartGame()
@@ -67,10 +66,16 @@ public class GameManager : ModSystem
         
         // Increase match duration by 1 tick
         MatchTime++;
+        Console.WriteLine("Match Time: " + MatchTime);
         // Updates holding/capturing status of both gems.
         BlueGem.Update(RedGem, Players);
         RedGem.Update(BlueGem, Players);
         
+        // if Match time exceeds a certain point, end the match
+        if (MatchTime >= 60 * 60 * 15)
+        {
+            EndGame();
+        }
         // TODO: 
     }
     

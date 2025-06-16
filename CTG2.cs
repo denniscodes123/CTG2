@@ -19,43 +19,39 @@ namespace CTG2
     
     public class CTG2 : Mod
     {
-        public static GameManager GameManager { get; private set; }
-        
-        public override void Load()
-        {
-            if (Main.dedServ)
-            {
-                GameManager = new GameManager();
-            }
-
-        }
         
         // Custom Packet IDs: 0 == Start Game, 1 == Stop Game
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {   
-            var ThisPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>();
+            // MyPlayer
+            var thisPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>();
+            // GameManager
+            var manager = ModContent.GetInstance<GameManager>();
+            
             byte msgType = reader.ReadByte();
             switch (msgType) {
                 // Client -> Server Packets
                 case (byte)MessageType.RequestStartGame:
-                    GameManager.StartGame();
+                    manager.StartGame();
                     Console.WriteLine("Server Received Game Start Request!");
                     break;
                 
                 case (byte)MessageType.RequestEndGame:
-                    GameManager.EndGame();
+                    manager.EndGame();
+                    Console.WriteLine("Server Received Game Start Request!");
                     break;
                 
                 // Server->Client Packets
                 case (byte)MessageType.ServerGameStart:
-                    ThisPlayer.EnterClassSelectionState();
+                    thisPlayer.EnterClassSelectionState();
                     Console.WriteLine("Client Received Game Start!");
                     break;
                 case (byte)MessageType.ServerGameEnd:
-                    ThisPlayer.EnterLobbyState();
+                    thisPlayer.EnterLobbyState();
+                    Console.WriteLine("Client Received Game End!");
                     break;
                 case (byte)MessageType.ServerGamePause:
-                    ThisPlayer.TogglePause();
+                    thisPlayer.TogglePause();
                     break;
                 
                 // Gems Status Updates
