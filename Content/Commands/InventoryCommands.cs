@@ -73,7 +73,7 @@ namespace CTG2.Content.Commands
             string[] inputSplit = input.Split(' ');
 
             string json = JsonSerializer.Serialize(inventoryData, new JsonSerializerOptions { WriteIndented = true });
-            string path = Path.Combine(Main.SavePath, "ModLoader", "InventorySaves");
+            string path = Path.Combine(Main.SavePath, "ModSources", "CTG2", "Content", "Classes");
             Directory.CreateDirectory(path);
 
             string filePath = Path.Combine(path, $"{inputSplit[1]}.json");
@@ -96,7 +96,7 @@ namespace CTG2.Content.Commands
             string modifiedInput = inputSplit[1];
 
             Player player = caller.Player;
-            string path = Path.Combine(Main.SavePath, "ModLoader", "InventorySaves");
+            string path = Path.Combine(Main.SavePath, "ModSources", "CTG2", "Content", "Classes");
             string filePath = Path.Combine(path, $"{modifiedInput}.json");
 
             if (!File.Exists(filePath))
