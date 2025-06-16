@@ -27,7 +27,7 @@ public class Gem
     }
     
     // Runs all Gem Logic - Check if Gem can be picked up/captured by any players
-    public void Update(Gem otherGem, Player[] players)
+    public void Update(Gem otherGem, Player[] otherTeam)
     {
         if (IsHeld)
         {
@@ -35,11 +35,11 @@ public class Gem
         }
         else
         {
-            TryGetGem(players);
+            TryGetGem(otherTeam);
         }
     }
     
-    private void TryGetGem(Player[] players)
+    private void TryGetGem(Player[] otherTeam)
     {
         // TODO: iterate over players, check if player hitbox overlaps this gem's area. set IsHeld=True
     }

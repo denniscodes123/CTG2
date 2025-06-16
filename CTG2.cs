@@ -14,12 +14,13 @@ namespace CTG2
         RequestEndGame   = 1,  // client → server
         ServerGameStart  = 2,  // server → client
         ServerGameEnd    = 3,  // server → client
-        ServerGamePause  = 4,  // server → client
+        RequestPause  = 4,  // client -> server
+        ServerGameUpdate  = 5,  // server → client
+        RequestClass   = 6,  // client → server
     }
     
     public class CTG2 : Mod
     {
-        
         // Custom Packet IDs: 0 == Start Game, 1 == Stop Game
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {   
@@ -41,6 +42,10 @@ namespace CTG2
                     Console.WriteLine("Server Received Game Start Request!");
                     break;
                 
+                case(byte)MessageType.RequestClass:
+                    // TODO: Give inventory to player
+                    break;
+                
                 // Server->Client Packets
                 case (byte)MessageType.ServerGameStart:
                     thisPlayer.EnterClassSelectionState();
@@ -50,14 +55,13 @@ namespace CTG2
                     thisPlayer.EnterLobbyState();
                     Console.WriteLine("Client Received Game End!");
                     break;
-                case (byte)MessageType.ServerGamePause:
-                    thisPlayer.TogglePause();
+                case (byte)MessageType.RequestPause:
+                    manager.PauseGame();
                     break;
                 
                 // Gems Status Updates
-                case 5:
-                    break;
-                case 6:
+                case (byte)MessageType.ServerGameUpdate:
+                    // TODO: Give new game info to client: gems held, gem position...
                     break;
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);

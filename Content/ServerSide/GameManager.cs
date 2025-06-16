@@ -15,6 +15,9 @@ public class GameManager : ModSystem
     public int MatchTime { get; private set; }
     
     public Player[] Players { get; private set; }
+    
+    public GameTeam BlueTeam { get; private set; }
+    public GameTeam RedTeam { get; private set; }
         
     public Gem BlueGem { get; private set; }
     public Gem RedGem { get; private set; }
@@ -22,8 +25,12 @@ public class GameManager : ModSystem
     public override void OnWorldLoad()
     {
         Players = Main.player;                     
-        BlueGem  = new Gem(new Vector2(0,0));     
-        RedGem   = new Gem(new Vector2(0,0));
+        BlueGem  = new Gem(new Vector2(100, 100));     
+        RedGem   = new Gem(new Vector2(100, 100));
+
+        BlueTeam = new GameTeam(new Vector2(100, 100), new Vector2(100, 100), 3);
+        RedTeam = new GameTeam(new Vector2(200, 100), new Vector2(200, 100), 1);
+        
         IsGameActive = false;
         MatchTime    = 0;
     }
@@ -31,27 +38,28 @@ public class GameManager : ModSystem
     public void StartGame()
     {
         IsGameActive = true;
-        var mod = ModContent.GetInstance<CTG2>();
-        ModPacket packet = mod.GetPacket();
-        packet.Write((byte)MessageType.ServerGameStart);
-        packet.Send();
-        // TODO: Map logic (map select?, load map from file, 
+        
+        BlueTeam.UpdateTeam();
+        RedTeam.UpdateTeam();
+        
+        BlueTeam.StartMatch();
+        RedTeam.StartMatch();
+        // TODO: Map logic (map select?, load map from file, teleport to class select)...
+        
     }
     
     // Pauses/Unpauses game
     public void PauseGame()
     {
-        IsGameActive = !IsGameActive;
-        var mod = ModContent.GetInstance<CTG2>();
-        ModPacket packet = mod.GetPacket();
-        packet.Write((byte)MessageType.ServerGamePause);
-        packet.Send();
-        // TODO: Send a ModPacket to toggle 'Pause Mode' client-side. Add new packet type to HandlePacket()
+        MatchTime += 900;
+        BlueTeam.PauseTeam();
+        RedTeam.PauseTeam();
     }
     
     public void EndGame()
     {
         IsGameActive = false;
+        MatchTime = 0;
         var mod = ModContent.GetInstance<CTG2>();
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerGameEnd);
@@ -63,10 +71,14 @@ public class GameManager : ModSystem
     public void UpdateGame()
     {
         // TODO: Check if each player has completed class selection (no == class select, yes == send to match)
-        
+
+        if (MatchTime == 900)
+        {
+            BlueTeam.SendToBase();
+            RedTeam.SendToBase();
+        }
         // Increase match duration by 1 tick
         MatchTime++;
-        Console.WriteLine("Match Time: " + MatchTime);
         // Updates holding/capturing status of both gems.
         BlueGem.Update(RedGem, Players);
         RedGem.Update(BlueGem, Players);

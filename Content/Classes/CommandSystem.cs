@@ -1,3 +1,4 @@
+using CTG2;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Chat;
@@ -14,10 +15,12 @@ public class ClassCommand : ModCommand
     public override string Description => "Select a player class";
 
     public override void Action(CommandCaller caller, string input, string[] args)
-    {
-        if (GameUI.matchTimer - (int)(Main.GameUpdateCount / 60) < 0) //!CTG2.Content.Game.preparationPhase
+    {   
+        var thisPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>();
+        
+        if (thisPlayer.currentState != PlayerState.ClassSelection) //!CTG2.Content.Game.preparationPhase
         {
-            caller.Reply("You can only select a class after the match has started! Use /start first.", Color.Red);
+            caller.Reply("You can only select a class during class selection!", Color.Red);
             return;
         }
 
@@ -29,7 +32,11 @@ public class ClassCommand : ModCommand
 
         Player player = caller.Player;
         var modPlayer = player.GetModPlayer<ClassSystem>();
-
+        
+        ModPacket myPacket = Mod.GetPacket();
+        myPacket.Write((byte)MessageType.RequestClass); // id
+        myPacket.Send();
+        
         switch (classType)
         {
             case 1:

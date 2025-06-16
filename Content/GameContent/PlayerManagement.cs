@@ -20,8 +20,7 @@ namespace CTG2.Content
         public Game currentGame = null;
 
         private int classSelectionTimer = 0;
-
-        public bool Paused = false;
+        
         
         // --- State Transition Methods ---
         public void EnterLobbyState()
@@ -83,16 +82,6 @@ namespace CTG2.Content
 
         }
 
-        public void TogglePause()
-        {
-            Paused = !Paused;
-            if (Paused)
-            {
-                // TODO: Write pause logic (freeze all movement, apply cursed?)
-            }
-        }
-
-
         // --- tModLoader Hooks ---
 
         public override void OnEnterWorld()
@@ -122,6 +111,9 @@ namespace CTG2.Content
                     else
                     {
                         Main.NewText($"{Player.name}'s time is up! Assigning a random class.");
+                        ModPacket myPacket = Mod.GetPacket();
+                        myPacket.Write((byte)MessageType.RequestClass); // id
+                        myPacket.Send();
                         // class selelction random
                         EnterActiveState();
                     }
@@ -129,6 +121,7 @@ namespace CTG2.Content
 
                 case PlayerState.Active:
                     // zone checking and active player logic goes here
+                    // TODO: Write game display here (timer, gem status)
                     break;
             }
         }
