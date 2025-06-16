@@ -2,6 +2,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Runtime.CompilerServices;
+using ClassesNamespace;
 
 
 namespace CTG2.Content
@@ -16,6 +23,14 @@ namespace CTG2.Content
 
         private int class8HP = 0;
 
+        private ClassSystem classSystem;
+        private string path = "";
+        private string inventoryData = "";
+        private List<ItemData> class16RushData;
+        private List<ItemData> class16RegenData;
+        private bool initializedMutant;
+        private int mutantState;
+
 
         private void SetCooldown(int seconds)
         {
@@ -23,13 +38,13 @@ namespace CTG2.Content
         }
 
 
-        private void ArcherOnUse() //not finished
+        private void ArcherOnUse()
         {
             Player.AddBuff(137, 5 * 60);
         }
 
 
-        private void ArcherPostStatus()
+        private void ArcherPostStatus() // not finished
         {
 
         }
@@ -258,10 +273,53 @@ namespace CTG2.Content
 
         }
 
-
-        private void MutantOnUse() //not finished
+        
+        private void MutantInitialize()
         {
+            path = classSystem.GetPathRelativeToSource("rushmutant.json");
+            inventoryData = File.ReadAllText(path);
+            try
+            {
+                class16RushData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
+            }
+            catch
+            {
+                Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                return;
+            }
 
+            path = classSystem.GetPathRelativeToSource("regenmutant.json");
+            inventoryData = File.ReadAllText(path);
+            try
+            {
+                class16RegenData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
+            }
+            catch
+            {
+                Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                return;
+            }
+        }
+
+
+        private void MutantOnUse()
+        {
+            Player.AddBuff(149, 90);
+
+            switch (mutantState)
+            {
+                case 1:
+                    classSystem.SetInventory(class16RegenData);
+                    mutantState = 2;
+
+                    break;
+
+                case 2:
+                    classSystem.SetInventory(class16RushData);
+                    mutantState = 1;
+
+                    break;
+            }
         }
 
 
@@ -273,6 +331,12 @@ namespace CTG2.Content
 
         public override void PostItemCheck() // Upon activation
         {
+            if (!initializedMutant)
+            {
+                MutantInitialize();
+                initializedMutant = true;
+            }
+
             if (Player.HeldItem.type == ItemID.WhoopieCushion &&
                 Player.controlUseItem &&
                 Player.itemTime == 0 &&
@@ -301,13 +365,13 @@ namespace CTG2.Content
 
                         break;
 
-                    case 4: //finished
+                    case 4:
                         SetCooldown(35);
                         GladiatorOnUse();
 
                         break;
 
-                    case 5: //not finished
+                    case 5:
                         SetCooldown(10);
                         PaladinOnUse();
 
@@ -325,13 +389,13 @@ namespace CTG2.Content
 
                         break;
 
-                    case 8: //not finished
+                    case 8:
                         SetCooldown(40);
                         PsychicOnUse();
 
                         break;
 
-                    case 9: //not finished
+                    case 9:
                         SetCooldown(30);
                         WhiteMageOnUse();
 
@@ -384,7 +448,6 @@ namespace CTG2.Content
                         LeechOnUse();
 
                         break;
-
                 }
             }
         }
