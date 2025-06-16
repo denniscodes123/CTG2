@@ -14,6 +14,8 @@ namespace CTG2.Content
         private int class6FlameTimer = 0;
         private int class6FlameDuration = 0;
 
+        private int class8HP = 0;
+
 
         private void SetCooldown(int seconds)
         {
@@ -22,6 +24,12 @@ namespace CTG2.Content
 
 
         private void ArcherOnUse() //not finished
+        {
+            Player.AddBuff(137, 5 * 60);
+        }
+
+
+        private void ArcherPostStatus()
         {
 
         }
@@ -78,9 +86,31 @@ namespace CTG2.Content
         }
 
 
-        private void PaladinOnUse() //not finished
+        private void PaladinOnUse()
         {
+            foreach (Player other in Main.player)
+            {
+                if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
+                    continue;
 
+                if (Vector2.Distance(Player.Center, other.Center) <= 20 * 16) // 20 block radius
+                {
+                    other.AddBuff(58, 200);
+                    other.AddBuff(119, 200);
+                    other.AddBuff(2, 200);
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 58, 200);
+                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 119, 200);
+                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 200);
+                    }
+                }
+            }
+
+            Player.AddBuff(58, 100);
+            Player.AddBuff(119, 100);
+            Player.AddBuff(2, 100);
         }
 
 
@@ -145,15 +175,49 @@ namespace CTG2.Content
         }
 
 
-        private void PsychicOnUse() //not finished
+        private void PsychicOnUse()
         {
-
+            Player.AddBuff(196, 54000);
+            Player.AddBuff(178, 54000);
+            Player.AddBuff(181, 54000);
+            
+            class8HP = Player.statLife;
         }
 
 
-        private void WhiteMageOnUse() //not finished
+        private void PsychicPostStatus()
         {
+            if (class8HP != 0)
+            {
+                if (Player.HeldItem.type == ItemID.NebulaArcanum && Player.controlUseItem && Player.itemTime == 0) class8HP = (class8HP <= 20) ? 0 : class8HP - 20;
 
+                if (Player.statLife < class8HP) class8HP = Player.statLife;
+                Player.statLife = class8HP;
+            }
+        }
+
+
+        private void WhiteMageOnUse()
+        {
+            foreach (Player other in Main.player)
+            {
+                if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
+                    continue;
+
+                if (Vector2.Distance(Player.Center, other.Center) <= 25 * 16) // 25 block radius
+                {
+                    other.AddBuff(103, 480);
+                    other.AddBuff(26, 480);
+                    other.AddBuff(2, 480);
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 480);
+                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 26, 480);
+                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 103, 480);
+                    }
+                }
+            }
         }
 
 
@@ -328,8 +392,10 @@ namespace CTG2.Content
         //All timer logic below
         public override void PostUpdate()
         {
+            ArcherPostStatus();
             GladiatorPostStatus();
             JungleManPostStatus();
+            PsychicPostStatus();
         }
     }
 }
