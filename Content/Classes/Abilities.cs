@@ -22,16 +22,46 @@ namespace CTG2.Content
         private int class6ReleaseTimer = -1;
 
         private int class8HP = 0;
-        private int lastHeldTime = 0;
-        PlayerDeathReason reason = PlayerDeathReason.ByCustomReason("");
-
-        private ClassSystem classSystem;
+        private PlayerDeathReason reason = PlayerDeathReason.ByCustomReason("");
         private string path = "";
         private string inventoryData = "";
         private List<ItemData> class16RushData;
         private List<ItemData> class16RegenData;
         private bool initializedMutant;
-        private int mutantState;
+        private int mutantState = 1;
+
+
+        private string GetPathRelativeToSource(string fileName, [CallerFilePath] string sourceFilePath = "")
+        {
+            string folder = Path.GetDirectoryName(sourceFilePath);
+            return Path.Combine(folder, fileName);
+        }
+
+
+        private void SetInventory(List<ItemData> classData)
+        {
+            for (int b = 0; b < Player.inventory.Length; b++)
+            {
+                var itemData = classData[b];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                Player.inventory[b] = newItem;
+            }
+
+            for (int d = 0; d < Player.armor.Length; d++)
+            {
+                var itemData = classData[Player.inventory.Length + d];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                Player.armor[d] = newItem;
+            }
+        }
 
 
         private void SetCooldown(int seconds)
@@ -280,7 +310,7 @@ namespace CTG2.Content
         
         private void MutantInitialize()
         {
-            path = classSystem.GetPathRelativeToSource("rushmutant.json");
+            path = GetPathRelativeToSource("rushmutant.json");
             inventoryData = File.ReadAllText(path);
             try
             {
@@ -292,7 +322,7 @@ namespace CTG2.Content
                 return;
             }
 
-            path = classSystem.GetPathRelativeToSource("regenmutant.json");
+            path = GetPathRelativeToSource("regenmutant.json");
             inventoryData = File.ReadAllText(path);
             try
             {
@@ -313,13 +343,13 @@ namespace CTG2.Content
             switch (mutantState)
             {
                 case 1:
-                    classSystem.SetInventory(class16RegenData);
+                    SetInventory(class16RegenData);
                     mutantState = 2;
 
                     break;
 
                 case 2:
-                    classSystem.SetInventory(class16RushData);
+                    SetInventory(class16RushData);
                     mutantState = 1;
 
                     break;
@@ -335,13 +365,11 @@ namespace CTG2.Content
 
         public override void PostItemCheck() // Upon activation
         {
-            /*
             if (!initializedMutant)
             {
                 MutantInitialize();
                 initializedMutant = true;
             }
-            */
 
             if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && !Player.HasBuff(BuffID.ChaosState)) // Only activate if not on cooldown
             {
@@ -392,7 +420,7 @@ namespace CTG2.Content
                         break;
 
                     case 8:
-                        //SetCooldown(40);
+                        SetCooldown(40);
                         PsychicOnUse();
 
                         break;
@@ -416,25 +444,25 @@ namespace CTG2.Content
                         break;
 
                     case 12: //not finished
-                        SetCooldown(11);
+                        //SetCooldown(11);
                         ClownOnUse();
 
                         break;
 
                     case 13: //not finished
-                        SetCooldown(41);
+                        //SetCooldown(41);
                         FlameBunnyOnUse();
 
                         break;
 
                     case 14: //not finished
-                        SetCooldown(20);
+                        //SetCooldown(20);
                         TikiPriestOnUse();
 
                         break;
 
                     case 15: //not finished 
-                        SetCooldown(27);
+                        //SetCooldown(27);
                         TreeOnUse();
 
                         break;
@@ -446,7 +474,7 @@ namespace CTG2.Content
                         break;
 
                     case 17: //not finished
-                        SetCooldown(40);
+                        //SetCooldown(40);
                         LeechOnUse();
 
                         break;
@@ -457,7 +485,7 @@ namespace CTG2.Content
         //All timer logic below
         public override void PostUpdate()
         {
-            ArcherPostStatus();
+            ArcherPostStatus(); 
             GladiatorPostStatus();
             JungleManPostStatus();
             PsychicPostStatus();
