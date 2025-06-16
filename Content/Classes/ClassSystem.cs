@@ -4,6 +4,22 @@ using Terraria.ID;
 using CTG2.Content.Items;
 using CTG2.Content.Items.ModifiedWeps;
 using Microsoft.Xna.Framework; 
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Collections.Generic;
+
+
+public class ItemData
+{
+    public string Name { get; set; }
+    public int Type { get; set; }
+    public int Stack { get; set; }
+    public int Prefix { get; set; }
+    public int Slot { get; set; }
+}
 
 
 public class ClassSystem : ModPlayer
@@ -49,225 +65,106 @@ public class ClassSystem : ModPlayer
         switch (playerClass) //permabuffs are put here
         {
             case 1: // Archer
-
                 Player.statLifeMax2 = archerHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 2: // Ninja
-
                 Player.statLifeMax2 = ninjaHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-
-                GiveClassItems();
                 break;
 
             case 3: // Beast
-
                 Player.statLifeMax2 = beastHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-
-                GiveClassItems();
                 break;
 
             case 4: // Gladiator
-
                 Player.statLifeMax2 = gladiatorHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 5: // Paladin
-            
                 Player.statLifeMax2 = paladinHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 6: // Jungle Man
-
                 Player.statLifeMax2 = jungleManHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 7: // Black Mage
-
                 Player.statLifeMax2 = blackMageHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 8: // Psychic
-
                 Player.statLifeMax2 = psychicHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 9: // White Mage
-
                 Player.statLifeMax2 = whiteMageHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 10: // Miner
-
                 Player.statLifeMax2 = minerHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 11: // Fish
-
                 Player.statLifeMax2 = fishHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 12: // Clown
-
                 Player.statLifeMax2 = clownHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 13: // Flame Bunny
-
                 Player.statLifeMax2 = flameBunnyHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 14: // Tiki Priest
-
                 Player.statLifeMax2 = tikiPriestHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 15: // Tree
-
                 Player.statLifeMax2 = treeHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 16: // Mutant
-
                 Player.statLifeMax2 = mutantHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
 
             case 17: // Leech
-
                 Player.statLifeMax2 = leechHP;
-
-                if (!hasHealed)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                    hasHealed = true;
-                }
-                
-                GiveClassItems();
                 break;
+        }
+
+        if (!hasHealed)
+        {
+            Player.statLife = Player.statLifeMax2;
+            hasHealed = true;
+        }
+
+        GiveClassItems();
+
+    }
+
+    private void setInventory(List<ItemData> classData)
+    {
+        for (int b = 0; b < Player.inventory.Length; b++)
+        {
+            var itemData = classData[b];
+            Item newItem = new Item();
+            newItem.SetDefaults(itemData.Type);
+            newItem.stack = itemData.Stack;
+            newItem.Prefix(itemData.Prefix);
+
+            Player.inventory[b] = newItem;
+        }
+
+        for (int d = 0; d < Player.armor.Length; d++)
+        {
+            var itemData = classData[Player.inventory.Length + d];
+            Item newItem = new Item();
+            newItem.SetDefaults(itemData.Type);
+            newItem.stack = itemData.Stack;
+            newItem.Prefix(itemData.Prefix);
+
+            Player.armor[d] = newItem;
         }
     }
 
@@ -275,17 +172,42 @@ public class ClassSystem : ModPlayer
     {
         if (!hasReceivedItems)
         {
+
+            Player.inventory[0] = new Item(ModContent.ItemType<CTG2.Content.Items.ShardstonePickaxe>()); // pickaxe
+            Player.inventory[1] = new Item(215); // whoopie cushion
+            Player.inventory[9] = new Item(1299); // binoculars
+            Player.inventory[11] = new Item(215); // whoopie cushion
+            Player.inventory[12] = new Item(507); // bell
+            Player.inventory[19] = new Item(1299); // binoculars
+            Player.inventory[39] = new Item(271); // familiar wig
+            Player.inventory[49] = new Item(2216); // paint sprayer
+
             switch (playerClass)
             {
                 case 1: //archer
-                    //format is (null, id, amount) or (null, ItemID.name, amount)
 
-                    Player.QuickSpawnItem(null, ModContent.ItemType<CTG2.Content.Items.ShardstonePickaxe>(), 1); // pickaxe
-                    Player.QuickSpawnItem(null, 215, 1); // whoopie cushion
-                    Player.QuickSpawnItem(null, ModContent.ItemType<CTG2.Content.Items.Rancor>(), 1); // archer's bow
-                    Player.QuickSpawnItem(null, 2, 50); // dirt
+                    string inventoryData = File.ReadAllText("archer.json");
+                    List<ItemData> archerData;
 
-                    Player.QuickSpawnItem(null, ItemID.HellfireArrow, 9999);
+                    try
+                    {
+                        archerData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
+                    }
+                    catch
+                    {
+                        Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                        return;
+                    }
+
+                    setInventory(archerData);
+                    /*
+                    Player.inventory[2] = new Item(ModContent.ItemType<CTG2.Content.Items.Rancor>()); // archer's bow
+                    Player.inventory[3] = new Item(2, 25); // dirt
+                    Player.inventory[28] = new Item(2222); // peddler's hat
+                    Player.inventory[38] = new Item(874);
+                    Player.inventory[48] = new Item(875);
+                    Player.inventory[29] = new Item(28, 99); // lesser healing potions
+                    Player.inventory[54] = new Item(ItemID.HellfireArrow, 9999); // hellfire arrows
 
                     Player.armor[0] = new Item();
                     Player.armor[0].SetDefaults(ItemID.VulkelfEar);
@@ -325,26 +247,18 @@ public class ClassSystem : ModPlayer
 
                     Player.armor[14] = new Item();
                     Player.armor[14].SetDefaults(ItemID.HunterCloak);
+                    */
 
                     break;
 
 
                 case 2:
-                    SpawnCustomItem(
-                    itemID: 64,
-                    prefix: 39,            
-                    damage: 56,
-                    useTime: 10,
-                    useAnimation: 10,
-                    scale: 0f,
-                    knockBack: 3.75f,
-                    shoot: 93,
-                    shootSpeed: 10f,
-                    colorOverride: new Color(0, 0, 255) 
-                    );
 
-                    Player.QuickSpawnItem(null, 2, 999); //dirt
-                    Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
+                    Player.QuickSpawnItem(null, ModContent.ItemType<CTG2.Content.Items.ShardstonePickaxe>(), 1); // pickaxe
+                    Player.QuickSpawnItem(null, 215, 1); // whoopie cushion
+                    Player.QuickSpawnItem(null, ModContent.ItemType<CTG2.Content.Items.Zen>(), 1); // ninja's dagger
+                    Player.QuickSpawnItem(null, 2, 50); // dirt
+
                     Player.armor[3] = new Item();
                     Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
 
@@ -543,44 +457,44 @@ public class ClassSystem : ModPlayer
         }
     }
 
-   
-private void SpawnCustomItem(
-    int itemID,
-    int? prefix = null,
-    int? damage = null,
-    int? useTime = null,
-    int? useAnimation = null,
-    float? scale = null,
-    float? knockBack = null,
-    int? shoot = null,
-    float? shootSpeed = null,
-    Color? colorOverride = null
-)
-{
-    Item item = new Item();
-    item.SetDefaults(itemID);
 
-    if (prefix.HasValue)
-        item.Prefix(prefix.Value);
-    if (damage.HasValue)
-        item.damage = damage.Value;
-    if (useTime.HasValue)
-        item.useTime = useTime.Value;
-    if (useAnimation.HasValue)
-        item.useAnimation = useAnimation.Value;
-    if (scale.HasValue)
-        item.scale = scale.Value;
-    if (knockBack.HasValue)
-        item.knockBack = knockBack.Value;
-    if (shoot.HasValue)
-        item.shoot = shoot.Value;
-    if (shootSpeed.HasValue)
-        item.shootSpeed = shootSpeed.Value;
-    if (colorOverride.HasValue)
-        item.color = colorOverride.Value;
+    private void SpawnCustomItem(
+        int itemID,
+        int? prefix = null,
+        int? damage = null,
+        int? useTime = null,
+        int? useAnimation = null,
+        float? scale = null,
+        float? knockBack = null,
+        int? shoot = null,
+        float? shootSpeed = null,
+        Color? colorOverride = null
+    )
+    {
+        Item item = new Item();
+        item.SetDefaults(itemID);
 
-    Player.QuickSpawnItem(null, item, 1);
-}
+        if (prefix.HasValue)
+            item.Prefix(prefix.Value);
+        if (damage.HasValue)
+            item.damage = damage.Value;
+        if (useTime.HasValue)
+            item.useTime = useTime.Value;
+        if (useAnimation.HasValue)
+            item.useAnimation = useAnimation.Value;
+        if (scale.HasValue)
+            item.scale = scale.Value;
+        if (knockBack.HasValue)
+            item.knockBack = knockBack.Value;
+        if (shoot.HasValue)
+            item.shoot = shoot.Value;
+        if (shootSpeed.HasValue)
+            item.shootSpeed = shootSpeed.Value;
+        if (colorOverride.HasValue)
+            item.color = colorOverride.Value;
+
+        Player.QuickSpawnItem(null, item, 1);
+    }
 
 
 
