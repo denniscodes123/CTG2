@@ -1,6 +1,7 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.DataStructures; 
 using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
@@ -18,10 +19,11 @@ namespace CTG2.Content
         private int class4BuffTimer = 0;
         private bool class4PendingBuffs = false;
 
-        private int class6FlameTimer = 0;
-        private int class6FlameDuration = 0;
+        private int class6ReleaseTimer = -1;
 
         private int class8HP = 0;
+        private int lastHeldTime = 0;
+        PlayerDeathReason reason = PlayerDeathReason.ByCustomReason("");
 
         private ClassSystem classSystem;
         private string path = "";
@@ -131,18 +133,18 @@ namespace CTG2.Content
 
         private void JungleManOnUse()
         {
-            Player.AddBuff(149, 42);
-            Player.AddBuff(114, 42);
-                        
-            class6FlameDuration = 1;
+            Player.AddBuff(149, 60);
+            Player.AddBuff(114, 60);
+
+            class6ReleaseTimer = 60;
         }
 
 
         private void JungleManPostStatus()
         {
-            if (class6FlameDuration > 0)
+            class6ReleaseTimer = (class6ReleaseTimer > -1) ? class6ReleaseTimer - 1 : -1;
+            if (class6ReleaseTimer == 0)
             {
-                class6FlameDuration--;
 
                 if (Main.myPlayer == Player.whoAmI && Main.netMode != NetmodeID.MultiplayerClient)
                 {
@@ -204,11 +206,13 @@ namespace CTG2.Content
         {
             if (class8HP != 0)
             {
-                if (Player.HeldItem.type == ItemID.NebulaArcanum && Player.controlUseItem && Player.itemTime == 0) class8HP = (class8HP <= 20) ? 0 : class8HP - 20;
+                if (Player.HeldItem.type == ItemID.NebulaArcanum && Player.controlUseItem && Player.itemAnimation == 30) class8HP = (class8HP <= 20) ? 0 : class8HP - 20;
 
                 if (Player.statLife < class8HP) class8HP = Player.statLife;
                 Player.statLife = class8HP;
             }
+
+            if (Player.statLife <= 0) Player.KillMe(reason, 1, 0);
         }
 
 
@@ -331,24 +335,22 @@ namespace CTG2.Content
 
         public override void PostItemCheck() // Upon activation
         {
+            /*
             if (!initializedMutant)
             {
                 MutantInitialize();
                 initializedMutant = true;
             }
+            */
 
-            if (Player.HeldItem.type == ItemID.WhoopieCushion &&
-                Player.controlUseItem &&
-                Player.itemTime == 0 &&
-                !Player.HasBuff(BuffID.ChaosState)) // Only activate if not on cooldown
+            if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && !Player.HasBuff(BuffID.ChaosState)) // Only activate if not on cooldown
             {
-                
                 int selectedClass = Player.GetModPlayer<ClassSystem>().playerClass;
 
                 switch (selectedClass)
                 {
                     case 1:
-                        SetCooldown(36);
+                        //SetCooldown(36);
                         ArcherOnUse();
 
                         break;
@@ -390,7 +392,7 @@ namespace CTG2.Content
                         break;
 
                     case 8:
-                        SetCooldown(40);
+                        //SetCooldown(40);
                         PsychicOnUse();
 
                         break;
@@ -402,7 +404,7 @@ namespace CTG2.Content
                         break;
 
                     case 10: //not finished
-                        SetCooldown(15);
+                        //SetCooldown(15);
                         MinerOnUse();
 
                         break;
