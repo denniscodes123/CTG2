@@ -22,7 +22,7 @@ namespace CTG2.Content
     {
         public override CommandType Type => CommandType.Chat;
         public override string Command => "gamestart";
-        public override string Description => "Starts the match countdown with a preparation phase";
+        public override string Description => "Creates a game (equivalent to hosting a game in PG)";
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
