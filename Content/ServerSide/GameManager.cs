@@ -1,9 +1,12 @@
-﻿using Terraria;
+﻿using System;
+using Terraria;
 using Terraria.ModLoader;
+using CTG2.Content;
+using Microsoft.Xna.Framework;
 
 namespace CTG2.Content.ServerSide;
 
-public class GameManager
+public class GameManager : ModSystem
 {   
     // True when 
     public bool IsGameActive { get; private set; }
@@ -18,13 +21,21 @@ public class GameManager
     
     public GameManager()
     {
-        // TODO: populate constructor
+        IsGameActive = false;
+        HasRoundStarted = false;
+        MatchTime = 0;
+        Players = [];
+        BlueGem = new Gem(new Vector2(0, 0));
+        RedGem = new Gem(new Vector2(0, 0));
     }
     
     public void StartGame()
     {
         IsGameActive = true;
-        
+        var mod = ModContent.GetInstance<CTG2>();
+        ModPacket packet = mod.GetPacket();
+        packet.Write((byte)MessageType.ServerGameStart);
+        packet.Send();
         // TODO: Map logic (map select?, load map from file, 
     }
     
@@ -32,12 +43,20 @@ public class GameManager
     public void PauseGame()
     {
         IsGameActive = !IsGameActive;
+        var mod = ModContent.GetInstance<CTG2>();
+        ModPacket packet = mod.GetPacket();
+        packet.Write((byte)MessageType.ServerGamePause);
+        packet.Send();
         // TODO: Send a ModPacket to toggle 'Pause Mode' client-side. Add new packet type to HandlePacket()
     }
     
     public void EndGame()
     {
         IsGameActive = false;
+        var mod = ModContent.GetInstance<CTG2>();
+        ModPacket packet = mod.GetPacket();
+        packet.Write((byte)MessageType.ServerGameEnd);
+        packet.Send();
         // TODO: Return all players to spectate area, clear inventories, etc. 
     }
     
@@ -53,6 +72,16 @@ public class GameManager
         RedGem.Update(BlueGem, Players);
         
         // TODO: 
+    }
+    
+    public override void PostUpdateWorld()
+    {
+        if (!Main.dedServ) return;
+        if (!IsGameActive) return;
+        
+        UpdateGame();
+        
+        base.PostUpdateWorld();
     }
 
 }

@@ -40,7 +40,13 @@ namespace CTG2.Content
                 caller.Reply("you are in a game end it to start a new one", Color.Red);
                 return;
             }
-
+            
+            // Send a packet telling the server to start a game.
+            ModPacket myPacket = Mod.GetPacket();
+            myPacket.Write((byte)MessageType.RequestStartGame); // id
+            myPacket.Send();
+            
+            return;
             Game game = new Game();
             modPlayer.game = game;
 

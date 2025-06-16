@@ -13,14 +13,17 @@ public class Gem
     
     
     // X, Y Coords for the Top-Left Corner of Gem
-    public int X {get;set;}
-    public int Y {get;set;}
+    public Vector2 Position {get; private set;}
     public int Width {get;set;}
     public int Height {get;set;}
 
-    public Gem()
-    {
-        // TODO: populate constructor
+    public Gem(Vector2 position)
+    {   
+        IsActive = true;
+        IsHeld = false;
+        HeldBy = -1;
+        IsCaptured = false;
+        Position = position;
     }
     
     // Runs all Gem Logic - Check if Gem can be picked up/captured by any players

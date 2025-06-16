@@ -21,6 +21,8 @@ namespace CTG2.Content
 
         private int classSelectionTimer = 0;
 
+        public bool Paused = false;
+        
         // --- State Transition Methods ---
         public void EnterLobbyState()
         {
@@ -79,6 +81,15 @@ namespace CTG2.Content
 
             Player.ghost = false;
 
+        }
+
+        public void TogglePause()
+        {
+            Paused = !Paused;
+            if (Paused)
+            {
+                // TODO: Write pause logic (freeze all movement, apply cursed?)
+            }
         }
 
 
