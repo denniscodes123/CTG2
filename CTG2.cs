@@ -1,34 +1,72 @@
+using System;
 using Terraria.ModLoader;
 using System.IO;
 using Terraria;
 using CTG2.Content;
-
+using CTG2.Content.ServerSide;
 	
 
-
 namespace CTG2
-{
+{   
+    public enum MessageType : byte
+    {
+        RequestStartGame = 0,  // client → server
+        RequestEndGame   = 1,  // client → server
+        ServerGameStart  = 2,  // server → client
+        ServerGameEnd    = 3,  // server → client
+        RequestPause  = 4,  // client -> server
+        ServerGameUpdate  = 5,  // server → client
+        RequestClass   = 6,  // client → server
+    }
+    
     public class CTG2 : Mod
     {
-      /*  public override void HandlePacket(BinaryReader reader, int whoAmI)
-        {
-            byte packetType = reader.ReadByte();
-
-            if (packetType == 1) 
-            {
-                Game.matchStarted = reader.ReadBoolean();
-                Game.preparationPhase = reader.ReadBoolean();
-                Game.matchTimeLeft = reader.ReadInt32();
-                Game.preparationTimeLeft = reader.ReadInt32();
-
-                ModContent.GetInstance<CTG2>().Logger.Info("Packet received");
-
+        // Custom Packet IDs: 0 == Start Game, 1 == Stop Game
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {   
+            // MyPlayer
+            var thisPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>();
+            // GameManager
+            var manager = ModContent.GetInstance<GameManager>();
+            
+            byte msgType = reader.ReadByte();
+            switch (msgType) {
+                // Client -> Server Packets
+                case (byte)MessageType.RequestStartGame:
+                    manager.StartGame();
+                    Console.WriteLine("Server Received Game Start Request!");
+                    break;
+                
+                case (byte)MessageType.RequestEndGame:
+                    manager.EndGame();
+                    Console.WriteLine("Server Received Game Start Request!");
+                    break;
+                
+                case(byte)MessageType.RequestClass:
+                    // TODO: Give inventory to player
+                    break;
+                
+                // Server->Client Packets
+                case (byte)MessageType.ServerGameStart:
+                    thisPlayer.EnterClassSelectionState();
+                    Console.WriteLine("Client Received Game Start!");
+                    break;
+                case (byte)MessageType.ServerGameEnd:
+                    thisPlayer.EnterLobbyState();
+                    Console.WriteLine("Client Received Game End!");
+                    break;
+                case (byte)MessageType.RequestPause:
+                    manager.PauseGame();
+                    break;
+                
+                // Gems Status Updates
+                case (byte)MessageType.ServerGameUpdate:
+                    // TODO: Give new game info to client: gems held, gem position...
+                    break;
+                default:
+                    Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
+                    break;
             }
         }
-		public override void Load()
-{
-    Logger.Info("[DEBUG] CTG2 Mod Loaded Successfully.");
-}
- */
     }
 }

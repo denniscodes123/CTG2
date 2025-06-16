@@ -30,7 +30,9 @@ namespace CTG2.Content
         public override void Action(CommandCaller caller, string input, string[] args)
         {
 
-          
+            ModPacket myPacket = Mod.GetPacket();
+            myPacket.Write((byte)MessageType.RequestEndGame); // id
+            myPacket.Send();
 
             Game gameToEnd = caller.Player.GetModPlayer<AdminPlayer>().game;
 
