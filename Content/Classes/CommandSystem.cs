@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using CTG2.Content;
+using ClassesNamespace;
 
 
 public class ClassCommand : ModCommand
