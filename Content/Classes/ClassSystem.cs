@@ -9,7 +9,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-
+using System.Runtime.CompilerServices;
 
 
 public class ItemData
@@ -66,84 +66,141 @@ public class ClassSystem : ModPlayer
         {
             case 1: // Archer
                 Player.statLifeMax2 = archerHP;
+                GiveClassItems();
+                
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+
                 break;
 
             case 2: // Ninja
                 Player.statLifeMax2 = ninjaHP;
+                GiveClassItems();
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 break;
 
             case 3: // Beast
                 Player.statLifeMax2 = beastHP;
+                GiveClassItems();
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 break;
 
             case 4: // Gladiator
                 Player.statLifeMax2 = gladiatorHP;
+                GiveClassItems();
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 break;
 
             case 5: // Paladin
                 Player.statLifeMax2 = paladinHP;
+                GiveClassItems();
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 break;
 
             case 6: // Jungle Man
                 Player.statLifeMax2 = jungleManHP;
+                GiveClassItems();
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 break;
 
             case 7: // Black Mage
                 Player.statLifeMax2 = blackMageHP;
+                GiveClassItems();
+
+                if (!hasHealed)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    hasHealed = true;
+                }
+                
                 break;
 
             case 8: // Psychic
                 Player.statLifeMax2 = psychicHP;
+                GiveClassItems();
                 break;
 
             case 9: // White Mage
                 Player.statLifeMax2 = whiteMageHP;
+                GiveClassItems();
                 break;
 
             case 10: // Miner
                 Player.statLifeMax2 = minerHP;
+                GiveClassItems();
                 break;
 
             case 11: // Fish
                 Player.statLifeMax2 = fishHP;
+                GiveClassItems();
                 break;
 
             case 12: // Clown
                 Player.statLifeMax2 = clownHP;
+                GiveClassItems();
                 break;
 
             case 13: // Flame Bunny
                 Player.statLifeMax2 = flameBunnyHP;
+                GiveClassItems();
                 break;
 
             case 14: // Tiki Priest
                 Player.statLifeMax2 = tikiPriestHP;
+                GiveClassItems();
                 break;
 
             case 15: // Tree
                 Player.statLifeMax2 = treeHP;
+                GiveClassItems();
                 break;
 
             case 16: // Mutant
                 Player.statLifeMax2 = mutantHP;
+                GiveClassItems();
                 break;
 
             case 17: // Leech
                 Player.statLifeMax2 = leechHP;
+                GiveClassItems();
                 break;
         }
-
-        if (!hasHealed)
-        {
-            Player.statLife = Player.statLifeMax2;
-            hasHealed = true;
-        }
-
-        GiveClassItems();
-
     }
 
-    private void setInventory(List<ItemData> classData)
+    private void SetInventory(List<ItemData> classData)
     {
         for (int b = 0; b < Player.inventory.Length; b++)
         {
@@ -166,6 +223,14 @@ public class ClassSystem : ModPlayer
 
             Player.armor[d] = newItem;
         }
+
+        Player.inventory[27] = new Item(1567);
+    }
+
+    static string GetPathRelativeToSource(string fileName, [CallerFilePath] string sourceFilePath = "")
+    {
+        string folder = Path.GetDirectoryName(sourceFilePath);
+        return Path.Combine(folder, fileName);
     }
 
     private void GiveClassItems()
@@ -186,7 +251,8 @@ public class ClassSystem : ModPlayer
             {
                 case 1: //archer
 
-                    string inventoryData = File.ReadAllText("archer.json");
+                    string path = GetPathRelativeToSource("archer.json");
+                    string inventoryData = File.ReadAllText(path);
                     List<ItemData> archerData;
 
                     try
@@ -199,55 +265,7 @@ public class ClassSystem : ModPlayer
                         return;
                     }
 
-                    setInventory(archerData);
-                    /*
-                    Player.inventory[2] = new Item(ModContent.ItemType<CTG2.Content.Items.Rancor>()); // archer's bow
-                    Player.inventory[3] = new Item(2, 25); // dirt
-                    Player.inventory[28] = new Item(2222); // peddler's hat
-                    Player.inventory[38] = new Item(874);
-                    Player.inventory[48] = new Item(875);
-                    Player.inventory[29] = new Item(28, 99); // lesser healing potions
-                    Player.inventory[54] = new Item(ItemID.HellfireArrow, 9999); // hellfire arrows
-
-                    Player.armor[0] = new Item();
-                    Player.armor[0].SetDefaults(ItemID.VulkelfEar);
-
-                    Player.armor[1] = new Item();
-                    Player.armor[1].SetDefaults(ItemID.NecroBreastplate);
-
-                    Player.armor[2] = new Item();
-                    Player.armor[2].SetDefaults(ItemID.CactusLeggings);
-
-                    Player.armor[3] = new Item();
-                    Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
-
-                    Player.armor[4] = new Item();
-                    Player.armor[4].SetDefaults(ItemID.AnkletoftheWind);
-
-                    Player.armor[5] = new Item();
-                    Player.armor[5].SetDefaults(ItemID.LuckyCoin);
-
-                    Player.armor[6] = new Item();
-                    Player.armor[6].SetDefaults(ItemID.TsunamiInABottle);
-
-                    Player.armor[7] = new Item();
-                    Player.armor[7].SetDefaults(ItemID.Toolbox);
-
-                    Player.armor[10] = new Item();
-                    Player.armor[10].SetDefaults(ItemID.HerosHat);
-
-                    Player.armor[11] = new Item();
-                    Player.armor[11].SetDefaults(ItemID.HerosShirt);
-
-                    Player.armor[12] = new Item();
-                    Player.armor[12].SetDefaults(ItemID.HerosPants);
-
-                    Player.armor[13] = new Item();
-                    Player.armor[13].SetDefaults(ItemID.JungleRose);
-
-                    Player.armor[14] = new Item();
-                    Player.armor[14].SetDefaults(ItemID.HunterCloak);
-                    */
+                    SetInventory(archerData);
 
                     break;
 
@@ -442,15 +460,6 @@ public class ClassSystem : ModPlayer
                     Player.QuickSpawnItem(null, 670);
 
                     break;
-
-                    /*case 18: 
-                        Player.QuickSpawnItem(null, 1202); //titanium pickaxe
-                        Player.QuickSpawnItem(null, 2, 999); //dirt
-                        Player.QuickSpawnItem(null, 215, 1); //whoopie cushion
-                        Player.armor[3] = new Item();
-                        Player.armor[3].SetDefaults(ItemID.LuckyHorseshoe);
-    //disabled right now
-                        Player.QuickSpawnItem(null, 113); */
             }
 
             hasReceivedItems = true;
