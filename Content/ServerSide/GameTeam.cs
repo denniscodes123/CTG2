@@ -10,7 +10,7 @@ namespace CTG2.Content.ServerSide;
 
 public class GameTeam
 {   
-    private List<Player> Players { get; set; }
+    public List<Player> Players { get; set; }
     private Vector2 ClassLocation { get; set; }
     private Vector2 BaseLocation { get; set; }
     
@@ -43,37 +43,35 @@ public class GameTeam
         foreach (Player ply in Players)
         {   
             ply.Teleport(ClassLocation);
-            Console.WriteLine("teleported player!");
-            NetMessage.SendData(
-                MessageID.TeleportEntity,
-                remoteClient: -1,           // send to everyone
-                ignoreClient: -1,           // don’t ignore anyone
-                text: null,
-                number: ply.whoAmI,         // which player to teleport
-                number2: ClassLocation.X,       // x (in pixels)
-                number3: ClassLocation.Y,      // y (in pixels)
-                number4: 1                  // style = 1
-            );
+            ply.position = ClassLocation;
+            
+            int tpX = (int)ClassLocation.X;
+            int tpY = (int)ClassLocation.Y;
+            
+            ModPacket packet2 = mod.GetPacket();
+            packet2.Write((byte)MessageType.ServerTeleport);
+            packet2.Write(tpX);
+            packet2.Write(tpY);
+            packet2.Send(toClient: ply.whoAmI);
+            Console.WriteLine($"teleported {ply.name} to {ply.position}!");
         }
     }
 
     public void SendToBase()
     {   
+        var mod = ModContent.GetInstance<CTG2>();
         foreach (Player ply in Players)
         {
             ply.SpawnX = (int)BaseLocation.X;
             ply.SpawnY = (int)BaseLocation.Y;
-            ply.Teleport(ClassLocation);
-            NetMessage.SendData(
-                MessageID.TeleportEntity,
-                remoteClient: -1,           // send to everyone
-                ignoreClient: -1,           // don’t ignore anyone
-                text: null,
-                number: ply.whoAmI,         // which player to teleport
-                number2: ClassLocation.X,       // x (in pixels)
-                number3: ClassLocation.Y,      // y (in pixels)
-                number4: 1                  // style = 1
-            );
+            ply.Teleport(BaseLocation);
+            int tpX = (int)BaseLocation.X;
+            int tpY = (int)BaseLocation.Y;
+            ModPacket packet2 = mod.GetPacket();
+            packet2.Write((byte)MessageType.ServerTeleport);
+            packet2.Write(tpX);
+            packet2.Write(tpY);
+            packet2.Send(toClient: ply.whoAmI);
         }
         
     }

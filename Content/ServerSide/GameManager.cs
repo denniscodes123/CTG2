@@ -14,8 +14,6 @@ public class GameManager : ModSystem
     
     public int MatchTime { get; private set; }
     
-    public Player[] Players { get; private set; }
-    
     public GameTeam BlueTeam { get; private set; }
     public GameTeam RedTeam { get; private set; }
         
@@ -24,12 +22,11 @@ public class GameManager : ModSystem
 
     public override void OnWorldLoad()
     {
-        Players = Main.player;                     
-        BlueGem  = new Gem(new Vector2(100, 100));     
-        RedGem   = new Gem(new Vector2(100, 100));
+        BlueGem  = new Gem(new Vector2(13332, 11504));     
+        RedGem   = new Gem(new Vector2(19316, 11504));
 
-        BlueTeam = new GameTeam(new Vector2(100, 100), new Vector2(100, 100), 3);
-        RedTeam = new GameTeam(new Vector2(200, 100), new Vector2(200, 100), 1);
+        BlueTeam = new GameTeam(new Vector2(12346, 10980), new Vector2(12346, 10980), 3);
+        RedTeam = new GameTeam(new Vector2(20385, 10980), new Vector2(20385, 10980), 1);
         
         IsGameActive = false;
         MatchTime    = 0;
@@ -38,6 +35,10 @@ public class GameManager : ModSystem
     public void StartGame()
     {
         IsGameActive = true;
+        
+        MatchTime    = 0;
+        BlueGem.Reset();
+        RedGem.Reset();
         
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
@@ -59,7 +60,6 @@ public class GameManager : ModSystem
     public void EndGame()
     {
         IsGameActive = false;
-        MatchTime = 0;
         var mod = ModContent.GetInstance<CTG2>();
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerGameEnd);
@@ -79,10 +79,39 @@ public class GameManager : ModSystem
         }
         // Increase match duration by 1 tick
         MatchTime++;
-        // Updates holding/capturing status of both gems.
-        BlueGem.Update(RedGem, Players);
-        RedGem.Update(BlueGem, Players);
         
+        // Updates holding/capturing status of both gems.
+        BlueGem.Update(RedGem, RedTeam.Players);
+        RedGem.Update(BlueGem, BlueTeam.Players);
+        
+        // Send updated GameInfo to clients
+        var mod = ModContent.GetInstance<CTG2>();
+        ModPacket packet = mod.GetPacket();
+        packet.Write((byte)MessageType.ServerGameUpdate);
+        packet.Write((int)0);
+        packet.Write((int)MatchTime);
+        packet.Write((int)0);
+        packet.Write((int)0);
+        if (BlueGem.IsHeld) packet.Write(Main.player[BlueGem.HeldBy].name); 
+        else packet.Write("At Base");
+        if (RedGem.IsHeld) packet.Write(Main.player[RedGem.HeldBy].name);
+        else packet.Write("At Base");
+        packet.Send();
+        
+        if (BlueGem.IsCaptured)
+        {   
+            Console.WriteLine("Blue gem captured!");
+            Main.NewText("Blue gem captured! Red wins!");
+            EndGame();
+        }
+
+        else if (RedGem.IsCaptured)
+        {
+            Console.WriteLine("Red gem captured!");
+            Main.NewText("Red gem captured! Blue wins!");
+            EndGame();
+        }
+            
         // if Match time exceeds a certain point, end the match
         if (MatchTime >= 60 * 60 * 15)
         {

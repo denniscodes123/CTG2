@@ -3,8 +3,10 @@ using Terraria.ModLoader;
 using System.IO;
 using Terraria;
 using CTG2.Content;
+using CTG2.Content.ClientSide;
 using CTG2.Content.ServerSide;
-	
+using Microsoft.Xna.Framework;
+
 
 namespace CTG2
 {   
@@ -17,6 +19,8 @@ namespace CTG2
         RequestPause  = 4,  // client -> server
         ServerGameUpdate  = 5,  // server → client
         RequestClass   = 6,  // client → server
+        RequestAbility = 7, // client -> server
+        ServerTeleport = 8 // server -> client
     }
     
     public class CTG2 : Mod
@@ -39,13 +43,18 @@ namespace CTG2
                 
                 case (byte)MessageType.RequestEndGame:
                     manager.EndGame();
-                    Console.WriteLine("Server Received Game Start Request!");
+                    Console.WriteLine("Server Received Game End Request!");
                     break;
                 
                 case(byte)MessageType.RequestClass:
                     // TODO: Give inventory to player
                     break;
-                
+                case (byte)MessageType.RequestPause:
+                    manager.PauseGame();
+                    break;
+                case (byte)MessageType.RequestAbility:
+                    // TODO: run ability code here
+                    break;
                 // Server->Client Packets
                 case (byte)MessageType.ServerGameStart:
                     thisPlayer.EnterClassSelectionState();
@@ -55,13 +64,24 @@ namespace CTG2
                     thisPlayer.EnterLobbyState();
                     Console.WriteLine("Client Received Game End!");
                     break;
-                case (byte)MessageType.RequestPause:
-                    manager.PauseGame();
+                
+                case (byte)MessageType.ServerTeleport:
+                    var local = Main.LocalPlayer;
+                    int tpX = reader.ReadInt32();
+                    int tpY = reader.ReadInt32();
+                    local.Teleport(new Vector2(tpX, tpY), 1);
+                    Console.WriteLine("Client Received Teleport!");
                     break;
                 
                 // Gems Status Updates
                 case (byte)MessageType.ServerGameUpdate:
-                    // TODO: Give new game info to client: gems held, gem position...
+                    // Populate GameInfo fields
+                    GameInfo.matchStage = reader.ReadInt32();
+                    GameInfo.matchTime = reader.ReadInt32();
+                    GameInfo.blueGemX = reader.ReadInt32();
+                    GameInfo.redGemX = reader.ReadInt32();
+                    GameInfo.blueGemCarrier = reader.ReadString();
+                    GameInfo.redGemCarrier = reader.ReadString();
                     break;
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
