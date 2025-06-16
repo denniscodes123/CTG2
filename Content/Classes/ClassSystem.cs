@@ -33,7 +33,7 @@ namespace ClassesNamespace
         string inventoryData = "";
         List<ItemData> classData;
 
-        public void SetInventory(List<ItemData> classData)
+        private void SetInventory(List<ItemData> classData)
         {
             for (int b = 0; b < Player.inventory.Length; b++)
             {
@@ -59,14 +59,14 @@ namespace ClassesNamespace
         }
 
 
-        public string GetPathRelativeToSource(string fileName, [CallerFilePath] string sourceFilePath = "")
+        private string GetPathRelativeToSource(string fileName, [CallerFilePath] string sourceFilePath = "")
         {
             string folder = Path.GetDirectoryName(sourceFilePath);
             return Path.Combine(folder, fileName);
         }
 
 
-        public void SpawnCustomItem(int itemID, int? prefix = null, int? damage = null, int? useTime = null, int? useAnimation = null, float? scale = null, float? knockBack = null, int? shoot = null, float? shootSpeed = null, Color? colorOverride = null)
+        private void SpawnCustomItem(int itemID, int? prefix = null, int? damage = null, int? useTime = null, int? useAnimation = null, float? scale = null, float? knockBack = null, int? shoot = null, float? shootSpeed = null, Color? colorOverride = null)
         {
             Item item = new Item();
             item.SetDefaults(itemID);
