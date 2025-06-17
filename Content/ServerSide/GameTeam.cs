@@ -29,7 +29,8 @@ public class GameTeam
         Players.Clear();
         foreach (Player ply in Main.player)
         {   
-            if ((ply.name == "carlos2" && TeamColor == 3) || (ply.name == "carlos3" && TeamColor == 1)) Players.Add(ply);
+            // if ((ply.name == "carlos2" && TeamColor == 3) || (ply.name == "carlos3" && TeamColor == 1)) Players.Add(ply);
+            if (ply.team == TeamColor) Players.Add(ply);
         }
     }
     

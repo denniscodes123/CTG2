@@ -58,17 +58,12 @@ namespace CTG2.Content.Commands
 
 
 
-target.team = teamID;
-playerTeamAssignments[target.whoAmI] = teamID;
-target.GetModPlayer<CTGPlayer>().LockTeam(teamID);
-
-
-
-            if (Main.netMode == NetmodeID.Server)
-            {
+            target.team = teamID;
+            playerTeamAssignments[target.whoAmI] = teamID;
+            target.GetModPlayer<CTGPlayer>().LockTeam(teamID);
+            
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target.whoAmI);
-            }
-
+            
             caller.Reply($"Set player '{target.name}' to the {teamColor} team.", Color.Green);
         }
     }

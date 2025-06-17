@@ -20,7 +20,7 @@ namespace CTG2
         ServerGameUpdate  = 5,  // server → client
         RequestClass   = 6,  // client → server
         RequestAbility = 7, // client -> server
-        ServerTeleport = 8 // server -> client
+        ServerTeleport = 8, // server -> client
     }
     
     public class CTG2 : Mod
