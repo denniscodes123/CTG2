@@ -145,13 +145,10 @@ namespace CTG2.Content
                     other.AddBuff(58, 200);
                     other.AddBuff(119, 200);
                     other.AddBuff(2, 200);
-
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 58, 200);
-                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 119, 200);
-                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 200);
-                    }
+                    
+                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 58, 200);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 119, 200);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 200);
                 }
             }
 
@@ -259,12 +256,11 @@ namespace CTG2.Content
                     other.AddBuff(26, 480);
                     other.AddBuff(2, 480);
 
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 480);
-                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 26, 480);
-                        NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 103, 480);
-                    }
+
+                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 480);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 26, 480);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 103, 480);
+                    
                 }
             }
         }

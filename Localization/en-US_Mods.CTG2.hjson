@@ -42,7 +42,10 @@ Items: {
 	}
 }
 
-NPCs.TimedNPC.DisplayName: Timed N P C
+NPCs: {
+	TimedNPC.DisplayName: Timed N P C
+	StationaryBeast.DisplayName: Stationary Beast
+}
 
 Projectiles: {
 	FoliageTendrilsProjectile.DisplayName: Foliage Tendrils Projectile
