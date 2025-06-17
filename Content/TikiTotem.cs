@@ -7,10 +7,16 @@ namespace CTG2.Content
 {
     public class TikiTotem : ModNPC
     {
+
+        float healFrameGap = 40;
+        float frameCount = 0;
+
+
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 1;
         }
+
 
         public override void SetDefaults()
         {
@@ -26,6 +32,7 @@ namespace CTG2.Content
             NPC.noTileCollide = false;
             NPC.friendly = false;
         }
+
 
         public override void AI()
         {
@@ -45,13 +52,29 @@ namespace CTG2.Content
                     NPC.velocity.X = 0f;
             }
 
-
             float gravity = 0.3f;
             float maxFallSpeed = 10f;
 
             NPC.velocity.Y += gravity;
             if (NPC.velocity.Y > maxFallSpeed)
                 NPC.velocity.Y = maxFallSpeed;
+
+            foreach (Player player in Main.player)
+            {
+                if (!player.active || player.dead || player.whoAmI == player.whoAmI)
+                    continue;
+
+                if (Vector2.Distance(NPC.Center, player.Center) <= 15 * 16 && frameCount % healFrameGap == 0) // 15 block radius
+                {
+                    player.statLife += 1;
+                    if (player.statLife > player.statLifeMax2)
+                        player.statLife = player.statLifeMax2;
+
+                    CombatText.NewText(player.Hitbox, CombatText.HealLife, 1);
+                }
+            }
+
+            frameCount++;
         }
     }
 }
