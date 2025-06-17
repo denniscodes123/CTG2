@@ -62,8 +62,7 @@ public class GameTeam
         var mod = ModContent.GetInstance<CTG2>();
         foreach (Player ply in Players)
         {
-            ply.SpawnX = (int)BaseLocation.X;
-            ply.SpawnY = (int)BaseLocation.Y;
+
             ply.Teleport(BaseLocation);
             int tpX = (int)BaseLocation.X;
             int tpY = (int)BaseLocation.Y;
@@ -72,15 +71,18 @@ public class GameTeam
             packet2.Write(tpX);
             packet2.Write(tpY);
             packet2.Send(toClient: ply.whoAmI);
+
+            int spawnPosX = tpX / 16;
+            int spawnPosY = tpY / 16;
+
+            ply.SpawnX = spawnPosX;
+            ply.SpawnY = spawnPosY;
             
-            NetMessage.SendData(
-                MessageID.PlayerSpawn,
-                remoteClient: -1,
-                ignoreClient: -1,  
-                text: null,
-                number: ply.whoAmI
-            );
-            
+            ModPacket packet3 = mod.GetPacket();
+            packet3.Write((byte)MessageType.ServerSetSpawn);
+            packet3.Write(spawnPosX);
+            packet3.Write(spawnPosY);
+            packet3.Send(toClient: ply.whoAmI);
         }
         
     }

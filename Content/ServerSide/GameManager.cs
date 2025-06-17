@@ -97,7 +97,15 @@ public class GameManager : ModSystem
         var mod = ModContent.GetInstance<CTG2>();
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerGameUpdate);
-        packet.Write((int)2);
+        if (MatchTime >= 1800)
+        {
+            packet.Write((int)2);
+        }
+        else
+        {
+            packet.Write((int)1);
+        }
+        
         packet.Write((int)MatchTime);
         // Blue and red Gem X positions
         var distBetweenGems = Math.Abs(RedGem.Position.X - BlueGem.Position.X);

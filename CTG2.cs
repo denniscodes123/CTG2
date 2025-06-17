@@ -19,14 +19,14 @@ namespace CTG2
         RequestPause  = 4,  // client -> server
         ServerGameUpdate  = 5,  // server → client
         ServerTeleport = 6, // server -> client
+        ServerSetSpawn = 7 // server -> client
     }
     
     public class CTG2 : Mod
-    {
+    {   
+        public static Random randomGenerator = new Random();
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {   
-            // MyPlayer
-            var thisPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>();
             // GameManager
             var manager = ModContent.GetInstance<GameManager>();
             
@@ -47,20 +47,27 @@ namespace CTG2
                     break;
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
-                    thisPlayer.EnterClassSelectionState();
+                    GameInfo.matchStage = 1;
                     Console.WriteLine("Client Received Game Start!");
                     break;
                 case (byte)MessageType.ServerGameEnd:
-                    thisPlayer.EnterLobbyState();
+                    GameInfo.matchStage = 0;
                     Console.WriteLine("Client Received Game End!");
                     break;
                 
                 case (byte)MessageType.ServerTeleport:
-                    var local = Main.LocalPlayer;
+                    var local = Main.player[Main.myPlayer];
                     int tpX = reader.ReadInt32();
                     int tpY = reader.ReadInt32();
                     local.Teleport(new Vector2(tpX, tpY), 1);
                     Console.WriteLine("Client Received Teleport!");
+                    break;
+                case (byte)MessageType.ServerSetSpawn:
+                    var localPlayer = Main.player[Main.myPlayer];
+                    int spawnX = reader.ReadInt32();
+                    int spawnY = reader.ReadInt32();
+                    localPlayer.ChangeSpawn(spawnX, spawnY);
+                    Console.WriteLine("Client Received Spawn Update!");
                     break;
                 
                 // Gems Status Updates
