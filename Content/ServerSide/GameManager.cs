@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using CTG2.Content;
 using Microsoft.Xna.Framework;
+using Terraria.WorldBuilding;
 
 namespace CTG2.Content.ServerSide;
 
@@ -72,7 +73,7 @@ public class GameManager : ModSystem
     {
         // TODO: Check if each player has completed class selection (no == class select, yes == send to match)
 
-        if (MatchTime == 900)
+        if (MatchTime == 1800)
         {
             BlueTeam.SendToBase();
             RedTeam.SendToBase();
@@ -88,10 +89,31 @@ public class GameManager : ModSystem
         var mod = ModContent.GetInstance<CTG2>();
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerGameUpdate);
-        packet.Write((int)0);
+        packet.Write((int)2);
         packet.Write((int)MatchTime);
-        packet.Write((int)0);
-        packet.Write((int)0);
+        // Blue and red Gem X positions
+        var distBetweenGems = Math.Abs(RedGem.Position.X - BlueGem.Position.X);
+        if (BlueGem.IsHeld)
+        {   
+            // send % of the way the gem is to enemy base as an integer
+            var distFromGem = Main.player[BlueGem.HeldBy].position.X - BlueGem.Position.X;
+            var intPercentage = (int)Math.Round(distFromGem/distBetweenGems * 100);
+            intPercentage = Math.Clamp(intPercentage, 0, 100);
+            packet.Write(intPercentage);
+        }
+        else packet.Write((int)0);
+        if (RedGem.IsHeld)
+        {   
+            // send % of the way the gem is to enemy base as an integer
+            // dist from gem is negative for red
+            var distFromGem = -(Main.player[RedGem.HeldBy].position.X - RedGem.Position.X);
+            var intPercentage = (int)Math.Round(distFromGem/distBetweenGems * 100);
+            intPercentage = Math.Clamp(intPercentage, 0, 100);
+            packet.Write(intPercentage);
+        }
+        else packet.Write((int)0);
+        
+        // Blue and red gem holders
         if (BlueGem.IsHeld) packet.Write(Main.player[BlueGem.HeldBy].name); 
         else packet.Write("At Base");
         if (RedGem.IsHeld) packet.Write(Main.player[RedGem.HeldBy].name);

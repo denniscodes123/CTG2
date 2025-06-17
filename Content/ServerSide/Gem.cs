@@ -17,6 +17,8 @@ public class Gem
     public Vector2 Position {get; private set;}
     public int Width {get;set;}
     public int Height {get;set;}
+    
+    public Rectangle GemHitbox {get; private set;}
 
     public Gem(Vector2 position)
     {   
@@ -27,6 +29,7 @@ public class Gem
         Position = position;
         Width = 6 * 16;
         Height = 9 * 16;
+        GemHitbox = new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
     }
 
     public void Reset()
@@ -50,14 +53,13 @@ public class Gem
     
     private void TryGetGem(List<Player> otherTeam)
     {
-        var gemRect = new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
 
         foreach (var ply in otherTeam)
         {
             if (!ply.active || ply.dead)
                 continue;
 
-            if (ply.Hitbox.Intersects(gemRect))
+            if (ply.Hitbox.Intersects(GemHitbox))
             {
                 IsHeld = true;
                 HeldBy = ply.whoAmI;
@@ -72,14 +74,7 @@ public class Gem
         if (!carrier.active || carrier.dead)
             return;
 
-        var otherGemRect = new Rectangle(
-            (int)otherGem.Position.X,
-            (int)otherGem.Position.Y,
-            otherGem.Width,
-            otherGem.Height
-        );
-
-        if (carrier.Hitbox.Intersects(otherGemRect))
+        if (carrier.Hitbox.Intersects(otherGem.GemHitbox))
         {
             IsCaptured = true;
             IsHeld     = false;
