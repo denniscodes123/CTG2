@@ -18,14 +18,11 @@ namespace CTG2
         ServerGameEnd    = 3,  // server → client
         RequestPause  = 4,  // client -> server
         ServerGameUpdate  = 5,  // server → client
-        RequestClass   = 6,  // client → server
-        RequestAbility = 7, // client -> server
-        ServerTeleport = 8, // server -> client
+        ServerTeleport = 6, // server -> client
     }
     
     public class CTG2 : Mod
     {
-        // Custom Packet IDs: 0 == Start Game, 1 == Stop Game
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {   
             // MyPlayer
@@ -45,15 +42,8 @@ namespace CTG2
                     manager.EndGame();
                     Console.WriteLine("Server Received Game End Request!");
                     break;
-                
-                case(byte)MessageType.RequestClass:
-                    // TODO: Give inventory to player
-                    break;
                 case (byte)MessageType.RequestPause:
                     manager.PauseGame();
-                    break;
-                case (byte)MessageType.RequestAbility:
-                    // TODO: run ability code here
                     break;
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:

@@ -34,10 +34,6 @@ public class ClassCommand : ModCommand
         Player player = caller.Player;
         var modPlayer = player.GetModPlayer<ClassSystem>();
         
-        ModPacket myPacket = Mod.GetPacket();
-        myPacket.Write((byte)MessageType.RequestClass); // id
-        myPacket.Send();
-        
         switch (classType)
         {
             case 1:

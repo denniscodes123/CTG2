@@ -22,7 +22,9 @@ public class GameManager : ModSystem
     public Gem RedGem { get; private set; }
 
     public override void OnWorldLoad()
-    {
+    {   
+        // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
+        
         BlueGem  = new Gem(new Vector2(13332, 11504));     
         RedGem   = new Gem(new Vector2(19316, 11504));
 
@@ -46,7 +48,7 @@ public class GameManager : ModSystem
         
         // Map Set
         
-        
+        //TODO: Create MapLoad() function (maybe using a GameMap class?)
         
         BlueTeam.StartMatch();
         RedTeam.StartMatch();
