@@ -19,7 +19,8 @@ namespace CTG2
         RequestPause  = 4,  // client -> server
         ServerGameUpdate  = 5,  // server → client
         ServerTeleport = 6, // server -> client
-        ServerSetSpawn = 7 // server -> client
+        ServerSetSpawn = 7, // server -> client
+        RequestSpawnNpc = 8
     }
     
     public class CTG2 : Mod
@@ -45,6 +46,13 @@ namespace CTG2
                 case (byte)MessageType.RequestPause:
                     manager.PauseGame();
                     break;
+                case (byte)MessageType.RequestSpawnNpc:
+                    var npcX = reader.ReadInt32();
+                    var npcY = reader.ReadInt32();
+                    var npcType = reader.ReadInt32();
+                    int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("Class14Ability"), npcX, npcY, npcType);
+                    break;
+                
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
                     GameInfo.matchStage = 1;

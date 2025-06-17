@@ -95,7 +95,7 @@ namespace CTG2.Content
             int npcIndex = NPC.NewNPC(Player.GetSource_Misc("Class3Ability"), (int)Player.Center.X, (int)Player.Center.Y, ModContent.NPCType<StationaryBeast>());
             NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npcIndex);
         }
-
+        
 
         private void GladiatorOnUse()
         {
@@ -288,9 +288,15 @@ namespace CTG2.Content
 
 
         private void TikiPriestOnUse() //not finished
-        {
-            int npcIndex = NPC.NewNPC(Player.GetSource_Misc("Class14Ability"), (int)Player.Center.X, (int)Player.Center.Y, ModContent.NPCType<TikiTotem>());
-            NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npcIndex);
+        {   
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestSpawnNpc);
+            packet.Write((int)Player.Center.X);
+            packet.Write((int)Player.Center.Y);
+            packet.Write(ModContent.NPCType<TikiTotem>());
+            packet.Send();
+            
         }
 
 

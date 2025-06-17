@@ -64,13 +64,19 @@ namespace CTG2.Content
                 if (!player.active || player.dead || player.whoAmI == player.whoAmI)
                     continue;
 
-                if (Vector2.Distance(NPC.Center, player.Center) <= 15 * 16 && frameCount % healFrameGap == 0) // 15 block radius
-                {
+                if (Vector2.Distance(NPC.Center, player.Center) <= 15 * 16 && frameCount % healFrameGap == 0 && Main.netMode != NetmodeID.MultiplayerClient) // 15 block radius
+                {   
                     player.statLife += 1;
                     if (player.statLife > player.statLifeMax2)
                         player.statLife = player.statLifeMax2;
 
                     CombatText.NewText(player.Hitbox, CombatText.HealLife, 1);
+                    player.HealEffect(1);
+                    NetMessage.SendData(MessageID.PlayerLifeMana,      // 16
+                        remoteClient: -1,         
+                        ignoreClient: -1,  
+                        text: null,
+                        number: player.whoAmI);
                 }
             }
 

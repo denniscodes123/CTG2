@@ -45,6 +45,7 @@ Items: {
 NPCs: {
 	TimedNPC.DisplayName: Timed N P C
 	StationaryBeast.DisplayName: Stationary Beast
+	TikiTotem.DisplayName: Tiki Totem
 }
 
 Projectiles: {
