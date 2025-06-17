@@ -29,7 +29,6 @@ public class GameTeam
         Players.Clear();
         foreach (Player ply in Main.player)
         {   
-            // if ((ply.name == "carlos2" && TeamColor == 3) || (ply.name == "carlos3" && TeamColor == 1)) Players.Add(ply);
             if (ply.team == TeamColor) Players.Add(ply);
         }
     }
@@ -73,6 +72,15 @@ public class GameTeam
             packet2.Write(tpX);
             packet2.Write(tpY);
             packet2.Send(toClient: ply.whoAmI);
+            
+            NetMessage.SendData(
+                MessageID.PlayerSpawn,
+                remoteClient: -1,
+                ignoreClient: -1,  
+                text: null,
+                number: ply.whoAmI
+            );
+            
         }
         
     }

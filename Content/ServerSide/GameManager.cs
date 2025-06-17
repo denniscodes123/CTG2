@@ -26,8 +26,8 @@ public class GameManager : ModSystem
         BlueGem  = new Gem(new Vector2(13332, 11504));     
         RedGem   = new Gem(new Vector2(19316, 11504));
 
-        BlueTeam = new GameTeam(new Vector2(12346, 10980), new Vector2(12346, 10980), 3);
-        RedTeam = new GameTeam(new Vector2(20385, 10980), new Vector2(20385, 10980), 1);
+        BlueTeam = new GameTeam(new Vector2(12346, 10940), new Vector2(12346, 10940), 3);
+        RedTeam = new GameTeam(new Vector2(20385, 10940), new Vector2(20385, 10940), 1);
         
         IsGameActive = false;
         MatchTime    = 0;
@@ -44,9 +44,12 @@ public class GameManager : ModSystem
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
         
+        // Map Set
+        
+        
+        
         BlueTeam.StartMatch();
         RedTeam.StartMatch();
-        // TODO: Map logic (map select?, load map from file, teleport to class select)...
         
     }
     
@@ -81,9 +84,12 @@ public class GameManager : ModSystem
         // Increase match duration by 1 tick
         MatchTime++;
         
-        // Updates holding/capturing status of both gems.
-        BlueGem.Update(RedGem, RedTeam.Players);
-        RedGem.Update(BlueGem, BlueTeam.Players);
+        if (MatchTime >= 1800)
+        {
+            // Updates holding/capturing status of both gems.
+            BlueGem.Update(RedGem, RedTeam.Players);
+            RedGem.Update(BlueGem, BlueTeam.Players);
+        }
         
         // Send updated GameInfo to clients
         var mod = ModContent.GetInstance<CTG2>();
@@ -123,14 +129,12 @@ public class GameManager : ModSystem
         if (BlueGem.IsCaptured)
         {   
             Console.WriteLine("Blue gem captured!");
-            Main.NewText("Blue gem captured! Red wins!");
             EndGame();
         }
 
         else if (RedGem.IsCaptured)
         {
             Console.WriteLine("Red gem captured!");
-            Main.NewText("Red gem captured! Blue wins!");
             EndGame();
         }
             

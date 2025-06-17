@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using System.Collections.Generic;
+using Terraria.Chat;
+using Terraria.ID;
+using Terraria.Localization;
 
 namespace CTG2.Content.ServerSide;
 
 public class Gem
 {
-    public bool IsActive {get; private set;}
     public bool IsHeld { get; private set;}
     public int HeldBy {get; private set;}
     
@@ -22,7 +24,6 @@ public class Gem
 
     public Gem(Vector2 position)
     {   
-        IsActive = true;
         IsHeld = false;
         HeldBy = -1;
         IsCaptured = false;
@@ -44,6 +45,7 @@ public class Gem
         if (IsHeld)
         {
             TryCapture(otherGem, Main.player[HeldBy]);
+            TryDrop(Main.player[HeldBy]);
         }
         else
         {
@@ -63,6 +65,9 @@ public class Gem
             {
                 IsHeld = true;
                 HeldBy = ply.whoAmI;
+                NetworkText pickUpText = NetworkText.FromLiteral($"{ply.name} has picked up the gem!");
+                // Broadcast to everyone
+                ChatHelper.BroadcastChatMessage(pickUpText, Color.Aqua);
                 break;
             }
         }
@@ -79,6 +84,20 @@ public class Gem
             IsCaptured = true;
             IsHeld     = false;
             // Optionally trigger capture event
+            NetworkText captureText = NetworkText.FromLiteral($"{carrier.name} has captured the gem!");
+            // Broadcast to everyone
+            ChatHelper.BroadcastChatMessage(captureText, Color.Aqua);
+        }
+    }
+
+    private void TryDrop(Player gemHolder)
+    {
+        if (gemHolder.dead)
+        {
+            IsHeld = false;
+            NetworkText dropText = NetworkText.FromLiteral($"{gemHolder.name} has dropped the gem!");
+            // Broadcast to everyone
+            ChatHelper.BroadcastChatMessage(dropText, Color.Aqua);
         }
     }
     

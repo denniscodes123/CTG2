@@ -35,7 +35,7 @@ namespace CTG2
             
             byte msgType = reader.ReadByte();
             switch (msgType) {
-                // Client -> Server Packets
+                // Client -> Server Packets (these cases will run on the Server)
                 case (byte)MessageType.RequestStartGame:
                     manager.StartGame();
                     Console.WriteLine("Server Received Game Start Request!");
@@ -55,7 +55,7 @@ namespace CTG2
                 case (byte)MessageType.RequestAbility:
                     // TODO: run ability code here
                     break;
-                // Server->Client Packets
+                // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
                     thisPlayer.EnterClassSelectionState();
                     Console.WriteLine("Client Received Game Start!");
@@ -83,6 +83,7 @@ namespace CTG2
                     GameInfo.blueGemCarrier = reader.ReadString();
                     GameInfo.redGemCarrier = reader.ReadString();
                     break;
+                
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
