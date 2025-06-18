@@ -8,20 +8,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
-
+using ClassesNamespace;
 
 namespace CTG2.Content.Commands
 {
-    public class ItemData
-    {
-        public string Name { get; set; }
-        public int Type { get; set; }
-        public int Stack { get; set; }
-        public int Prefix { get; set; }
-        public int Slot { get; set; }
-    }
-
-
+    
     public class SaveInventoryCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
@@ -33,7 +24,6 @@ namespace CTG2.Content.Commands
         {
             Player player = caller.Player;
             var inventoryData = new List<ItemData>();
-
             int count = 0;
 
             foreach (Item item in player.inventory)
@@ -72,7 +62,12 @@ namespace CTG2.Content.Commands
 
             string[] inputSplit = input.Split(' ');
 
-            string json = JsonSerializer.Serialize(inventoryData, new JsonSerializerOptions { WriteIndented = true });
+            var inventory = new CtgClass();
+            inventory.HealthPoints = player.statLifeMax2;
+            inventory.ManaPoints = player.statManaMax2;
+            inventory.InventoryItems = inventoryData;
+
+            string json = JsonSerializer.Serialize(inventory, new JsonSerializerOptions { WriteIndented = true });
             string path = Path.Combine(Main.SavePath, "ModSources", "CTG2", "Content", "Classes");
             Directory.CreateDirectory(path);
 
