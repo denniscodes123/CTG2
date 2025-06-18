@@ -208,41 +208,35 @@ namespace CTG2.Content
         private void JungleManPostStatus()
         {
             class6ReleaseTimer = (class6ReleaseTimer > -1) ? class6ReleaseTimer - 1 : -1;
+            
             if (class6ReleaseTimer == 0)
             {
+                Vector2 spawnPos = Player.Center + new Vector2(0, Player.height / 2);
 
-                if (Main.myPlayer == Player.whoAmI && Main.netMode != NetmodeID.MultiplayerClient)
+                for (int i = 0; i < 25; i++)
                 {
-                    Vector2 spawnPos = Player.Center + new Vector2(0, Player.height / 2);
+                    // Horizontal speed, Vertical
+                    float speed = Main.rand.NextFloat(0f, 5f);
 
-                    for (int i = 0; i < 25; i++)
-                    {
-                        // Horizontal speed, Vertical
-                        float speed = Main.rand.NextFloat(0f, 5f);
+                    // might be too fast currently
+                    float direction = Main.rand.NextBool() ? 0f : 180f;
+                    Vector2 velocity = direction.ToRotationVector2() * speed;
 
-                        // might be too fast currently
-                        float direction = Main.rand.NextBool() ? 0f : 180f;
-                        Vector2 velocity = direction.ToRotationVector2() * speed;
+                    //horizontal offset
+                    float xOffset = Main.rand.NextFloat(-32f, 32f); // 1 tile = 16px 
+                    float yOffset = Main.rand.NextFloat(-32f, 10f);
 
-                        //horizontal offset
-                        float xOffset = Main.rand.NextFloat(-32f, 32f); // 1 tile = 16px 
-                        float yOffset = Main.rand.NextFloat(-32f, 10f);
+                    Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
 
-                        Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
-
-                        if (Main.myPlayer == Player.whoAmI && Main.netMode != NetmodeID.MultiplayerClient)
-                        {
-                            Projectile.NewProjectile(
-                                Player.GetSource_Misc("Class6GroundFlames"),
-                                spawnPoss,
-                                velocity,
-                                480, // cursed flame
-                                26,
-                                1f,
-                                Player.whoAmI
-                            );
-                        }
-                    }
+                    Projectile.NewProjectile(
+                        Player.GetSource_Misc("Class6GroundFlames"),
+                        spawnPoss,
+                        velocity,
+                        480, // cursed flame
+                        26,
+                        1f,
+                        Player.whoAmI
+                    );
                 }
             }
         }
@@ -304,7 +298,29 @@ namespace CTG2.Content
 
         private void MinerOnUse() //not finished
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                Point playerTile = Player.Center.ToTileCoordinates();
 
+                for (int offsetX = -13; offsetX <= 13; offsetX++)
+                {
+                    for (int offsetY = -4; offsetY <= 1; offsetY++)
+                    {
+                        int x = playerTile.X + offsetX;
+                        int y = playerTile.Y + offsetY;
+
+                        if (WorldGen.InWorld(x, y))
+                        {
+                            Tile tile = Main.tile[x, y];
+                            if (tile.HasTile && tile.TileType == TileID.Dirt)
+                            {
+                                WorldGen.KillTile(x, y, false, false, true);
+                                NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 0, x, y);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -353,7 +369,7 @@ namespace CTG2.Content
 
                 Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
 
-                Projectile.NewProjectile(Player.GetSource_Misc("Class15Ability"), spawnPoss, velocity, 511, 1, 0);
+                Projectile.NewProjectile(Player.GetSource_Misc("Class15Ability"), spawnPoss, velocity, 511, 0, 0);
 
                 // var mod = ModContent.GetInstance<CTG2>();
                 // ModPacket packet = mod.GetPacket();
@@ -495,7 +511,7 @@ namespace CTG2.Content
                         break;
 
                     case 10: //not finished
-                        //SetCooldown(15);
+                        SetCooldown(1); //15
                         MinerOnUse();
 
                         break;
