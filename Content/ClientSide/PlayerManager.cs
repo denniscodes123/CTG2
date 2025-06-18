@@ -53,10 +53,11 @@ public class PlayerManager : ModPlayer
             {   
                 var player = Main.LocalPlayer.GetModPlayer<ClassSystem>();
                 
-                if (player.playerClass == 0)
+                if (player.playerClass == GameClass.None)
                 {
                     Main.NewText($"You did not select a class! Assigning a random class.");
-                    player.playerClass = CTG2.randomGenerator.Next(1, 18);
+                    var classes = Enum.GetValues(typeof(GameClass));
+                    player.playerClass = (GameClass)CTG2.randomGenerator.Next(1, classes.Length);
                     player.ResetEffects();
                 }
             }

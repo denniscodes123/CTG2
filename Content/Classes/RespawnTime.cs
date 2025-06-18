@@ -20,15 +20,15 @@ namespace CTG2.Content.Classes
 
             switch (modPlayer.playerClass)
             {
-                case 1: // Archer
+                case GameClass.Archer: // Archer
                     Player.respawnTimer = (3 + extraSeconds) * 60;
                     break;
 
-                case 2: 
+                case GameClass.Ninja: 
                     Player.respawnTimer = (1 + extraSeconds) * 60;
                     break;
 
-                case 3: 
+                case GameClass.Beast: 
                     Player.respawnTimer = (2 + extraSeconds) * 60;
                     break;
 

@@ -454,7 +454,7 @@ namespace CTG2.Content
 
             if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && !Player.HasBuff(BuffID.ChaosState)) // Only activate if not on cooldown
             {
-                int selectedClass = Player.GetModPlayer<ClassSystem>().playerClass;
+                int selectedClass = (int)Player.GetModPlayer<ClassSystem>().playerClass;
 
                 switch (selectedClass)
                 {

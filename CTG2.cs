@@ -52,7 +52,7 @@ namespace CTG2
                     var npcX = reader.ReadInt32();
                     var npcY = reader.ReadInt32();
                     var npcType = reader.ReadInt32();
-                    int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("Class14Ability"), npcX, npcY, npcType);
+                    int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("SpawnNPC"), npcX, npcY, npcType);
                     break;
                 case (byte)MessageType.RequestSpawnProjectile:
                     var spawnPos = new Vector2(reader.ReadSingle(), reader.ReadSingle());
@@ -73,8 +73,8 @@ namespace CTG2
                         Main.NewText("hitplayer", Color.Red);
                         player.AddBuff(buffType, time);
                     }
-                    break;
 
+                    break;
                 
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
