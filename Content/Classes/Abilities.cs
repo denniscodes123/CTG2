@@ -299,13 +299,34 @@ namespace CTG2.Content
             packet.Write((int)Player.Center.Y);
             packet.Write(ModContent.NPCType<TikiTotem>());
             packet.Send();
-            
         }
 
 
-        private void TreeOnUse() //not finished
+        private void TreeOnUse() //not done
         {
+            for (int i = 0; i < 7; i++)
+            {
+                float direction = Main.rand.NextBool() ? 0f : 180f;
+                Vector2 velocity = direction.ToRotationVector2() * 0;
 
+                float xOffset = Main.rand.NextFloat(-5f, 5f);
+                float yOffset = Main.rand.NextFloat(-5f, 5f);
+
+                Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
+
+                var mod = ModContent.GetInstance<CTG2>();
+                ModPacket packet = mod.GetPacket();
+                packet.Write((byte)MessageType.RequestSpawnProjectile);
+                packet.Write(spawnPoss.X);
+                packet.Write(spawnPoss.Y);
+                packet.Write(velocity.X);
+                packet.Write(velocity.Y);
+                packet.Write(511);
+                packet.Write(0);
+                packet.Write(0);
+
+                packet.Send();
+            }
         }
 
         
@@ -468,7 +489,7 @@ namespace CTG2.Content
 
                         break;
 
-                    case 16: //not finished
+                    case 16:
                         SetCooldown(1);
                         MutantOnUse();
 
