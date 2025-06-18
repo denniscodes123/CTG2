@@ -133,22 +133,5 @@ namespace CTG2.Content
         }
     }
 
-    public class MapCommand : ModCommand
-    {
-        public override CommandType Type => CommandType.Chat;
-        public override string Command => "nm";
-        public override string Usage => "/nm [mapname]";
-        public override string Description => "Set the current map for spawn points";
 
-        public override void Action(CommandCaller caller, string input, string[] args)
-        {
-            if (args.Length == 0)
-            {
-                caller.Reply("Usage: /nm [mapname]");
-                return;
-            }
-
-            SpawnPoints.SetCurrentMap(args[0]);
-        }
-    }
 }

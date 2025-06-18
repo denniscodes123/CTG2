@@ -24,7 +24,7 @@ namespace CTG2
         RequestSpawnProjectile = 9,
         RequestAddBuff = 10,
 
-        RequestChangeMap = 11,
+        RequestNextMap = 11,
         ServerChangeMap = 12
     }
     
@@ -115,9 +115,20 @@ namespace CTG2
                     GameInfo.redGemCarrier = reader.ReadString();
                     break;
                 
-                case (byte)MessageType.RequestChangeMap:
-                    var map = reader.ReadChar();
-                    break; 
+                case (byte)MessageType.RequestNextMap:
+                    string receivedMapName = reader.ReadString();
+
+
+                    if (Enum.TryParse<MapTypes>(receivedMapName, true, out MapTypes mapType))
+                    {
+
+                        manager.queueMap(mapType);
+                    }
+                    else
+                    {
+                        // log?
+                    }
+                    break;
                 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
