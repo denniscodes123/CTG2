@@ -52,6 +52,14 @@ namespace CTG2
                     var npcType = reader.ReadInt32();
                     int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("Class14Ability"), npcX, npcY, npcType);
                     break;
+                case (byte)MessageType.RequestSpawnProjectile:
+                    var spawnPos = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                    var velocity = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                    var projType = reader.ReadInt32();
+                    var damage = reader.ReadInt32();
+                    var knockback = reader.ReadSingle();
+                    int projectileIndex = Projectile.NewProjectile(Main.LocalPlayer.GetSource_Misc("Class15Ability"), spawnPos, velocity, projType, damage, knockback);
+                    break;
                 
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
