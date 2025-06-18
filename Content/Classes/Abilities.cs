@@ -64,6 +64,50 @@ namespace CTG2.Content
         }
 
 
+        public override void OnHurt(Player.HurtInfo info)
+        {
+            int projectileType = info.DamageSource.SourceProjectileType;
+            int attackerIndex = info.DamageSource.SourcePlayerIndex;
+            
+            if (attackerIndex >= 0 && attackerIndex < Main.maxPlayers) {
+                Player attacker = Main.player[attackerIndex];
+                int damage = info.Damage;
+
+                switch (projectileType)
+                {
+                    case ProjectileID.HellfireArrow:
+                        if (attacker.HasBuff(320))
+                        {
+                            Player.AddBuff(24, 60);
+                            Player.AddBuff(30, 60);
+                            Player.AddBuff(32, 60);
+                            Player.AddBuff(323, 60);
+                        }
+                        break;
+                    
+                    case 15:case 19:
+                        if (attacker.HasBuff(320) && attacker.HasBuff(137))
+                        {
+                            Player.AddBuff(20, 30);
+                            Player.AddBuff(39, 30);
+                            Player.AddBuff(44, 30);
+                            Player.AddBuff(48, 30);
+                        }
+                        break;
+
+                    case 273: case 304:
+                        if (attacker.HasBuff(320))
+                        {
+                            int healAmount = damage / 3;
+                            attacker.statLife += healAmount;
+                            attacker.HealEffect(healAmount);
+                        }
+                        break;
+                }
+            }
+        }
+
+
         private void SetCooldown(int seconds)
         {
             Player.AddBuff(BuffID.ChaosState, seconds * 60);
@@ -72,13 +116,7 @@ namespace CTG2.Content
 
         private void ArcherOnUse()
         {
-            Player.AddBuff(137, 5 * 60);
-        }
-
-
-        private void ArcherPostStatus() // not finished
-        {
-
+            Player.AddBuff(320, 6 * 60);
         }
 
 
@@ -286,7 +324,8 @@ namespace CTG2.Content
 
         private void FlameBunnyOnUse() //not finished
         {
-
+            Player.AddBuff(137, 6 * 60);
+            Player.AddBuff(320, 6 * 60);
         }
 
 
@@ -315,8 +354,6 @@ namespace CTG2.Content
                 Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
 
                 Projectile.NewProjectile(Player.GetSource_Misc("Class15Ability"), spawnPoss, velocity, 511, 1, 0);
-
-                Main.NewText("hitplayer", Color.Red);
 
                 // var mod = ModContent.GetInstance<CTG2>();
                 // ModPacket packet = mod.GetPacket();
@@ -385,7 +422,7 @@ namespace CTG2.Content
 
         private void LeechOnUse() //not finished
         {
-
+            Player.AddBuff(320, 5 * 60);
         }
 
 
@@ -404,7 +441,7 @@ namespace CTG2.Content
                 switch (selectedClass)
                 {
                     case 1:
-                        //SetCooldown(36);
+                        SetCooldown(1); //36
                         ArcherOnUse();
 
                         break;
@@ -511,7 +548,6 @@ namespace CTG2.Content
         //All timer logic below
         public override void PostUpdate()
         {
-            ArcherPostStatus(); 
             GladiatorPostStatus();
             JungleManPostStatus();
             PsychicPostStatus();
