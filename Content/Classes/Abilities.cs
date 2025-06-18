@@ -314,18 +314,22 @@ namespace CTG2.Content
 
                 Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
 
-                var mod = ModContent.GetInstance<CTG2>();
-                ModPacket packet = mod.GetPacket();
-                packet.Write((byte)MessageType.RequestSpawnProjectile);
-                packet.Write(spawnPoss.X);
-                packet.Write(spawnPoss.Y);
-                packet.Write(velocity.X);
-                packet.Write(velocity.Y);
-                packet.Write(511);
-                packet.Write(0);
-                packet.Write(0);
+                Projectile.NewProjectile(Player.GetSource_Misc("Class15Ability"), spawnPoss, velocity, 511, 1, 0);
 
-                packet.Send();
+                Main.NewText("hitplayer", Color.Red);
+
+                // var mod = ModContent.GetInstance<CTG2>();
+                // ModPacket packet = mod.GetPacket();
+                // packet.Write((byte)MessageType.RequestSpawnProjectile);
+                // packet.Write(spawnPoss.X);
+                // packet.Write(spawnPoss.Y);
+                // packet.Write(velocity.X);
+                // packet.Write(velocity.Y);
+                // packet.Write(511);
+                // packet.Write(10);
+                // packet.Write(1);
+
+                // packet.Send();
             }
         }
 
@@ -484,7 +488,7 @@ namespace CTG2.Content
                         break;
 
                     case 15: //not finished 
-                        //SetCooldown(27);
+                        SetCooldown(1); //27
                         TreeOnUse();
 
                         break;
