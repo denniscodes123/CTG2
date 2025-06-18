@@ -9,20 +9,23 @@ using Microsoft.Xna.Framework;
 
 
 namespace CTG2
-{   
+{
     public enum MessageType : byte
     {
         RequestStartGame = 0,  // client → server
-        RequestEndGame   = 1,  // client → server
-        ServerGameStart  = 2,  // server → client
-        ServerGameEnd    = 3,  // server → client
-        RequestPause  = 4,  // client -> server
-        ServerGameUpdate  = 5,  // server → client
+        RequestEndGame = 1,  // client → server
+        ServerGameStart = 2,  // server → client
+        ServerGameEnd = 3,  // server → client
+        RequestPause = 4,  // client -> server
+        ServerGameUpdate = 5,  // server → client
         ServerTeleport = 6, // server -> client
         ServerSetSpawn = 7, // server -> client
         RequestSpawnNpc = 8,
         RequestSpawnProjectile = 9,
-        RequestAddBuff = 10
+        RequestAddBuff = 10,
+
+        RequestChangeMap = 11,
+        ServerChangeMap = 12
     }
     
     public class CTG2 : Mod
@@ -111,6 +114,10 @@ namespace CTG2
                     GameInfo.blueGemCarrier = reader.ReadString();
                     GameInfo.redGemCarrier = reader.ReadString();
                     break;
+                
+                case (byte)MessageType.RequestChangeMap:
+                    var map = reader.ReadChar();
+                    break; 
                 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
