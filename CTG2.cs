@@ -20,7 +20,9 @@ namespace CTG2
         ServerGameUpdate  = 5,  // server → client
         ServerTeleport = 6, // server -> client
         ServerSetSpawn = 7, // server -> client
-        RequestSpawnNpc = 8
+        RequestSpawnNpc = 8,
+        RequestSpawnProjectile = 9,
+        RequestAddBuff = 10
     }
     
     public class CTG2 : Mod
@@ -58,8 +60,21 @@ namespace CTG2
                     var projType = reader.ReadInt32();
                     var damage = reader.ReadInt32();
                     var knockback = reader.ReadSingle();
+
                     int projectileIndex = Projectile.NewProjectile(Main.LocalPlayer.GetSource_Misc("Class15Ability"), spawnPos, velocity, projType, damage, knockback);
                     break;
+                case (byte)MessageType.RequestAddBuff:
+                    var playerID = reader.ReadByte();
+                    var buffType = reader.ReadInt32();
+                    var time = reader.ReadInt32();
+
+                    if (Main.player[playerID] is Player player)
+                    {
+                        Main.NewText("hitplayer", Color.Red);
+                        player.AddBuff(buffType, time);
+                    }
+                    break;
+
                 
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
