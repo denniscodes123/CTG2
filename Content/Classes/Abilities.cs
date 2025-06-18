@@ -444,6 +444,8 @@ namespace CTG2.Content
 
         public override void PostItemCheck() // Upon activation
         {
+            if (Main.netMode == NetmodeID.Server) return;
+            
             if (!initializedMutant)
             {
                 MutantInitialize();
