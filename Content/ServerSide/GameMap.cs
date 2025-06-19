@@ -50,6 +50,10 @@ public class GameMap
     }
     public void LoadMap(MapTypes mapPick)
     {
+        /*
+        needs to be accessed by method in GameManager loadMap
+
+        */
         var mapData = GetMap(mapPick);
         int startX = 600;
         int startY = 100;

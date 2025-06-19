@@ -24,6 +24,7 @@ public class GameManager : ModSystem
     public Gem RedGem { get; private set; }
 
     public Queue<MapTypes> mapQueue = new();
+    private static readonly Random rand = new Random();
 
     public override void OnWorldLoad()
     {
@@ -166,6 +167,20 @@ public class GameManager : ModSystem
 
     public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
         mapQueue.Enqueue(mapType);
+    }
+
+    public void loadMap()
+    {
+        if (this.mapQueue.Count == 0)
+        {
+            Array mapValues = Enum.GetValues(typeof(MapTypes));
+            int randomIndex = rand.Next(mapValues.Length);
+            MapTypes map = (MapTypes)mapValues.GetValue(randomIndex);
+        }
+        else
+        {
+            MapTypes map = this.mapQueue.Dequeue();
+        }
     }
 
     public override void PostUpdateWorld()
