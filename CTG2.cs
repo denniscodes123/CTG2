@@ -88,9 +88,8 @@ namespace CTG2
                     GameInfo.matchStage = 0;
                     Console.WriteLine("Client Received Game End!");
                     break;
-                
                 case (byte)MessageType.ServerTeleport:
-                    var local = Main.player[Main.myPlayer];
+                    var local = Main.player[reader.ReadInt32()];
                     int tpX = reader.ReadInt32();
                     int tpY = reader.ReadInt32();
                     local.Teleport(new Vector2(tpX, tpY), 1);
