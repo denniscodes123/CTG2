@@ -8,7 +8,7 @@ namespace CTG2.Content
     public class TikiTotem : ModNPC
     {
 
-        float healFrameGap = 40;
+        float healFrameGap = 30;
         float frameCount = 0;
 
 
@@ -24,7 +24,7 @@ namespace CTG2.Content
             NPC.height = 48;
             NPC.damage = 0; 
             NPC.defense = 0;
-            NPC.lifeMax = 300;
+            NPC.lifeMax = 600;
             NPC.knockBackResist = 0; //make this higher for more knockback
 
             NPC.aiStyle = -1; 
@@ -61,22 +61,16 @@ namespace CTG2.Content
 
             foreach (Player player in Main.player)
             {
-                if (!player.active || player.dead || player.whoAmI == player.whoAmI)
+                if (!player.active || player.dead)
                     continue;
 
-                if (Vector2.Distance(NPC.Center, player.Center) <= 15 * 16 && frameCount % healFrameGap == 0 && Main.netMode != NetmodeID.MultiplayerClient) // 15 block radius
+                if (Vector2.Distance(NPC.Center, player.Center) <= 14 * 16 && frameCount % healFrameGap == 0) // 14 block radius
                 {   
                     player.statLife += 1;
                     if (player.statLife > player.statLifeMax2)
                         player.statLife = player.statLifeMax2;
 
-                    CombatText.NewText(player.Hitbox, CombatText.HealLife, 1);
                     player.HealEffect(1);
-                    NetMessage.SendData(MessageID.PlayerLifeMana,      // 16
-                        remoteClient: -1,         
-                        ignoreClient: -1,  
-                        text: null,
-                        number: player.whoAmI);
                 }
             }
 
