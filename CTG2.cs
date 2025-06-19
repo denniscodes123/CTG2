@@ -1,11 +1,13 @@
 using System;
 using Terraria.ModLoader;
 using System.IO;
+using ClassesNamespace;
 using Terraria;
 using CTG2.Content;
 using CTG2.Content.ClientSide;
 using CTG2.Content.ServerSide;
 using Microsoft.Xna.Framework;
+using Terraria.ID;
 
 
 namespace CTG2
@@ -25,7 +27,8 @@ namespace CTG2
         RequestAddBuff = 10,
         RequestNextMap = 11,
         ServerChangeMap = 12,
-        RequestTeleport = 13
+        RequestTeleport = 13,
+        RequestMaxHealth = 14
     }
     
     public class CTG2 : Mod
@@ -111,6 +114,15 @@ namespace CTG2
                     packet2.Write(tpX2);
                     packet2.Write(tpY2);
                     packet2.Send();
+                    break;
+                
+                case (byte)MessageType.RequestMaxHealth:
+                    // teleport on server
+                    int sender = reader.ReadInt32();
+                    int newMax = reader.ReadInt32();
+                    var playerToEdit = Main.player[sender];
+                    playerToEdit.statLifeMax = newMax;
+                    playerToEdit.statLifeMax2 = newMax;
                     break;
                 
                 // Server->Client Packets (these cases will run on the Client)

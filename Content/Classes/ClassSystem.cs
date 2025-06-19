@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
+using CTG2;
 
 
 namespace ClassesNamespace
@@ -63,6 +64,19 @@ namespace ClassesNamespace
         private int currentHP = 100;
         private int currentMana = 20;
 
+        public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
+        {   
+            base.ModifyMaxStats(out health, out mana);
+            health = new StatModifier(0f, 0f, 0f, 0f);
+            health.Flat = currentHP;
+        }
+
+        public override void OnEnterWorld()
+        {
+            base.OnEnterWorld();
+            Player.statLifeMax = 100;
+            Player.statLifeMax2 = 100;
+        }
 
         private void SetInventory(CtgClass classData)
         {
@@ -140,20 +154,15 @@ namespace ClassesNamespace
                     }
                     catch
                     {
-                        Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                        Main.NewText("Failed to load or parse inventory file.", Color.Red);
                         return;
                     }
                 }
 
                 SetInventory(classInfo);
                 lastPlayerClass = playerClass;
-                NetMessage.SendData(MessageID.PlayerHeal, -1, -1, null, Player.whoAmI);
-                NetMessage.SendData(MessageID.PlayerMana, -1, -1, null, Player.whoAmI);
             }
-            Player.statLifeMax = currentHP;
-            Player.statLifeMax2 = currentHP;
-            Player.statManaMax = currentMana;
-            Player.statManaMax2 = currentMana;
+            
         }
     }
 }

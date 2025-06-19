@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using Terraria;
+using Terraria.GameContent.Achievements;
 using Terraria.ModLoader;
 
 namespace CTG2.Content.ServerSide;
@@ -73,7 +74,8 @@ public class GameMap
                 {   
                     WorldGen.PlaceTile(wx, wy, (mapTile.TileType ?? 0), 
                         mute: true, forced: true, -1, style: 0);
-                    
+                    var newTile = Framing.GetTileSafely(wx, wy);
+                    newTile.Slope = 0;
                 }
                 else
                 {
@@ -87,7 +89,7 @@ public class GameMap
                 }
                 else
                 {
-                    WorldGen.KillWall(wx, wy);
+                    tile.WallType = 0;
                 }
                 tile.TileColor = (byte)(mapTile.TileColor ?? 0);
                 tile.WallColor = (byte)(mapTile.WallColor ?? 0);

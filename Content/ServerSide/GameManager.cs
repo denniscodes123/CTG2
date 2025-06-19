@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Terraria.WorldBuilding;
 using System.Collections;
 using System.Collections.Generic;
+using Terraria.ID;
 
 namespace CTG2.Content.ServerSide;
 
@@ -100,6 +101,7 @@ public class GameManager : ModSystem
         {
             BlueTeam.SendToBase();
             RedTeam.SendToBase();
+            
         }
         // Increase match duration by 1 tick
         MatchTime++;
