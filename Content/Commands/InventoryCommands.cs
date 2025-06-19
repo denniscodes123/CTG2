@@ -77,7 +77,8 @@ namespace CTG2.Content.Commands
             Main.NewText($"Inventory saved to {filePath}", Color.LightGreen);
         }
     }
-    
+
+
     public class LoadInventoryCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
@@ -101,11 +102,11 @@ namespace CTG2.Content.Commands
             }
 
             string json = File.ReadAllText(filePath);
-            List<ItemData> inventoryData;
+            CtgClass inventoryData;
 
             try
             {
-                inventoryData = JsonSerializer.Deserialize<List<ItemData>>(json);
+                inventoryData = JsonSerializer.Deserialize<CtgClass>(json);
             }
             catch
             {
@@ -113,11 +114,11 @@ namespace CTG2.Content.Commands
                 return;
             }
 
-            // Load items
+            List<ItemData> allItemData = inventoryData.InventoryItems;
 
             for (int b = 0; b < player.inventory.Length; b++)
             {
-                var itemData = inventoryData[b];
+                var itemData = allItemData[b];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
@@ -128,7 +129,7 @@ namespace CTG2.Content.Commands
 
             for (int d = 0; d < player.armor.Length; d++)
             {
-                var itemData = inventoryData[player.inventory.Length + d];
+                var itemData = allItemData[player.inventory.Length + d];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
