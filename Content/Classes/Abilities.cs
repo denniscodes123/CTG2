@@ -393,7 +393,7 @@ namespace CTG2.Content
 
                     var mod = ModContent.GetInstance<CTG2>();
                     
-                    //Player.Teleport()
+                    //class12ClosestPlayer.Teleport(tempPosition);
                     ModPacket packet1 = mod.GetPacket();
                     packet1.Write((byte)MessageType.ServerTeleport);
                     packet1.Write(Player.whoAmI);
