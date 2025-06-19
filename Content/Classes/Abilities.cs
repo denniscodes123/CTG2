@@ -456,44 +456,28 @@ namespace CTG2.Content
                     Player.whoAmI
                 );
             }
-
-            Player.GetModPlayer<Abilities>().class15AbilityTimer = 120;
         }
 
 
         private void TreePostStatus()
         {
-            if (Player.GetModPlayer<Abilities>().class15AbilityTimer != -1) Player.GetModPlayer<Abilities>().class15AbilityTimer--;
-
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile proj = Main.projectile[i];
 
-                if (proj.owner == Player.whoAmI)
+                if (proj.active && proj.type == 511 && proj.owner == Player.whoAmI)
                 {
-                    if (Main.myPlayer == targetPlayer.whoAmI)
+                    foreach (Player other in Main.player)
                     {
-                        Main.NewText("Hello only to you!", Color.LightGreen);
-                    }
-                    if (proj.active && proj.type == 511 && Player.GetModPlayer<Abilities>().class15AbilityTimer > 0)
-                    {
-                        foreach (Player other in Main.player)
+                        if (Player.whoAmI == other.whoAmI) continue;
+                        if (proj.Hitbox.Intersects(other.Hitbox))
                         {
-                            if (Player.whoAmI == other.whoAmI) continue;
-                            if (proj.Hitbox.Intersects(other.Hitbox))
-                            {
-                                //other.AddBuff(160, 30);
-                                //other.AddBuff(197, 30);
+                            other.AddBuff(160, 30);
+                            other.AddBuff(197, 30);
                                     
-                                NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 160, 30);
-                                NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 197, 30);
-                            }
+                            NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 160, 30);
+                            NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 197, 30);
                         }
-                    }
-                    else if (proj.active && proj.type == 511 && Player.GetModPlayer<Abilities>().class15AbilityTimer <= 0)
-                    {
-                        proj.Kill();
-                        //NetMessage.SendData(MessageID.KillProjectile, -1, -1, null, proj.whoAmI);
                     }
                 }
             }
@@ -655,7 +639,7 @@ namespace CTG2.Content
                         break;
 
                     case 14: //not finished
-                        //SetCooldown(20);
+                        SetCooldown(1); //20 
                         TikiPriestOnUse();
 
                         break;
