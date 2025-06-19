@@ -22,20 +22,17 @@ namespace CTG2.Content
         private int class6ReleaseTimer = -1;
 
         private int class8HP = 0;
+
+        private int class12SwapTimer = -1;
+        private int class12ClosestDist = 99999;
+        private Player class12ClosestPlayer = null;
+
         private PlayerDeathReason reason = PlayerDeathReason.ByCustomReason("");
-        private string path = "";
         private string inventoryData = "";
         private List<ItemData> class16RushData;
         private List<ItemData> class16RegenData;
         private bool initializedMutant;
         private int mutantState = 1;
-
-
-        private string GetPathRelativeToSource(string fileName, [CallerFilePath] string sourceFilePath = "")
-        {
-            string folder = Path.GetDirectoryName(sourceFilePath);
-            return Path.Combine(folder, fileName);
-        }
 
 
         private void SetInventory(List<ItemData> classData)
@@ -334,7 +331,51 @@ namespace CTG2.Content
 
         private void ClownOnUse() //not finished
         {
+            Player.AddBuff(320, 60);
+            
+            class12SwapTimer = 60;
 
+            Main.NewText("Swapping...");
+        }
+
+
+        private void ClownPostStatus()
+        {
+            if (class12SwapTimer != -1) class12SwapTimer--;
+
+            if (class12SwapTimer == 0)
+            {
+                foreach (Player other in Main.player)
+                {  
+                    if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
+                        continue;
+
+                    if (Vector2.Distance(Player.Center, other.Center) <= 22 * 16 && Vector2.Distance(Player.Center, other.Center) < class12ClosestDist && Player.team != other.team) // 22 block radius
+                    {
+                        class12ClosestDist = (int) Vector2.Distance(Player.Center, other.Center);
+                        class12ClosestPlayer = other;
+                    }
+                }
+
+                if (class12ClosestPlayer != null)
+                {
+                    Vector2 tempPosition = Player.position;
+                    Player.Teleport(class12ClosestPlayer.position, 1);
+                    class12ClosestPlayer.Teleport(tempPosition, 1);
+
+                    //NetMessage.SendData(MessageID.Teleport, -1, -1, null, 0, Player.whoAmI, Player.position.X, Player.position.Y, 1);
+                    //NetMessage.SendData(MessageID.Teleport, -1, -1, null, 0, class12ClosestPlayer.whoAmI, class12ClosestPlayer.position.X, class12ClosestPlayer.position.Y, 1);
+
+                    Player.AddBuff(BuffID.ChaosState, 13 * 60);
+
+                    Main.NewText("Successfully swapped!");
+                }
+                
+                class12ClosestDist = 99999;
+                class12ClosestPlayer = null;
+
+                Main.NewText("Unsuccessfully swapped!");
+            }
         }
 
 
@@ -389,8 +430,9 @@ namespace CTG2.Content
         
         private void MutantInitialize()
         {
-            path = GetPathRelativeToSource("rushmutant.json");
-            inventoryData = File.ReadAllText(path);
+            var path = Mod.GetFileStream($"Content/Classes/rushmutant.json");
+            var fileReader = new StreamReader(path);
+            inventoryData = fileReader.ReadToEnd();
             try
             {
                 class16RushData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
@@ -401,8 +443,9 @@ namespace CTG2.Content
                 return;
             }
 
-            path = GetPathRelativeToSource("regenmutant.json");
-            inventoryData = File.ReadAllText(path);
+            path = Mod.GetFileStream($"Content/Classes/regenmutant.json");
+            fileReader = new StreamReader(path);
+            inventoryData = fileReader.ReadToEnd();
             try
             {
                 class16RegenData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
@@ -525,7 +568,7 @@ namespace CTG2.Content
                         break;
 
                     case 12: //not finished
-                        //SetCooldown(11);
+                        SetCooldown(14);
                         ClownOnUse();
 
                         break;
@@ -569,6 +612,7 @@ namespace CTG2.Content
             GladiatorPostStatus();
             JungleManPostStatus();
             PsychicPostStatus();
+            ClownPostStatus();
         }
     }
 }
