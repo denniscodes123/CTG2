@@ -23,9 +23,9 @@ namespace CTG2
         RequestSpawnNpc = 8,
         RequestSpawnProjectile = 9,
         RequestAddBuff = 10,
-
         RequestNextMap = 11,
-        ServerChangeMap = 12
+        ServerChangeMap = 12,
+        RequestTeleport = 13
     }
     
     public class CTG2 : Mod
@@ -79,6 +79,40 @@ namespace CTG2
 
                     break;
                 
+                case (byte)MessageType.RequestNextMap:
+                    string receivedMapName = reader.ReadString();
+
+
+                    if (Enum.TryParse<MapTypes>(receivedMapName, true, out MapTypes mapType))
+                    {
+
+                        manager.queueMap(mapType);
+                    }
+                    else
+                    {
+                        // log?
+                    }
+                    break;
+                
+                // mainly used for clown ability
+                case (byte)MessageType.RequestTeleport:
+                    // teleport on server
+                    var id2 = reader.ReadInt32();
+                    int tpX2 = reader.ReadInt32();
+                    int tpY2 = reader.ReadInt32();
+                    var ply = Main.player[id2];
+                    ply.Teleport(new Vector2(tpX2, tpY2));
+                    Console.WriteLine("Server Received Teleport!");
+                    // then tell all clients they were teleported
+                    var mod = ModContent.GetInstance<CTG2>();
+                    ModPacket packet2 = mod.GetPacket();
+                    packet2.Write((byte)MessageType.ServerTeleport);
+                    packet2.Write(ply.whoAmI);
+                    packet2.Write(tpX2);
+                    packet2.Write(tpY2);
+                    packet2.Send();
+                    break;
+                
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
                     GameInfo.matchStage = 1;
@@ -112,21 +146,6 @@ namespace CTG2
                     GameInfo.redGemX = reader.ReadInt32();
                     GameInfo.blueGemCarrier = reader.ReadString();
                     GameInfo.redGemCarrier = reader.ReadString();
-                    break;
-                
-                case (byte)MessageType.RequestNextMap:
-                    string receivedMapName = reader.ReadString();
-
-
-                    if (Enum.TryParse<MapTypes>(receivedMapName, true, out MapTypes mapType))
-                    {
-
-                        manager.queueMap(mapType);
-                    }
-                    else
-                    {
-                        // log?
-                    }
                     break;
                 
                 default:

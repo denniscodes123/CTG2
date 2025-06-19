@@ -24,7 +24,8 @@ public class GameManager : ModSystem
     public Gem RedGem { get; private set; }
 
     public Queue<MapTypes> mapQueue = new();
-    private static readonly Random rand = new Random();
+    
+    public GameMap Map { get; private set; }
 
     public override void OnWorldLoad()
     {
@@ -35,6 +36,8 @@ public class GameManager : ModSystem
 
         BlueTeam = new GameTeam(new Vector2(12346, 10940), new Vector2(12346, 10940), 3);
         RedTeam = new GameTeam(new Vector2(20385, 10940), new Vector2(20385, 10940), 1);
+        
+        Map = new GameMap();
 
         IsGameActive = false;
         MatchTime = 0;
@@ -54,6 +57,16 @@ public class GameManager : ModSystem
         // Map Set
 
         //TODO: Create MapLoad() function (maybe using a GameMap class?)
+        bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
+        if (isMapPicked)
+        {
+            Map.LoadMap(result);
+        }
+        else
+        {
+            Map.LoadMap((MapTypes)CTG2.randomGenerator.Next(0, 7));
+        }
+        
 
         BlueTeam.StartMatch();
         RedTeam.StartMatch();
@@ -167,20 +180,6 @@ public class GameManager : ModSystem
 
     public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
         mapQueue.Enqueue(mapType);
-    }
-
-    public void loadMap()
-    {
-        if (this.mapQueue.Count == 0)
-        {
-            Array mapValues = Enum.GetValues(typeof(MapTypes));
-            int randomIndex = rand.Next(mapValues.Length);
-            MapTypes map = (MapTypes)mapValues.GetValue(randomIndex);
-        }
-        else
-        {
-            MapTypes map = this.mapQueue.Dequeue();
-        }
     }
 
     public override void PostUpdateWorld()

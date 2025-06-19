@@ -146,12 +146,14 @@ namespace ClassesNamespace
                 }
 
                 SetInventory(classInfo);
+                lastPlayerClass = playerClass;
+                NetMessage.SendData(MessageID.PlayerHeal, -1, -1, null, Player.whoAmI);
+                NetMessage.SendData(MessageID.PlayerMana, -1, -1, null, Player.whoAmI);
             }
-
+            Player.statLifeMax = currentHP;
             Player.statLifeMax2 = currentHP;
+            Player.statManaMax = currentMana;
             Player.statManaMax2 = currentMana;
-
-            lastPlayerClass = playerClass;
         }
     }
 }

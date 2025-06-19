@@ -66,14 +66,9 @@ namespace CTG2.Content
 
                 if (Vector2.Distance(NPC.Center, player.Center) <= 14 * 16 && frameCount % healFrameGap == 0) // 14 block radius
                 {   
-                    player.statLife += 1;
-                    if (player.statLife > player.statLifeMax2)
-                        player.statLife = player.statLifeMax2;
-
-                    player.HealEffect(1);
+                    player.Heal(1);
                 }
             }
-
             frameCount++;
         }
     }

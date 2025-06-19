@@ -390,24 +390,25 @@ namespace CTG2.Content
                 if (class12ClosestPlayer != null)
                 {
                     Vector2 tempPosition = Player.position;
+                    Vector2 tempPosition2 = class12ClosestPlayer.position;
 
                     var mod = ModContent.GetInstance<CTG2>();
                     
                     //class12ClosestPlayer.Teleport(tempPosition);
                     ModPacket packet1 = mod.GetPacket();
-                    packet1.Write((byte)MessageType.ServerTeleport);
+                    packet1.Write((byte)MessageType.RequestTeleport);
                     packet1.Write(Player.whoAmI);
-                    packet1.Write(class12ClosestPlayer.position.X);
-                    packet1.Write(class12ClosestPlayer.position.Y);
+                    packet1.Write((int)tempPosition2.X);
+                    packet1.Write((int)tempPosition2.Y);
                     packet1.Send();
 
                     ModPacket packet2 = mod.GetPacket();
-                    packet2.Write((byte)MessageType.ServerTeleport);
+                    packet2.Write((byte)MessageType.RequestTeleport);
                     packet2.Write(class12ClosestPlayer.whoAmI);
-                    packet2.Write(tempPosition.X);
-                    packet2.Write(tempPosition.Y);
+                    packet2.Write((int)tempPosition.X);
+                    packet2.Write((int)tempPosition.Y);
                     packet2.Send();
-
+                    
                     Player.AddBuff(BuffID.ChaosState, 26 * 60);
 
                     Main.NewText("Successfully swapped!");

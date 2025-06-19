@@ -14,20 +14,19 @@ public enum MapTypes
     Triangles,
     Keep,
     Classic,
-    SteppingStones,
     Goblin
 }
 
 public class MapData
 {
-    public int TileType { get; set; }
-    public int WallType  { get; set; }
-    public int TileColor  { get; set; }
-    public int WallColor  { get; set; }
+    public int? TileType { get; set; }
+    public int? WallType  { get; set; }
+    public int? TileColor  { get; set; }
+    public int? WallColor  { get; set; }
 }
 public class GameMap
 {
-    public List<MapData> GetMap(MapTypes map)
+    public List<List<MapData>> GetMap(MapTypes map)
     {
         string fileName = map.ToString().ToLower();
         var mod = ModContent.GetInstance<CTG2>();
@@ -38,7 +37,7 @@ public class GameMap
             var jsonData = fileReader.ReadToEnd();
             try
             {
-                var mapData = JsonSerializer.Deserialize<List<MapData>>(jsonData);
+                var mapData = JsonSerializer.Deserialize<List<List<MapData>>>(jsonData);
                 return mapData;
             }
             catch
@@ -55,23 +54,49 @@ public class GameMap
 
         */
         var mapData = GetMap(mapPick);
-        int startX = 600;
-        int startY = 100;
+        int startX = 856;
+        int startY = 682;
         
-        int mapWidth = 500;
-        int mapHeight = 100;
-        int idx = 0;
-        for (int y = startY; y < startY + mapHeight; y++)
+        int mapWidth = mapData[0].Count;
+        int mapHeight = mapData.Count;
+        for (int y = 0; y < mapHeight; y++)
         {
-            for (int x = startX; x < startX + mapWidth; x++)
+            for (int x = 0; x < mapWidth; x++)
             {   
-                Tile tile = Framing.GetTileSafely(x, y);
+                
+                int wx = x+startX;
+                int wy = y+startY;
+                Tile tile = Framing.GetTileSafely(wx, wy);
+                var mapTile = mapData[y][x];
+                
+                if (mapTile.TileType.HasValue)
+                {   
+                    WorldGen.PlaceTile(wx, wy, (mapTile.TileType ?? 0), 
+                        mute: true, forced: true, -1, style: 0);
+                    
+                }
+                else
+                {
+                    WorldGen.KillTile(wx, wy, noItem: true);
+                }
 
-                tile.TileType = (ushort)mapData[idx].TileType;
-                tile.WallType = (ushort)mapData[idx].WallType;
-                tile.TileColor = (byte)mapData[idx].TileColor;
-                tile.WallColor = (byte)mapData[idx].WallColor;
-                idx++;
+                if (mapTile.WallType.HasValue)
+                {   
+                    WorldGen.PlaceWall(wx, wy, (mapTile.WallType ?? 0), mute: true);
+                    
+                }
+                else
+                {
+                    WorldGen.KillWall(wx, wy);
+                }
+                tile.TileColor = (byte)(mapTile.TileColor ?? 0);
+                tile.WallColor = (byte)(mapTile.WallColor ?? 0);
+                
+                // Send tile update squares
+                if (x % 7 == 0 || y % 7 == 0)
+                {
+                    NetMessage.SendTileSquare(-1, x+startX, y+startY, 15);
+                }
             }
         }
     }

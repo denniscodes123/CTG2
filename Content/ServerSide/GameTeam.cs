@@ -50,6 +50,7 @@ public class GameTeam
             
             ModPacket packet2 = mod.GetPacket();
             packet2.Write((byte)MessageType.ServerTeleport);
+            packet2.Write(ply.whoAmI);
             packet2.Write(tpX);
             packet2.Write(tpY);
             packet2.Send(toClient: ply.whoAmI);
@@ -68,6 +69,7 @@ public class GameTeam
             int tpY = (int)BaseLocation.Y;
             ModPacket packet2 = mod.GetPacket();
             packet2.Write((byte)MessageType.ServerTeleport);
+            packet2.Write(ply.whoAmI);
             packet2.Write(tpX);
             packet2.Write(tpY);
             packet2.Send(toClient: ply.whoAmI);

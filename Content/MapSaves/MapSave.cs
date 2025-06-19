@@ -14,6 +14,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using CTG2.Content;
 using System.Linq;
+using CTG2.Content.ServerSide;
+using Terraria.GameContent.Biomes;
 
 
 namespace CTG2.Content
@@ -71,7 +73,7 @@ namespace CTG2.Content
 
         public override string Description => "saves world under <name>.json";
 
-                public override void Action(CommandCaller caller, string input, string[] args)
+        public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length == 0)
             {
@@ -87,14 +89,38 @@ namespace CTG2.Content
 
             try
             {
-              
+                /*
                 TileSnapshot[,] savedTiles = WorldProperties.SaveRegion(
                     (int)(MapSave.startPoint.X / 16), (int)(MapSave.startPoint.Y / 16),
                     (int)(MapSave.endPoint.X / 16), (int)(MapSave.endPoint.Y / 16)
                 );
+                */
+                int width = 334;
+                int height = 57;
+                int startX = (int)(MapSave.startPoint.X / 16);
+                int startY = (int)(MapSave.startPoint.Y / 16);
                 
+                var rows = new List<List<MapData>>(height);
+                for (int y = 0; y < height; y++)
+                {
+                    var row = new List<MapData>(width);
+                    for (int x = 0; x < width; x++)
+                    {
+                        var tile = Framing.GetTileSafely(startX + x, startY + y);
+
+                        // if your MapData uses nullable ints, they'll pick up `null` here
+                        row.Add(new MapData
+                        {
+                            TileType  = tile.HasTile    ? (int?)tile.TileType  : null,
+                            WallType  = tile.WallType   != 0   ? (int?)tile.WallType  : null,
+                            TileColor = tile.TileColor,
+                            WallColor = tile.WallColor
+                        });
+                    }
+                    rows.Add(row);
+                }
     
-                string json = JsonConvert.SerializeObject(savedTiles, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(rows, Formatting.Indented);
 
   
                 string saveDirectory = Path.Combine(Main.SavePath, "Mods", "CTG2", "MapSaves");
