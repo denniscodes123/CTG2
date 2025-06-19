@@ -27,19 +27,22 @@ namespace CTG2.Content
         private int class12ClosestDist = 99999;
         private Player class12ClosestPlayer = null;
 
-        private PlayerDeathReason reason = PlayerDeathReason.ByCustomReason("");
-        private string inventoryData = "";
-        private List<ItemData> class16RushData;
-        private List<ItemData> class16RegenData;
+        private CtgClass class16RushData;
+        private CtgClass class16RegenData;
         private bool initializedMutant;
         private int mutantState = 1;
 
 
-        private void SetInventory(List<ItemData> classData)
+        private void SetInventory(CtgClass classData)
         {
+            Player.statLifeMax2 = classData.HealthPoints;
+            Player.statManaMax2 = classData.ManaPoints;
+
+            List<ItemData> classItems = classData.InventoryItems;
+
             for (int b = 0; b < Player.inventory.Length; b++)
             {
-                var itemData = classData[b];
+                var itemData = classItems[b];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
@@ -50,7 +53,7 @@ namespace CTG2.Content
 
             for (int d = 0; d < Player.armor.Length; d++)
             {
-                var itemData = classData[Player.inventory.Length + d];
+                var itemData = classItems[Player.inventory.Length + d];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
@@ -268,7 +271,7 @@ namespace CTG2.Content
                 Player.statLife = class8HP;
             }
 
-            if (Player.statLife <= 0) Player.KillMe(reason, 1, 0);
+            if (Player.statLife <= 0) Player.KillMe(PlayerDeathReason.ByCustomReason(""), 1, 0);
         }
 
 
@@ -430,30 +433,33 @@ namespace CTG2.Content
         
         private void MutantInitialize()
         {
-            var path = Mod.GetFileStream($"Content/Classes/rushmutant.json");
-            var fileReader = new StreamReader(path);
-            inventoryData = fileReader.ReadToEnd();
-            try
+            using (var stream = Mod.GetFileStream($"Content/Classes/rushmutant.json"))
+            using (var fileReader = new StreamReader(stream))
             {
-                class16RushData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
+                var jsonData = fileReader.ReadToEnd();
+                try
+                {
+                    class16RushData = JsonSerializer.Deserialize<CtgClass>(jsonData);
+                }
+                catch
+                {
+                    Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                    return;
+                }
             }
-            catch
+            using (var stream = Mod.GetFileStream($"Content/Classes/regenmutant.json"))
+            using (var fileReader = new StreamReader(stream))
             {
-                Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
-                return;
-            }
-
-            path = Mod.GetFileStream($"Content/Classes/regenmutant.json");
-            fileReader = new StreamReader(path);
-            inventoryData = fileReader.ReadToEnd();
-            try
-            {
-                class16RegenData = JsonSerializer.Deserialize<List<ItemData>>(inventoryData);
-            }
-            catch
-            {
-                Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
-                return;
+                var jsonData = fileReader.ReadToEnd();
+                try
+                {
+                    class16RegenData = JsonSerializer.Deserialize<CtgClass>(jsonData);
+                }
+                catch
+                {
+                    Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                    return;
+                }
             }
         }
 
