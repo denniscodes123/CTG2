@@ -29,6 +29,8 @@ namespace CTG2.Content
         private int class12ClosestDist = 99999;
         private Player class12ClosestPlayer = null;
 
+        private int class15AbilityTimer = -1;
+
         private CtgClass class16RushData;
         private CtgClass class16RegenData;
         private bool initializedMutant;
@@ -106,12 +108,15 @@ namespace CTG2.Content
                         }
                         break;
                     case 496: // Black Mage ability
-                        attacker.GetModPlayer<Abilities>().class7HitCounter++;
+                        if (!attacker.HasBuff(206))
+                        {
+                            attacker.GetModPlayer<Abilities>().class7HitCounter++;
 
-                        if (attacker.GetModPlayer<Abilities>().class7HitCounter < 10)
-                            Main.NewText($"{attacker.GetModPlayer<Abilities>().class7HitCounter}/10 hits");
-                        else {
-                            Main.NewText("10/10 hits");
+                            if (attacker.GetModPlayer<Abilities>().class7HitCounter < 10)
+                                Main.NewText($"{attacker.GetModPlayer<Abilities>().class7HitCounter}/10 hits");
+                            else {
+                                Main.NewText("10/10 hits");
+                            }
                         }
                         break;
                 }
@@ -384,22 +389,36 @@ namespace CTG2.Content
 
                 if (class12ClosestPlayer != null)
                 {
-                    Vector2 tempPosition = Player.Center;
-                    Player.Teleport(class12ClosestPlayer.Center, 1);
-                    class12ClosestPlayer.Teleport(tempPosition, 1);
+                    Vector2 tempPosition = Player.position;
 
-                    //NetMessage.SendData(MessageID.Teleport, -1, -1, null, 0, Player.whoAmI, Player.position.X, Player.position.Y, 1);
-                    //NetMessage.SendData(MessageID.Teleport, -1, -1, null, 0, class12ClosestPlayer.whoAmI, class12ClosestPlayer.position.X, class12ClosestPlayer.position.Y, 1);
+                    var mod = ModContent.GetInstance<CTG2>();
+                    
+                    //Player.Teleport()
+                    ModPacket packet1 = mod.GetPacket();
+                    packet1.Write((byte)MessageType.ServerTeleport);
+                    packet1.Write(Player.whoAmI);
+                    packet1.Write(class12ClosestPlayer.position.X);
+                    packet1.Write(class12ClosestPlayer.position.Y);
+                    packet1.Send();
 
-                    Player.AddBuff(BuffID.ChaosState, 13 * 60);
+                    ModPacket packet2 = mod.GetPacket();
+                    packet2.Write((byte)MessageType.ServerTeleport);
+                    packet2.Write(class12ClosestPlayer.whoAmI);
+                    packet2.Write(tempPosition.X);
+                    packet2.Write(tempPosition.Y);
+                    packet2.Send();
+
+                    Player.AddBuff(BuffID.ChaosState, 26 * 60);
 
                     Main.NewText("Successfully swapped!");
+                }
+                else
+                {
+                    Main.NewText("Swap was unsuccessful!");
                 }
                 
                 class12ClosestDist = 99999;
                 class12ClosestPlayer = null;
-
-                Main.NewText("Swap was unsuccessful!");
             }
         }
 
@@ -427,28 +446,56 @@ namespace CTG2.Content
         {
             for (int i = 0; i < 7; i++)
             {
-                float direction = Main.rand.NextBool() ? 0f : 180f;
-                Vector2 velocity = direction.ToRotationVector2() * 0;
+                Projectile.NewProjectile(
+                    Player.GetSource_Misc("Class15Ability"),
+                    Player.Center,
+                    Vector2.Zero,
+                    511, 
+                    0,
+                    0f,
+                    Player.whoAmI
+                );
+            }
 
-                float xOffset = Main.rand.NextFloat(-5f, 5f);
-                float yOffset = Main.rand.NextFloat(-5f, 5f);
+            Player.GetModPlayer<Abilities>().class15AbilityTimer = 120;
+        }
 
-                Vector2 spawnPoss = Player.Center + new Vector2(xOffset, Player.height / 2f + yOffset);
 
-                Projectile.NewProjectile(Player.GetSource_Misc("Class15Ability"), spawnPoss, velocity, 511, 0, 0);
+        private void TreePostStatus()
+        {
+            if (Player.GetModPlayer<Abilities>().class15AbilityTimer != -1) Player.GetModPlayer<Abilities>().class15AbilityTimer--;
 
-                // var mod = ModContent.GetInstance<CTG2>();
-                // ModPacket packet = mod.GetPacket();
-                // packet.Write((byte)MessageType.RequestSpawnProjectile);
-                // packet.Write(spawnPoss.X);
-                // packet.Write(spawnPoss.Y);
-                // packet.Write(velocity.X);
-                // packet.Write(velocity.Y);
-                // packet.Write(511);
-                // packet.Write(10);
-                // packet.Write(1);
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile proj = Main.projectile[i];
 
-                // packet.Send();
+                if (proj.owner == Player.whoAmI)
+                {
+                    if (Main.myPlayer == targetPlayer.whoAmI)
+                    {
+                        Main.NewText("Hello only to you!", Color.LightGreen);
+                    }
+                    if (proj.active && proj.type == 511 && Player.GetModPlayer<Abilities>().class15AbilityTimer > 0)
+                    {
+                        foreach (Player other in Main.player)
+                        {
+                            if (Player.whoAmI == other.whoAmI) continue;
+                            if (proj.Hitbox.Intersects(other.Hitbox))
+                            {
+                                //other.AddBuff(160, 30);
+                                //other.AddBuff(197, 30);
+                                    
+                                NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 160, 30);
+                                NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 197, 30);
+                            }
+                        }
+                    }
+                    else if (proj.active && proj.type == 511 && Player.GetModPlayer<Abilities>().class15AbilityTimer <= 0)
+                    {
+                        proj.Kill();
+                        //NetMessage.SendData(MessageID.KillProjectile, -1, -1, null, proj.whoAmI);
+                    }
+                }
             }
         }
 
@@ -566,7 +613,7 @@ namespace CTG2.Content
                         break;
 
                     case 7:
-                        SetCooldown(42);
+                        SetCooldown(1);
                         BlackMageOnUse();
 
                         break;
@@ -641,6 +688,7 @@ namespace CTG2.Content
             JungleManPostStatus();
             PsychicPostStatus();
             ClownPostStatus();
+            TreePostStatus();
         }
     }
 }
