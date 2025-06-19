@@ -89,10 +89,10 @@ namespace CTG2
                     Console.WriteLine("Client Received Game End!");
                     break;
                 case (byte)MessageType.ServerTeleport:
-                    var local = Main.player[reader.ReadInt32()];
+                    var id = reader.ReadInt32();
                     int tpX = reader.ReadInt32();
                     int tpY = reader.ReadInt32();
-                    local.Teleport(new Vector2(tpX, tpY), 1);
+                    Main.player[id].Teleport(new Vector2(tpX, tpY));
                     Console.WriteLine("Client Received Teleport!");
                     break;
                 case (byte)MessageType.ServerSetSpawn:
