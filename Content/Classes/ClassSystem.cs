@@ -23,6 +23,7 @@ namespace ClassesNamespace
         public int Slot { get; set; }
     }
 
+
     public enum GameClass : int
     {   
         None,
@@ -46,6 +47,7 @@ namespace ClassesNamespace
         Leech
     }
 
+
     public class CtgClass
     {   
         public int HealthPoints { get; set; }
@@ -53,20 +55,30 @@ namespace ClassesNamespace
         public List<ItemData> InventoryItems { get; set; }
     }
     
+
     public class ClassSystem : ModPlayer
     {
         public GameClass playerClass = GameClass.None;
         private GameClass lastPlayerClass = GameClass.None;
         private int currentHP = 100;
-        string path = "";
-        string inventoryData = "";
-        List<ItemData> classData;
+        private int currentMana = 20;
 
-        private void SetInventory(List<ItemData> classData)
+
+        private void SetInventory(CtgClass classData)
         {
+            Player.statLifeMax2 = classData.HealthPoints;
+            Player.statLife = classData.HealthPoints;
+            Player.statManaMax2 = classData.ManaPoints;
+            Player.statMana = classData.ManaPoints;
+
+            currentHP = classData.HealthPoints;
+            currentMana = classData.ManaPoints;
+
+            List<ItemData> classItems = classData.InventoryItems;
+
             for (int b = 0; b < Player.inventory.Length; b++)
             {
-                var itemData = classData[b];
+                var itemData = classItems[b];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
@@ -77,7 +89,7 @@ namespace ClassesNamespace
 
             for (int d = 0; d < Player.armor.Length; d++)
             {
-                var itemData = classData[Player.inventory.Length + d];
+                var itemData = classItems[Player.inventory.Length + d];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
@@ -87,6 +99,7 @@ namespace ClassesNamespace
             }
         }
         
+
         private void SpawnCustomItem(int itemID, int? prefix = null, int? damage = null, int? useTime = null, int? useAnimation = null, float? scale = null, float? knockBack = null, int? shoot = null, float? shootSpeed = null, Color? colorOverride = null)
         {
             Item item = new Item();
@@ -108,11 +121,11 @@ namespace ClassesNamespace
 
         public override void ResetEffects()
         {
-
             Player.AddBuff(BuffID.Shine, 54000);
             Player.AddBuff(BuffID.NightOwl, 54000);
             Player.AddBuff(BuffID.Builder, 54000);
 
+            CtgClass classInfo;
 
             if (playerClass != lastPlayerClass)
             {   
@@ -123,10 +136,7 @@ namespace ClassesNamespace
                     var jsonData = fileReader.ReadToEnd();
                     try
                     {
-                        var classInfo = JsonSerializer.Deserialize<CtgClass>(jsonData);
-                        classData = classInfo.InventoryItems;
-                        currentHP = classInfo.HealthPoints;
-                        // currentMana = classInfo.ManaPoints;
+                        classInfo = JsonSerializer.Deserialize<CtgClass>(jsonData);
                     }
                     catch
                     {
@@ -135,11 +145,11 @@ namespace ClassesNamespace
                     }
                 }
 
-                SetInventory(classData);
+                SetInventory(classInfo);
             }
 
             Player.statLifeMax2 = currentHP;
-            if (playerClass != lastPlayerClass) Player.statLife = currentHP;
+            Player.statManaMax2 = currentMana;
 
             lastPlayerClass = playerClass;
         }
