@@ -21,6 +21,8 @@ namespace CTG2.Content
 
         private int class6ReleaseTimer = -1;
 
+        public int class7HitCounter = 0;
+
         private int class8HP = 0;
 
         private int class12SwapTimer = -1;
@@ -75,7 +77,7 @@ namespace CTG2.Content
 
                 switch (projectileType)
                 {
-                    case ProjectileID.HellfireArrow:
+                    case ProjectileID.HellfireArrow: // Archer ability
                         if (attacker.HasBuff(320))
                         {
                             Player.AddBuff(24, 60);
@@ -85,7 +87,7 @@ namespace CTG2.Content
                         }
                         break;
                     
-                    case 15:case 19:
+                    case 15: case 19: // Flame Bunny ability
                         if (attacker.HasBuff(320) && attacker.HasBuff(137))
                         {
                             Player.AddBuff(20, 30);
@@ -95,12 +97,21 @@ namespace CTG2.Content
                         }
                         break;
 
-                    case 273: case 304:
+                    case 273: case 304: // Leech ability
                         if (attacker.HasBuff(320))
                         {
                             int healAmount = damage / 3;
                             attacker.statLife += healAmount;
                             attacker.HealEffect(healAmount);
+                        }
+                        break;
+                    case 496: // Black Mage ability
+                        attacker.GetModPlayer<Abilities>().class7HitCounter++;
+
+                        if (attacker.GetModPlayer<Abilities>().class7HitCounter < 10)
+                            Main.NewText($"{attacker.GetModPlayer<Abilities>().class7HitCounter}/10 hits");
+                        else {
+                            Main.NewText("10/10 hits");
                         }
                         break;
                 }
@@ -244,10 +255,21 @@ namespace CTG2.Content
 
         private void BlackMageOnUse()
         {
-            Player.AddBuff(176, 15);
-            Player.AddBuff(26, 420);
-            Player.AddBuff(137, 420);
-            Player.AddBuff(320, 420);
+            if (Player.GetModPlayer<Abilities>().class7HitCounter >= 10)
+            {
+                Player.AddBuff(176, 15);
+                Player.AddBuff(206, 420);
+                Player.AddBuff(137, 420);
+                Player.AddBuff(320, 420);
+
+                Player.GetModPlayer<Abilities>().class7HitCounter = 0;
+
+                Main.NewText("Ability activated!");
+            }
+            else
+            {
+                Main.NewText($"{Player.GetModPlayer<Abilities>().class7HitCounter}/10 hits");
+            }
         }
 
 
@@ -362,8 +384,8 @@ namespace CTG2.Content
 
                 if (class12ClosestPlayer != null)
                 {
-                    Vector2 tempPosition = Player.position;
-                    Player.Teleport(class12ClosestPlayer.position, 1);
+                    Vector2 tempPosition = Player.Center;
+                    Player.Teleport(class12ClosestPlayer.Center, 1);
                     class12ClosestPlayer.Teleport(tempPosition, 1);
 
                     //NetMessage.SendData(MessageID.Teleport, -1, -1, null, 0, Player.whoAmI, Player.position.X, Player.position.Y, 1);
@@ -377,7 +399,7 @@ namespace CTG2.Content
                 class12ClosestDist = 99999;
                 class12ClosestPlayer = null;
 
-                Main.NewText("Unsuccessfully swapped!");
+                Main.NewText("Swap was unsuccessful!");
             }
         }
 
