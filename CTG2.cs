@@ -64,6 +64,7 @@ namespace CTG2
                     var npcX = reader.ReadInt32();
                     var npcY = reader.ReadInt32();
                     var npcType = reader.ReadInt32();
+                    // use ai0 to store spawning player's team.
                     float ai0 = (float)reader.ReadInt32();
                     float ai1 = reader.ReadSingle();
                     int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("SpawnNPC"), npcX, npcY, npcType, 0, ai0, ai1);
