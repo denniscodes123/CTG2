@@ -32,6 +32,11 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.damage = 60;
                     item.shootSpeed = 10f;
                     break;
+
+                case ItemID.WhoopieCushion:
+                    item.useTime = 1;
+                    item.useAnimation = 1;
+                    break;
             }
         }
     }
