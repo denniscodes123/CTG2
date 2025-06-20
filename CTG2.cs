@@ -28,12 +28,17 @@ namespace CTG2
         RequestNextMap = 11,
         ServerChangeMap = 12,
         RequestTeleport = 13,
-        RequestMaxHealth = 14
+        RequestMaxHealth = 14,
+        SyncNpcIndex = 15,
+        SetNpcTeam = 16
     }
     
     public class CTG2 : Mod
     {   
+        public static int requestedNpcIndex = 0;
         public static Random randomGenerator = new Random();
+
+
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {   
             // GameManager
@@ -59,6 +64,16 @@ namespace CTG2
                     var npcY = reader.ReadInt32();
                     var npcType = reader.ReadInt32();
                     int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("SpawnNPC"), npcX, npcY, npcType);
+                    setRequestedNpcIndex(npcIndex);
+                    break;
+                case (byte)MessageType.SyncNpcIndex:
+                    int syncedNpcIndex = reader.ReadInt32();
+                    CTG2.requestedNpcIndex = syncedNpcIndex;
+                    break;
+                case (byte)MessageType.SetNpcTeam:
+                    int NpcIndex = reader.ReadInt32();
+                    int npcTeam = reader.ReadInt32();Main.npc[NpcIndex].GetGlobalNPC<AllNpcs>().team = npcTeam;
+                    
                     break;
                 case (byte)MessageType.RequestSpawnProjectile:
                     var spawnPos = new Vector2(reader.ReadSingle(), reader.ReadSingle());
@@ -164,6 +179,17 @@ namespace CTG2
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
             }
+        }
+
+
+        public void setRequestedNpcIndex(int index)
+        {
+            CTG2.requestedNpcIndex = index;
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.SyncNpcIndex);
+            packet.Write(index);
+            packet.Send();
         }
     }
 }
