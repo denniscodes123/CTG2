@@ -30,7 +30,8 @@ namespace CTG2
         RequestTeleport = 13,
         RequestMaxHealth = 14,
         SyncNpcIndex = 15,
-        SetNpcTeam = 16
+        SetNpcTeam = 16,
+        RequestTeamChange = 17
     }
     
     public class CTG2 : Mod
@@ -63,8 +64,10 @@ namespace CTG2
                     var npcX = reader.ReadInt32();
                     var npcY = reader.ReadInt32();
                     var npcType = reader.ReadInt32();
-                    int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("SpawnNPC"), npcX, npcY, npcType);
-                    setRequestedNpcIndex(npcIndex);
+                    float ai0 = (float)reader.ReadInt32();
+                    float ai1 = reader.ReadSingle();
+                    int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("SpawnNPC"), npcX, npcY, npcType, 0, ai0, ai1);
+
                     break;
                 case (byte)MessageType.SyncNpcIndex:
                     int syncedNpcIndex = reader.ReadInt32();
@@ -138,6 +141,12 @@ namespace CTG2
                     var playerToEdit = Main.player[sender];
                     playerToEdit.statLifeMax = newMax;
                     playerToEdit.statLifeMax2 = newMax;
+                    break;
+                case (byte)MessageType.RequestTeamChange:
+                    int target = reader.ReadInt32();
+                    int teamID = reader.ReadInt32();
+                    Main.player[target].team = teamID;
+                    NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target, teamID);
                     break;
                 
                 // Server->Client Packets (these cases will run on the Client)

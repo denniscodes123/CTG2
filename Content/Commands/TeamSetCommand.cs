@@ -55,14 +55,12 @@ namespace CTG2.Content.Commands
                 caller.Reply($"Invalid team color '{teamColor}'. Valid: red, green, blue, yellow, pink, none.", Color.Red);
                 return;
             }
-
-
-
-            target.team = teamID;
-            playerTeamAssignments[target.whoAmI] = teamID;
-            target.GetModPlayer<CTGPlayer>().LockTeam(teamID);
-            
-            NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target.whoAmI);
+            var mod1 = ModContent.GetInstance<CTG2>();
+            ModPacket packet1 = mod1.GetPacket();
+            packet1.Write((byte)MessageType.RequestTeamChange);
+            packet1.Write(target.whoAmI);
+            packet1.Write(teamID);
+            packet1.Send();
             
             caller.Reply($"Set player '{target.name}' to the {teamColor} team.", Color.Green);
         }

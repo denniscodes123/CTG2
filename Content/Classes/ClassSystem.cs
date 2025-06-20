@@ -67,8 +67,12 @@ namespace ClassesNamespace
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {   
             base.ModifyMaxStats(out health, out mana);
-            health = new StatModifier(0f, 0f, 0f, 0f);
-            health.Flat = currentHP;
+            if (!Main.dedServ)
+            {
+                health = new StatModifier(0f, 0f, 0f, 0f);
+                health.Flat = currentHP;
+                NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, currentHP, currentHP, currentHP, currentHP);
+            }
         }
 
         public override void OnEnterWorld()

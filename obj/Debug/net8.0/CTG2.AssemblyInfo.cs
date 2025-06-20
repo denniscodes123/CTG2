@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CTG2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80c2a3f0e56fc72877b04a5b7cd88d2dea766e9c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5eef666eceed1a8161e8634e3367ea5bdbcbb8c")]
 [assembly: System.Reflection.AssemblyProductAttribute("CTG2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CTG2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

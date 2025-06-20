@@ -150,6 +150,8 @@ namespace CTG2.Content
             packet.Write((int)Player.Center.X);
             packet.Write((int)Player.Center.Y);
             packet.Write(ModContent.NPCType<StationaryBeast>());
+            packet.Write(0f);
+            packet.Write(0f);
             packet.Send();
         }
         
@@ -188,7 +190,7 @@ namespace CTG2.Content
 
 
         private void PaladinOnUse()
-        {
+        {   
             foreach (Player other in Main.player)
             {
                 if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
@@ -439,16 +441,18 @@ namespace CTG2.Content
             packet1.Write((int)Player.Center.X);
             packet1.Write((int)Player.Center.Y);
             packet1.Write(ModContent.NPCType<TikiTotem>());
+            packet1.Write(Player.team);
+            packet1.Write(0f);
             packet1.Send();
 
-            var mod2 = ModContent.GetInstance<CTG2>();
+            /*var mod2 = ModContent.GetInstance<CTG2>();
             ModPacket packet2 = mod2.GetPacket();
             packet2.Write((byte)MessageType.SetNpcTeam);
                 Main.NewText($"{CTG2.requestedNpcIndex}, {Player.team}");
             packet2.Write(CTG2.requestedNpcIndex);
             packet2.Write(Player.team);
             packet2.Send();
-            Main.npc[CTG2.requestedNpcIndex].GetGlobalNPC<AllNpcs>().team = Player.team;
+            Main.npc[CTG2.requestedNpcIndex].GetGlobalNPC<AllNpcs>().team = Player.team;*/
         }
 
 

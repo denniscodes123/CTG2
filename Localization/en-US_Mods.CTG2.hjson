@@ -40,16 +40,29 @@ Items: {
 		Tooltip: ""
 		DisplayName: Archer Dash
 	}
+
+	AmalgamatedHand1_3: {
+		DisplayName: Amalgamated Hand1_3
+		Tooltip: ""
+	}
+
+	AmalgamatedHand1_4: {
+		DisplayName: Amalgamated Hand1_4
+		Tooltip: ""
+	}
 }
 
 NPCs: {
 	TimedNPC.DisplayName: Timed N P C
 	StationaryBeast.DisplayName: Stationary Beast
 	TikiTotem.DisplayName: Tiki Totem
+	PaladinShield.DisplayName: Paladin Shield
 }
 
 Projectiles: {
 	FoliageTendrilsProjectile.DisplayName: Foliage Tendrils Projectile
 	ZenProjectile.DisplayName: Zen Projectile
 	ChargedBowProjectile.DisplayName: Charged Bow Projectile
+	AmalgamatedHandProjectile1_3.DisplayName: Amalgamated Hand Projectile1_3
+	AmalgamatedHandProjectile1_4.DisplayName: Amalgamated Hand Projectile1_4
 }

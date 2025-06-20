@@ -1,3 +1,4 @@
+using System;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
@@ -19,6 +20,7 @@ namespace CTG2.Content
 
         private float healFrameGap = 30;
         private float frameCount = 0;
+        private int totemTeam = 0;
 
         public override void SetStaticDefaults()
         {
@@ -27,7 +29,8 @@ namespace CTG2.Content
 
 
         public override void SetDefaults()
-        {
+        {   
+            totemTeam = (int)NPC.ai[0];
             NPC.width = 32;
             NPC.height = 48;
             NPC.damage = 0; 
@@ -71,7 +74,10 @@ namespace CTG2.Content
             {
                 if (!player.active || player.dead)
                     continue;
-
+                // ai[0] stores tiki's team
+                if (player.team != (int)NPC.ai[0])
+                    continue;
+                
                 if (Vector2.Distance(NPC.Center, player.Center) <= 14 * 16 && frameCount % healFrameGap == 0) // 14 block radius
                 {   
                     player.Heal(1);
@@ -79,7 +85,7 @@ namespace CTG2.Content
             }
             frameCount++;
 
-            Main.NewText(NPC.GetGlobalNPC<AllNpcs>().team);
+            // Main.NewText(NPC.GetGlobalNPC<AllNpcs>().team);
         }
     }
 }
