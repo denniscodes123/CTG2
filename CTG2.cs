@@ -63,8 +63,9 @@ namespace CTG2
                     var npcX = reader.ReadInt32();
                     var npcY = reader.ReadInt32();
                     var npcType = reader.ReadInt32();
+                    byte team = reader.ReadByte(); 
                     int npcIndex = NPC.NewNPC(Main.LocalPlayer.GetSource_Misc("SpawnNPC"), npcX, npcY, npcType);
-                    setRequestedNpcIndex(npcIndex);
+                    Main.npc[npcIndex].ai[0] = team; 
                     break;
                 case (byte)MessageType.SyncNpcIndex:
                     int syncedNpcIndex = reader.ReadInt32();
