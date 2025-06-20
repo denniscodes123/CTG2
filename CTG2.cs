@@ -72,8 +72,8 @@ namespace CTG2
                     break;
                 case (byte)MessageType.SetNpcTeam:
                     int NpcIndex = reader.ReadInt32();
-                    int npcTeam = reader.ReadInt32();Main.npc[NpcIndex].GetGlobalNPC<AllNpcs>().team = npcTeam;
-                    
+                    int npcTeam = reader.ReadInt32();
+                    Main.npc[NpcIndex].GetGlobalNPC<AllNpcs>().team = npcTeam;
                     break;
                 case (byte)MessageType.RequestSpawnProjectile:
                     var spawnPos = new Vector2(reader.ReadSingle(), reader.ReadSingle());
