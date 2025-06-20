@@ -410,5 +410,12 @@ namespace ClassesNamespace
 
             lastPlayerClass = playerClass;
         }
+        public override void UpdateEquips()
+    {
+        if (Main.expertMode || Main.masterMode)
+        {
+            Player.extraAccessory = true;
+        }
+    }
     }
 }
