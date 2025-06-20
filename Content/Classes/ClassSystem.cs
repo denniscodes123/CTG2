@@ -133,7 +133,7 @@ namespace ClassesNamespace
         }
 
 
-        public override void ResetEffects()
+   public override void ResetEffects()
         {
             Player.AddBuff(BuffID.Shine, 54000);
             Player.AddBuff(BuffID.NightOwl, 54000);
@@ -143,6 +143,13 @@ namespace ClassesNamespace
 
             if (playerClass != lastPlayerClass)
             {   
+                
+                for (int i = 0; i < Player.buffType.Length; i++)
+                {
+                    Player.DelBuff(i);
+                }
+
+
                 string selectedClass = playerClass.ToString().ToLower();
                 using (var stream = Mod.GetFileStream($"Content/Classes/{selectedClass}.json"))
                 using (var fileReader = new StreamReader(stream))
@@ -154,15 +161,254 @@ namespace ClassesNamespace
                     }
                     catch
                     {
-                        Main.NewText("Failed to load or parse inventory file.", Color.Red);
+                        Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
                         return;
                     }
                 }
 
                 SetInventory(classInfo);
-                lastPlayerClass = playerClass;
             }
-            
+
+            Player.statLifeMax2 = currentHP;
+            Player.statManaMax2 = currentMana;
+
+
+                    switch (playerClass)
+        {
+            case GameClass.Archer:
+                Player.AddBuff(107, 54000);
+                Player.AddBuff(115, 54000);
+                Player.AddBuff(257, 54000);
+                Player.AddBuff(321, 54000);
+                break;
+
+            case GameClass.Ninja:
+                Player.AddBuff(6, 54000);
+                Player.AddBuff(29, 54000);
+                Player.AddBuff(36, 54000);
+                Player.AddBuff(107, 54000);
+                Player.AddBuff(115, 54000);
+                Player.AddBuff(146, 54000);
+                Player.AddBuff(158, 54000);
+                Player.AddBuff(196, 54000);
+                Player.AddBuff(257, 54000);
+                Player.AddBuff(321, 54000);
+
+                break;
+
+            case GameClass.Beast:
+                Player.AddBuff(6, 54000);    // Ironskin
+                Player.AddBuff(107, 54000);  // Lifeforce
+                Player.AddBuff(108, 54000);  // Endurance
+                Player.AddBuff(146, 54000);  // Wrath
+                Player.AddBuff(158, 54000);  // Rage
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)
+                Player.AddBuff(257, 54000);  // Dryad's Blessing
+
+                break;
+
+            case GameClass.Gladiator:
+                Player.AddBuff(6, 54000);    // Ironskin
+                Player.AddBuff(33, 54000);   // Thorns
+                Player.AddBuff(36, 54000);   // Featherfall
+                Player.AddBuff(107, 54000);  // Lifeforce
+                Player.AddBuff(115, 54000);  // Ammo Reservation
+                Player.AddBuff(146, 54000);  // Wrath
+                Player.AddBuff(158, 54000);  // Rage
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)
+                Player.AddBuff(257, 54000);  // Dryad's Blessing
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)
+
+                break;
+
+            case GameClass.Paladin:
+                Player.AddBuff(6, 54000);    // Ironskin
+                Player.AddBuff(25, 54000);   // Regeneration
+                Player.AddBuff(33, 54000);   // Thorns
+                Player.AddBuff(107, 54000);  // Lifeforce
+                Player.AddBuff(114, 54000);  // Magic Power
+                Player.AddBuff(115, 54000);  // Ammo Reservation
+                Player.AddBuff(146, 54000);  // Wrath
+                Player.AddBuff(158, 54000);  // Rage
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)
+                Player.AddBuff(257, 54000);  // Dryad's Blessing
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)
+
+                break;
+
+            case GameClass.JungleMan:
+                Player.AddBuff(3, 54000);    // Swiftness
+                Player.AddBuff(6, 54000);    // Ironskin
+                Player.AddBuff(36, 54000);   // Featherfall
+                Player.AddBuff(107, 54000);  // Lifeforce
+                Player.AddBuff(115, 54000);  // Ammo Reservation
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)
+                Player.AddBuff(257, 54000);  // Dryad's Blessing
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)
+
+                break;
+
+            case GameClass.BlackMage:
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.Psychic:
+                Player.AddBuff(29, 54000);   // Archery  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.WhiteMage:
+                Player.AddBuff(3, 54000);    // Swiftness  
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(7, 54000);    // Regeneration  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.Miner:
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.Fish:
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.Clown:
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(33, 54000);   // Thorns  
+                Player.AddBuff(48, 54000);   // Spelunker  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.FlameBunny:
+                Player.AddBuff(33, 54000);   // Thorns  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.TikiPriest:
+                Player.AddBuff(3, 54000);    // Swiftness  
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.Tree:
+                Player.AddBuff(6, 54000);    // Ironskin  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(74, 54000);   // Obsidian Skin  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(158, 54000);  // Rage  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.RushMutant:
+                Player.AddBuff(3, 54000);    // Swiftness  
+                Player.AddBuff(30, 54000);   // Gills  
+                Player.AddBuff(33, 54000);   // Thorns  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(48, 54000);   // Spelunker  
+                Player.AddBuff(74, 54000);   // Obsidian Skin  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(117, 54000);  // Magic Regeneration  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.RegenMutant:
+                Player.AddBuff(3, 54000);    // Swiftness  
+                Player.AddBuff(30, 54000);   // Gills  
+                Player.AddBuff(33, 54000);   // Thorns  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(48, 54000);   // Spelunker  
+                Player.AddBuff(74, 54000);   // Obsidian Skin  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(117, 54000);  // Magic Regeneration  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(196, 54000);  // Well Fed 2 (Plenty Satisfied)  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+
+            case GameClass.Leech:
+                Player.AddBuff(25, 54000);   // Regeneration  
+                Player.AddBuff(29, 54000);   // Archery  
+                Player.AddBuff(33, 54000);   // Thorns  
+                Player.AddBuff(36, 54000);   // Featherfall  
+                Player.AddBuff(48, 54000);   // Spelunker  
+                Player.AddBuff(107, 54000);  // Lifeforce  
+                Player.AddBuff(115, 54000);  // Ammo Reservation  
+                Player.AddBuff(146, 54000);  // Wrath  
+                Player.AddBuff(176, 54000);  // Inferno  
+                Player.AddBuff(257, 54000);  // Dryad's Blessing  
+                Player.AddBuff(321, 54000);  // Tipsy (Ale)  
+
+                break;
+}
+
+
+
+            lastPlayerClass = playerClass;
         }
     }
 }
