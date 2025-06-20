@@ -1,4 +1,4 @@
-﻿using Terraria;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
@@ -95,9 +95,10 @@ public class ChargedBowProjectile : ModProjectile
 
 		if (player.channel && drawCharge < 40) // arrow isn't fully pulled back
 		{
+			framesPulledBack++;
 
-			if (++framesPulledBack % 8 == 0 && (!Main.autoPause || (Main.autoPause && !Main.playerInventory))) // pullback animation changes every 8 frames
-				pullback = (float) 13.0 * Math.Min(framesPulledBack, 1300) / 1300; // formula to calculate how far to pull back the arrow; pullback time is 500 frames
+			if (framesPulledBack % 8 == 0 && (!Main.autoPause || (Main.autoPause && !Main.playerInventory))) // pullback animation changes every 8 frames
+				pullback = (float) 13.0 * Math.Min(framesPulledBack, 1300) / 1300; // formula to calculate how far to pull back the arrow
 		}
 		else
 			framesPulledBack = 0; // reset pullback counter after releasing
@@ -121,7 +122,7 @@ public class ChargedBowProjectile : ModProjectile
 		Projectile.knockBack = item.knockBack; // knockback stays the same as base item
 
 		Vector2 position = player.Center + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f; // spawns the arrow from aiming direction, not inside player
-		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * ((charge / 20) * 0.8f); // calculates the direction and speed of the arrow based on charge: max 160% velocity
+		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * (1.2f + (charge / 40) * 1.5f); // calculates the direction and speed of the arrow based on charge: max 160% velocity (3)
 
 		if (player.channel & charge < 40f) // if still charging
 		{
@@ -154,7 +155,7 @@ public class ChargedBowProjectile : ModProjectile
 			if (SoundEngine.TryGetActiveSound(sound, out var s)) // stops any sound from playing after fully charged
 				s.Stop();
 
-			damage = (int)(item.damage * (charge / 20) * 0.7); // damage calculation for bow depending on charge
+			damage = (int) (item.damage * (0.5 + charge / 80)); // damage calculation for bow depending on charge
 
 			t2 = 1;
 			if (charge >= 40f && Projectile.ai[1] == ProjectileID.WoodenArrowFriendly) special = (int)Projectile.ai[0];
