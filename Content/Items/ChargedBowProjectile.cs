@@ -160,7 +160,10 @@ public class ChargedBowProjectile : ModProjectile
 			t2 = 1;
 			if (charge >= 40f && Projectile.ai[1] == ProjectileID.WoodenArrowFriendly) special = (int)Projectile.ai[0];
 
+			if (Main.myPlayer == Projectile.owner)
+				{
 			Projectile.NewProjectile(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
+   				}
 			SoundEngine.PlaySound(SoundID.Item5, Projectile.position); // sound played when fired
 		}
 
