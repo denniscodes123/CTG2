@@ -1,6 +1,14 @@
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ID;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using Terraria.Audio;
+using Terraria.GameContent;
+using Microsoft.Xna.Framework.Audio;
+using ReLogic.Utilities;
+using System;
 
 namespace CTG2.Content.Items.ModifiedWeps
 {
@@ -34,24 +42,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.useTime = 1;
                     item.useAnimation = 1;
                     break;
-                case ItemID.Bananarang:
-                    item.useTime = 20;
-                    item.useAnimation = 20;
-                    item.shootSpeed = 11.4f;
-                    item.knockBack = 6f;
-                    item.autoReuse = false;
-                    item.damage = 35;
-                    item.crit = 0;
-                    break;
-                case ItemID.Blowgun:
-                    item.useTime = 18;
-                    item.useAnimation = 18;
-                    item.shootSpeed = 13f;
-                    item.autoReuse = false;
-                    item.damage = 32;
-                    item.crit = 0;
-                    break;
-                case ItemID.GoldenShower:
+                case ItemID.GoldenShower: // Fish
                     item.useTime = 22;
                     item.useAnimation = 22;
                     item.shootSpeed = 6.2f;
@@ -61,14 +52,31 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.crit = 0;
                     item.UseSound = SoundID.Item109;
                     break;
-                case ItemID.ChainKnife:
+                case ItemID.Blowgun: // Tiki Priest
+                    item.useTime = 18;
+                    item.useAnimation = 18;
+                    item.shootSpeed = 13f;
+                    item.autoReuse = false;
+                    item.damage = 32;
+                    item.crit = 0;
+                    break;
+                case ItemID.Bananarang: // Tree
+                    item.useTime = 20;
+                    item.useAnimation = 20;
+                    item.shootSpeed = 11.4f;
+                    item.knockBack = 6f;
+                    item.autoReuse = false;
+                    item.damage = 35;
+                    item.crit = 0;
+                    break;
+                case ItemID.ChainKnife: // Leech
                     item.useTime = 4;
                     item.useAnimation = 4;
                     item.shootSpeed = 20;
                     item.damage = 31;
                     item.crit = 0;
                     break;
-                case ItemID.CursedFlames:
+                case ItemID.CursedFlames: // Leech
                     item.useTime = 40;
                     item.useAnimation = 40;
                     item.shootSpeed = 15;
