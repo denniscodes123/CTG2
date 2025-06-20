@@ -150,6 +150,7 @@ namespace CTG2.Content
             packet.Write((int)Player.Center.X);
             packet.Write((int)Player.Center.Y);
             packet.Write(ModContent.NPCType<StationaryBeast>());
+            packet.Write((byte)Player.team); 
             packet.Send();
         }
         
