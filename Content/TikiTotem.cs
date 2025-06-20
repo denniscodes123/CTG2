@@ -5,12 +5,20 @@ using Microsoft.Xna.Framework;
 
 namespace CTG2.Content
 {
+
+    public class AllNpcs : GlobalNPC
+    {
+        public int team = 3;
+
+        public override bool InstancePerEntity => true;
+    }
+
+
     public class TikiTotem : ModNPC
     {
 
-        float healFrameGap = 30;
-        float frameCount = 0;
-
+        private float healFrameGap = 30;
+        private float frameCount = 0;
 
         public override void SetStaticDefaults()
         {
@@ -70,6 +78,8 @@ namespace CTG2.Content
                 }
             }
             frameCount++;
+
+            Main.NewText(NPC.GetGlobalNPC<AllNpcs>().team);
         }
     }
 }
