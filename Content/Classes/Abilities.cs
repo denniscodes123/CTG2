@@ -80,7 +80,7 @@ namespace CTG2.Content
                 switch (projectileType)
                 {
                     case ProjectileID.HellfireArrow: // Archer ability
-                        if (attacker.HasBuff(320))
+                        if (attacker.HasBuff(320) && attacker.team != Player.team)
                         {
                             Player.AddBuff(24, 60);
                             Player.AddBuff(30, 60);
@@ -90,7 +90,7 @@ namespace CTG2.Content
                         break;
                     
                     case 15: case 19: // Flame Bunny ability
-                        if (attacker.HasBuff(320) && attacker.HasBuff(137))
+                        if (attacker.HasBuff(320) && attacker.HasBuff(137) && attacker.team != Player.team)
                         {
                             Player.AddBuff(20, 30);
                             Player.AddBuff(39, 30);
@@ -100,7 +100,7 @@ namespace CTG2.Content
                         break;
 
                     case 273: case 304: // Leech ability
-                        if (attacker.HasBuff(320))
+                        if (attacker.HasBuff(320) && attacker.team != Player.team)
                         {
                             int healAmount = damage / 3;
                             attacker.statLife += healAmount;
@@ -108,7 +108,7 @@ namespace CTG2.Content
                         }
                         break;
                     case 496: // Black Mage ability
-                        if (!attacker.HasBuff(206))
+                        if (!attacker.HasBuff(206) && attacker.team != Player.team)
                         {
                             attacker.GetModPlayer<Abilities>().class7HitCounter++;
 
@@ -424,22 +424,31 @@ namespace CTG2.Content
         }
 
 
-        private void FlameBunnyOnUse() //not finished
+        private void FlameBunnyOnUse()
         {
             Player.AddBuff(137, 6 * 60);
             Player.AddBuff(320, 6 * 60);
         }
 
 
-        private void TikiPriestOnUse() //not finished
+        private void TikiPriestOnUse()
         {   
-            var mod = ModContent.GetInstance<CTG2>();
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)MessageType.RequestSpawnNpc);
-            packet.Write((int)Player.Center.X);
-            packet.Write((int)Player.Center.Y);
-            packet.Write(ModContent.NPCType<TikiTotem>());
-            packet.Send();
+            var mod1 = ModContent.GetInstance<CTG2>();
+            ModPacket packet1 = mod1.GetPacket();
+            packet1.Write((byte)MessageType.RequestSpawnNpc);
+            packet1.Write((int)Player.Center.X);
+            packet1.Write((int)Player.Center.Y);
+            packet1.Write(ModContent.NPCType<TikiTotem>());
+            packet1.Send();
+
+            var mod2 = ModContent.GetInstance<CTG2>();
+            ModPacket packet2 = mod2.GetPacket();
+            packet2.Write((byte)MessageType.SetNpcTeam);
+                Main.NewText($"{CTG2.requestedNpcIndex}, {Player.team}");
+            packet2.Write(CTG2.requestedNpcIndex);
+            packet2.Write(Player.team);
+            packet2.Send();
+            Main.npc[CTG2.requestedNpcIndex].GetGlobalNPC<AllNpcs>().team = Player.team;
         }
 
 
@@ -470,7 +479,7 @@ namespace CTG2.Content
                 {
                     foreach (Player other in Main.player)
                     {
-                        if (Player.whoAmI == other.whoAmI) continue;
+                        if (Player.whoAmI == other.whoAmI || Player.team == other.team) continue;
                         if (proj.Hitbox.Intersects(other.Hitbox))
                         {
                             other.AddBuff(160, 30);
@@ -562,7 +571,7 @@ namespace CTG2.Content
                 switch (selectedClass)
                 {
                     case 1:
-                        SetCooldown(1); //36
+                        SetCooldown(36);
                         ArcherOnUse();
 
                         break;
@@ -616,7 +625,7 @@ namespace CTG2.Content
                         break;
 
                     case 10: //not finished
-                        SetCooldown(1); //15
+                        SetCooldown(15);
                         MinerOnUse();
 
                         break;
@@ -634,19 +643,19 @@ namespace CTG2.Content
                         break;
 
                     case 13: //not finished
-                        //SetCooldown(41);
+                        SetCooldown(41);
                         FlameBunnyOnUse();
 
                         break;
 
                     case 14: //not finished
-                        SetCooldown(1); //20 
+                        SetCooldown(1); //20
                         TikiPriestOnUse();
 
                         break;
 
                     case 15: //not finished 
-                        SetCooldown(1); //27
+                        SetCooldown(27);
                         TreeOnUse();
 
                         break;
@@ -658,7 +667,7 @@ namespace CTG2.Content
                         break;
 
                     case 17: //not finished
-                        //SetCooldown(40);
+                        SetCooldown(40);
                         LeechOnUse();
 
                         break;
