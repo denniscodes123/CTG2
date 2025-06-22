@@ -7,6 +7,7 @@ using CTG2.Content;
 
 public class GemLogic : ModPlayer
 {
+    /*
     public bool hasRedGem = false;
     public bool hasBlueGem = false;
     bool firstMessage = true;
@@ -14,7 +15,9 @@ public class GemLogic : ModPlayer
     private int fireworkTimerBlue = 0;
     public static Player redGemHolder = null;
     public static Player blueGemHolder = null;
-
+    
+    
+    
     public override void PostUpdate()
     {
         int minX = (int)(Player.Hitbox.Left / 16);
@@ -174,6 +177,8 @@ public class GemLogic : ModPlayer
             fireworkTimerBlue = 0;
         }
     }
+    
+    
     private void EndGame(string message)
 {
     GameUI.matchStarted = false;
@@ -191,4 +196,5 @@ public class GemLogic : ModPlayer
     Main.NewText(message, Color.GreenYellow);
 }
 
+    */
 }

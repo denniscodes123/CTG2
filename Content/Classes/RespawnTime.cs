@@ -4,6 +4,7 @@ using Terraria.ID;
 using Terraria.DataStructures;
 using System;
 using ClassesNamespace;
+using CTG2.Content.ClientSide;
 
 
 namespace CTG2.Content.Classes
@@ -15,7 +16,7 @@ namespace CTG2.Content.Classes
             var modPlayer = Player.GetModPlayer<ClassSystem>();
 
             // How much time has passed since match started
-            int timeElapsed = (int)(Main.GameUpdateCount / 60) - GameUI.matchTimer + 15;
+            int timeElapsed = GameInfo.matchTime/60 - 30;
             int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
 
             switch (modPlayer.playerClass)

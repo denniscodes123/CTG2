@@ -5,7 +5,8 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 namespace CTG2.Content
-{
+{   
+    /*
     public class SpawnPoints : ModPlayer
     {
         // Store spawn points for multiple maps
@@ -133,5 +134,5 @@ namespace CTG2.Content
         }
     }
 
-
+*/
 }

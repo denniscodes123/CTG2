@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace CTG2.Content
 {
-
+/*
 
 
     public class StartCommand : ModCommand
@@ -59,7 +59,7 @@ namespace CTG2.Content
             int py = (int)(player.position.Y / 16);
             caller.Reply($"You are at tile ({px}, {py})", Color.Yellow);
 
-            /* 
+            
             WorldProperties.savedX = 1493;
             WorldProperties.savedY = 258;
             WorldProperties.savedRegion = WorldProperties.SaveRegion(1493, 258, 2013, 337);
@@ -73,7 +73,7 @@ namespace CTG2.Content
                 WorldProperties.savedY,
                 Main.maxTilesX / 2 - 86,
                 89
-            ); */
+            ); 
 
 
             if (GameUI.matchStarted)
@@ -91,7 +91,9 @@ namespace CTG2.Content
 
 
     }
+    */
 
+    /*
     public class restoreMapTest : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
@@ -143,7 +145,7 @@ namespace CTG2.Content
         public static Vector2 arenaCoords = new Vector2( 40429 , 12001 );
         public static Vector2 mapStart = new Vector2(36283 , 10835 );
       
-
+        
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int index = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Resource Bars"));
@@ -163,7 +165,7 @@ namespace CTG2.Content
                 );
             }
         }
-
+        
 
         private void DrawMatchTimer()
         {
@@ -203,7 +205,7 @@ namespace CTG2.Content
             }
         }
     }
-
+    */
 }
 
 
