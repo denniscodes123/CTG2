@@ -1,0 +1,40 @@
+﻿{
+  "blue-class-select": [10000, 10000],
+  "blue-base": [10000, 10000],
+  "red-class-select": [10000, 10000],
+  "red-base": [10000, 10000],
+  "lobby": [10000, 10000],
+  "classes": [
+    {
+      "name": "Archer",
+      "summary": "Long-Range all-rounder.",
+      "description": "The sole survivor of their guild, this little fellow is a master at archery, able to quickly manuever around their opponents.",
+      "inventory": "archer",
+      "icon": 247,
+      "ability-cooldown": 5,
+      "health-from-kills": 0,
+      "respawn-time": 3,
+      "buffs": [],
+      "upgrades": [
+        {
+          "id":    "bonus_health",
+          "name":  "Bonus Health",
+          "icon":  89,
+          "value": 20
+        },
+        {
+          "id":    "bonus_regen",
+          "name":  "Bonus Regeneration",
+          "icon":  0,
+          "value": 1
+        },
+        {
+          "id":    "bonus_def",
+          "name":  "Bonus Defense",
+          "icon":  0,
+          "value": 2
+        }
+      ]
+    }
+  ]
+}

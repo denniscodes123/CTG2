@@ -1,6 +1,7 @@
 using System;
 using Terraria.ModLoader;
 using System.IO;
+using System.Text.Json;
 using ClassesNamespace;
 using Terraria;
 using CTG2.Content;
@@ -38,7 +39,27 @@ namespace CTG2
     {   
         public static int requestedNpcIndex = 0;
         public static Random randomGenerator = new Random();
-
+        public static ClientConfig config = new ClientConfig();
+        
+        public override void Load()
+        {
+            base.Load();
+            // load client config in
+            using (var stream = GetFileStream($"Content/Classes/clientconfig.json"))
+            using (var fileReader = new StreamReader(stream))
+            {
+                var jsonData = fileReader.ReadToEnd();
+                try
+                {
+                    config = JsonSerializer.Deserialize<ClientConfig>(jsonData);
+                }
+                catch
+                {
+                    Main.NewText("Failed to load or parse client config file.", Microsoft.Xna.Framework.Color.Red);
+                    return;
+                }
+            }
+        }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {   

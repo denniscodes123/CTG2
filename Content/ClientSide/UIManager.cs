@@ -14,12 +14,46 @@ using Terraria.UI.Chat;
 namespace CTG2.Content.ClientSide;
 
 public class UIManager : ModSystem
-{
+{   
+    private UserInterface classInterface;
+    private ClassUI classUIState;
+    
+    
+    public override void OnWorldLoad()
+    {
+        // 1) Create your UIState
+        classUIState = new ClassUI();
+
+        // 2) Create a UserInterface and attach your state
+        classInterface = new UserInterface();
+        classInterface.SetState(classUIState);
+    }
+    
+    public override void UpdateUI(GameTime gameTime)
+    {
+        // Must call Update every tick
+        classInterface?.Update(gameTime);
+    }
+    
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
         int index = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Resource Bars"));
         if (index != -1)
         {
+            if (PlayerManager.ShowClassUI)
+            {
+                layers.Insert(index, new LegacyGameInterfaceLayer(
+                    "CTG2: Class Selection UI",
+                    delegate
+                    {
+                        // Draw your UI
+                        classInterface.Draw(Main.spriteBatch, new GameTime());
+                        return true;
+                    },
+                    InterfaceScaleType.UI)
+                );
+            }
+            
             layers.Insert(index + 1, new LegacyGameInterfaceLayer(
                 "CTG2: Match Timer",
                 delegate

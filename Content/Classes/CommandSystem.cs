@@ -18,8 +18,6 @@ public class ClassCommand : ModCommand
 
     public override void Action(CommandCaller caller, string input, string[] args)
     {   
-        var thisPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>();
-        
         if (GameInfo.matchStage != 1) //!CTG2.Content.Game.preparationPhase
         {
             caller.Reply("You can only select a class during class selection!", Color.Red);

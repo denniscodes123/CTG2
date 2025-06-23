@@ -1,13 +1,48 @@
 ﻿using System;
+using System.IO;
+using System.Text.Json;
 using ClassesNamespace;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace CTG2.Content.ClientSide;
 
 public class PlayerManager : ModPlayer
-{
+{   
+    public static bool ShowClassUI = false;
+    public static bool ShowGameUI = false;
     
+    // Set Custom Respawn Times
+    public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+    {
+        var modPlayer = Player.GetModPlayer<ClassSystem>();
+
+        // How much time has passed since match started
+        int timeElapsed = GameInfo.matchTime/60 - 30;
+        int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
+
+        switch (modPlayer.playerClass)
+        {
+            case GameClass.Archer: // Archer
+                Player.respawnTimer = (3 + extraSeconds) * 60;
+                break;
+
+            case GameClass.Ninja: 
+                Player.respawnTimer = (1 + extraSeconds) * 60;
+                break;
+
+            case GameClass.Beast: 
+                Player.respawnTimer = (2 + extraSeconds) * 60;
+                break;
+
+            default:
+                Player.respawnTimer = (3 + extraSeconds) * 60; 
+                break;
+        }
+    }
+    
+    // Set Custom Spawn Points
     public override void OnRespawn()
     {   
         int blueBaseX = 12346 / 16;
