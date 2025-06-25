@@ -421,5 +421,32 @@ namespace ClassesNamespace
             Player.extraAccessory = true;
         }
     }
+
+    public override void PostUpdate()
+        {
+            //this is where dyes are set and forced on 
+            int redDyeType = ItemID.RedDye; //these arent the right dyes btw 
+            int blueDyeType = ItemID.BlueDye;
+
+            if (Main.netMode == NetmodeID.Server)
+                return;
+
+            if (playerClass != GameClass.None) {
+            int dyeID = Player.team switch
+            
+                {
+                    1 => redDyeType,  
+                3 => blueDyeType, 
+                _ => 0 
+            };
+                for (int i = 0; i <= 3; i++) //i<=3 just sets the armor for not can switch to i<=9 for all accessory slots later
+                {
+                    if (Player.dye[i] == null || Player.dye[i].type != dyeID)
+                    {
+                        Player.dye[i] = dyeID == 0 ? new Item() : new Item(dyeID);
+                    }
+                }
+            }
+        }
     }
 }
