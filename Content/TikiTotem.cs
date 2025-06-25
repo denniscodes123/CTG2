@@ -87,5 +87,31 @@ namespace CTG2.Content
 
             // Main.NewText(NPC.GetGlobalNPC<AllNpcs>().team);
         }
+
+        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            Texture2D texture = TextureAssets.Npc[NPC.type].Value;
+            Rectangle frame = NPC.frame;
+            Vector2 origin = new Vector2(frame.Width / 2f, frame.Height / 2f);
+            Color teamColar = Color.Gray;
+
+            int tikiTeam = (int)NPC.ai[0];
+            if (tikiTeam == 1){ teamColar = new Color(255, 0, 0, 180); }
+            if (tikiTeam == 3){ teamColar = new Color(0, 0, 255, 180); }
+
+                Vector2 drawPosition = NPC.Center - screenPos + new Vector2(0, 2.8f);
+
+            spriteBatch.Draw(
+                texture,
+                drawPosition,
+                frame,
+                teamColar,
+                NPC.rotation,
+                origin,
+                NPC.scale,
+                SpriteEffects.None,
+                0f
+            );
+        }
     }
 }
