@@ -53,6 +53,9 @@ public class ClassConfig
     
     [JsonPropertyName("buffs")]
     public List<int> Buffs { get; set; }
+    
+    [JsonPropertyName("ability-id")]
+    public int AbilityID { get; set; }
 
     [JsonPropertyName("upgrades")]
     public List<UpgradeConfig> Upgrades { get; set; }

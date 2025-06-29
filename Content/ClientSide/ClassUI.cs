@@ -33,7 +33,7 @@ public class ClassUI : UIState
             Height = { Percent = 0.6f },
             HAlign = 0.5f,
             VAlign = 0.5f,
-            BackgroundColor = new Color(209, 25, 255, 200)
+            BackgroundColor = new Color(209, 25, 255, 100)
         };
         Append(_mainPanel);
 

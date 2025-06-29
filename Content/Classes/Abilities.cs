@@ -10,6 +10,7 @@ using System.IO;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
 using ClassesNamespace;
+using CTG2.Content.ClientSide;
 
 
 namespace CTG2.Content
@@ -570,7 +571,7 @@ namespace CTG2.Content
 
             if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && !Player.HasBuff(BuffID.ChaosState)) // Only activate if not on cooldown
             {
-                int selectedClass = (int)Player.GetModPlayer<ClassSystem>().playerClass;
+                int selectedClass = PlayerManager.currentClass.AbilityID;
 
                 switch (selectedClass)
                 {

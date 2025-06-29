@@ -14,8 +14,8 @@ public class PlayerManager : ModPlayer
     public static bool ShowGameUI = false;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
-    public static ClassConfig currentClass { get; set; }
-    public static UpgradeConfig currentUpgrade { get; set; }
+    public static ClassConfig currentClass = new ClassConfig();
+    public static UpgradeConfig currentUpgrade = new UpgradeConfig();
 
     // Set Custom Respawn Times
     public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
