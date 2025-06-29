@@ -14,7 +14,8 @@ public class PlayerManager : ModPlayer
     public static bool ShowGameUI = false;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
-
+    public static ClassConfig currentClass { get; set; }
+    public static UpgradeConfig currentUpgrade { get; set; }
 
     // Set Custom Respawn Times
     public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
@@ -33,25 +34,9 @@ public class PlayerManager : ModPlayer
         int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
 
         Player.respawnTimer = 0;
-        switch (modPlayer.playerClass)
-        {
-            case GameClass.Archer: // Archer
-                customRespawnTimer = (3 + extraSeconds) * 60;
-                break;
-
-            case GameClass.Ninja:
-                customRespawnTimer = (1 + extraSeconds) * 60;
-                break;
-
-            case GameClass.Beast:
-                customRespawnTimer = (2 + extraSeconds) * 60;
-                break;
-
-            default:
-                customRespawnTimer = (3 + extraSeconds) * 60;
-                break;
-        }
-
+        
+        // removed switch, using config-based respawn time.
+        customRespawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
     }
 
     // Set Custom Spawn Points
@@ -98,6 +83,7 @@ public class PlayerManager : ModPlayer
     {
         if (GameInfo.matchStage == 1)
         {
+            ShowClassUI = true;
             if (GameInfo.matchTime == 1795)
             {
                 var player = Main.LocalPlayer.GetModPlayer<ClassSystem>();
@@ -110,6 +96,10 @@ public class PlayerManager : ModPlayer
                     player.ResetEffects();
                 }
             }
+        }
+        else
+        {
+            ShowClassUI = false;
         }
             if (awaitingRespawn) //was lowkey angry while coding this will clean up later
     {

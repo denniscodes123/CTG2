@@ -1,154 +1,269 @@
-﻿using Terraria.UI;
-using Terraria;
+﻿using Terraria;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
-using Terraria.ID;
-using CTG2.Content.Items;
-using CTG2.Content.Items.ModifiedWeps;
-using Microsoft.Xna.Framework; 
+using Terraria.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Runtime.CompilerServices;
 using ClassesNamespace;
-using CTG2;
-using Microsoft.Xna.Framework.Graphics;
+using CTG2.Content.ClientSide;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
-
-namespace CTG2.Content.ClientSide;
-
-
-public class ClassUpgrade
-{
-    public string Name;
-    public int  IconItemID;    // or buff ID, or a texture reference
-    public Action<Player> Apply;
-}
 
 public class ClassUI : UIState
 {
-    private UIPanel mainPanel;
-    private UIList classList;
-    private UIList upgradeList;
-    private UIImage previewImage;
-
+    private UIPanel _mainPanel;
+    private UIList _classList;
+    private UIList _upgradeList;
+    // private PlayerPreviewElement _preview;
+    private UIText _classNameText;
+    private UIText _classSummaryText;
+    private UIProgressBar _hpBar;
+    private UIProgressBar _mobilityBar;
     private ClassConfig selectedClass;
-    private ClassUpgrade selectedUpgrade;
+    private UpgradeConfig selectedUpgrade;
 
     public override void OnInitialize()
     {
-        selectedClass = CTG2.config.Classes[0];
-        // Main container
-        mainPanel = new UIPanel
-        {
-            Width = { Percent = 0.5f },
-            Height = { Percent = 0.5f },
-            HAlign = 0.5f, VAlign = 0.5f,
-            BackgroundColor = new Color(162, 69, 255)
-        };
-        Append(mainPanel);
+        if (Main.dedServ) return;
 
-        // Class List & Scroll Bar
-        classList = new UIList
-        {
+        // Main container
+        _mainPanel = new UIPanel {
+            Width = { Percent = 0.65f },
+            Height = { Percent = 0.6f },
+            HAlign = 0.5f,
+            VAlign = 0.5f,
+            BackgroundColor = new Color(209, 25, 255, 200)
+        };
+        Append(_mainPanel);
+
+        AddClassList();
+        AddClassInfo();
+        AddPlayerPreview();
+        AddStatBars();
+        AddUpgradeList();
+
+        // initial populate
+        PopulateClasses();
+    }
+
+    private void AddClassList()
+    {
+        var panel = new UIPanel {
+            Left = { Pixels = 0 },
+            Top = { Pixels = 0 },
             Width = { Pixels = 200 },
+            Height = { Percent = 1f }
+        };
+        _classList = new UIList {
+            Top = { Pixels = 10 },
+            Width = { Percent = 1f },
             Height = { Percent = 1f },
             ListPadding = 5f
         };
-        var classScrollbar = new UIScrollbar
-        {
+        var bar = new UIScrollbar {
             Height = { Percent = 1f },
             HAlign = 1f,
             VAlign = 0f
         };
-        classList.SetScrollbar(classScrollbar);
-        mainPanel.Append(classList);
-        mainPanel.Append(classScrollbar);
+        _classList.SetScrollbar(bar);
+        panel.Append(_classList);
+        panel.Append(bar);
+        _mainPanel.Append(panel);
+    }
 
-        // Class Info (Dependent on which class selected atm)
-        var className = new UITextPanel<string>(selectedClass.Name)
-        {
-            Width = { Pixels = 180 },
-            Height = { Pixels = 40 },
-            PaddingTop = 10
-        };
-        var classSummary = new UITextPanel<string>(selectedClass.Summary) {
-            Width = { Pixels = 180 },
-            Height = { Pixels = 40 },
-            PaddingTop = 10
-        };
-        var classDesc = new UITextPanel<string>(selectedClass.Description) {
-            Width = { Pixels = 180 },
-            Height = { Pixels = 40 },
-            PaddingTop = 10
-        };
-        mainPanel.Append(className);
-        mainPanel.Append(classSummary);
-        mainPanel.Append(classDesc);
-        
-        upgradeList = new UIList
-        {
-            Left = { Pixels = 210 },
+    private void AddClassInfo()
+    {
+        var infoPanel = new UIPanel {
+            Left = { Percent = 0.25f },
+            Top = { Pixels = 10 },
             Width = { Percent = 0.5f },
+            Height = { Pixels = 60 },
+            BackgroundColor = new Color(50, 50, 70, 200)
+        };
+        _classNameText = new UIText("Class Name") {
+            Top = { Pixels = 6 },
+            HAlign = 0.5f
+        };
+        _classSummaryText = new UIText("Class description goes here.") {
+            Top = { Pixels = 30 },
+            HAlign = 0.5f,
+            OverflowHidden = true
+        };
+        infoPanel.Append(_classNameText);
+        infoPanel.Append(_classSummaryText);
+        _mainPanel.Append(infoPanel);
+    }
+
+    private void AddPlayerPreview()
+    {   /*
+        _preview = new PlayerPreviewElement(width: 100, height: 140) {
+            HAlign = 0.5f,
+            VAlign = 0.5f
+        };
+        _mainPanel.Append(_preview); */
+    }
+
+    private void AddStatBars()
+    {
+        var statsPanel = new UIPanel {
+            Width = { Pixels = 220 },
+            Height = { Pixels = 50 },
+            HAlign = 0.5f,
+            Top = { Percent = 0.75f },
+            BackgroundColor = new Color(70, 50, 100, 200)
+        };
+        // You can implement UIProgressBar yourself or just use UIText placeholders:
+        _hpBar = new UIProgressBar() {
+            Top = { Pixels = 6 },
+            Left = { Pixels = 6 },
+            Width = { Pixels = 200 },
+            Height = { Pixels = 12 }
+        };
+        _mobilityBar = new UIProgressBar() {
+            Top = { Pixels = 30 },
+            Left = { Pixels = 6 },
+            Width = { Pixels = 200 },
+            Height = { Pixels = 12 }
+        };
+        statsPanel.Append(_hpBar);
+        statsPanel.Append(_mobilityBar);
+        _mainPanel.Append(statsPanel);
+    }
+
+    private void AddUpgradeList()
+    {
+        var panel = new UIPanel {
+            Left = { Percent = 0.75f },
+            Top = { Pixels = 0 },
+            Width = { Percent = 0.2f },
+            Height = { Percent = 1f },
+            BackgroundColor = new Color(50, 70, 50, 200)
+        };
+        _upgradeList = new UIList {
+            Top = { Pixels = 10 },
+            Width = { Percent = 1f },
             Height = { Percent = 1f },
             ListPadding = 5f
         };
-        mainPanel.Append(upgradeList);
-
-        // Preview area
-        /*
-        previewImage = new UIImage(ModContent.Request<Texture2D>("YourMod/Textures/PreviewBackground"))
-        {
-            Left = { Percent = 0.7f },
-            Width = { Percent = 0.25f },
-            Height = { Percent = 0.5f }
+        var bar = new UIScrollbar {
+            Height = { Percent = 1f },
+            HAlign = 1f,
+            VAlign = 0f
         };
-        mainPanel.Append(previewImage); */
-
-        PopulateClasses();
-        PopulateUpgrades(GameClass.Archer);
+        _upgradeList.SetScrollbar(bar);
+        panel.Append(_upgradeList);
+        panel.Append(bar);
+        _mainPanel.Append(panel);
     }
 
     private void PopulateClasses()
     {
-        classList.Clear();
-        foreach (GameClass ct in Enum.GetValues(typeof(GameClass)))
-        {
-            var button = new UITextPanel<string>(ct.ToString())
-            {
-                Width = { Pixels = 180 },
-                Height = { Pixels = 40 },
-                PaddingTop = 10
+        _classList.Clear();
+        foreach (var cls in CTG2.CTG2.config.Classes)
+        {   
+            var btn = new UITextPanel<string>(cls.Name) {
+                Width  = { Percent = 1f },
+                Height = { Pixels  = 30 }
             };
-            classList.Add(button);
+            Color PanelColor = Color.DarkMagenta;
+            btn.BackgroundColor =  PanelColor;
+            // store original for restoring
+            Color normal = PanelColor;
+            Color hover  = normal * 1.5f;
+            Color selected = Color.Gold;
+
+            btn.OnMouseOver += (evt, el) => {
+                if (btn.BackgroundColor != selected)
+                {
+                    btn.BackgroundColor = hover;
+                }
+                
+            };
+            btn.OnMouseOut += (evt, el) =>
+            {
+                if (btn.BackgroundColor != selected)
+                {
+                    btn.BackgroundColor = normal;
+                }
+            };
+
+            btn.OnLeftClick += (evt, el) => {
+                // clear all siblings
+                foreach (UITextPanel<string> button in _classList)
+                {
+                    if (button.BackgroundColor == selected)
+                    {
+                        button.BackgroundColor = normal;
+                    }
+                }
+                btn.BackgroundColor = selected;
+                SelectClass(cls);
+            };
+            _classList.Add(btn);
         }
+        
+        
+
+        // default select first
+        if (CTG2.CTG2.config.Classes.Any())
+            SelectClass(CTG2.CTG2.config.Classes[0]);
     }
 
-    private void PopulateUpgrades(GameClass ct)
+    private void SelectClass(ClassConfig cfg)
     {
-        upgradeList.Clear();
-        /*
-        foreach (var up in UpgradesByClass[ct])
+        PlayerManager.currentClass = cfg;
+        selectedClass = cfg;
+        _classNameText.SetText(cfg.Name);
+        _classSummaryText.SetText(cfg.Summary);
+
+        // update stats bars
+        _hpBar.SetProgress(cfg.HealthFromKills / 100f);        // example
+        _mobilityBar.SetProgress(cfg.RespawnTime / 10f);        // example
+
+        // populate upgrades
+        _upgradeList.Clear();
+        foreach (var up in cfg.Upgrades)
         {
-            var icon = new UIImage(TextureAssets.Buff[1]); // tModLoader helper to show an item or buff icon
-            var panel = new UIPanel
-            {
-                Width = { Pixels = 180 },
-                Height = { Pixels = 40 }
+            var btn = new UITextPanel<string>(up.Name) {
+                Width  = { Percent = 1f },
+                Height = { Pixels  = 30 }
             };
-            icon.Left.Pixels = 4;
-            panel.Append(icon);
+            Color PanelColor = Color.DarkMagenta;
+            btn.BackgroundColor =  PanelColor;
+            // store original for restoring
+            Color normal = PanelColor;
+            Color hover  = normal * 1.5f;
+            Color selected = Color.Gold;
 
-            var label = new UIText(up.Name)
-            {
-                Left = { Pixels = 40 }, VAlign = 0.5f
+            btn.OnMouseOver += (evt, el) => {
+                if (btn.BackgroundColor != selected)
+                {
+                    btn.BackgroundColor = hover;
+                }
+                
             };
-            panel.Append(label);
+            btn.OnMouseOut += (evt, el) =>
+            {
+                if (btn.BackgroundColor != selected)
+                {
+                    btn.BackgroundColor = normal;
+                }
+            };
 
-            upgradeList.Add(panel);
+            btn.OnLeftClick += (evt, el) => {
+                // clear all siblings
+                foreach (UITextPanel<string> button in _upgradeList)
+                {
+                    if (button.BackgroundColor == selected)
+                    {
+                        button.BackgroundColor = normal;
+                    }
+                }
+                btn.BackgroundColor = selected;
+                PlayerManager.currentUpgrade = up;
+            };
+            _upgradeList.Add(btn);
         }
-        */
     }
 }

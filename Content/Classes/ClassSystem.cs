@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
 using CTG2;
+using CTG2.Content.ClientSide;
 
 
 namespace ClassesNamespace
@@ -136,6 +137,10 @@ namespace ClassesNamespace
             Player.QuickSpawnItem(null, item, 1);
         }
 
+        private void ApplyPermBuffs(List<int> buffs)
+        {   
+            foreach(int id in buffs) Player.AddBuff(id, 54000);
+        }
 
    public override void ResetEffects()
         {
@@ -175,15 +180,20 @@ namespace ClassesNamespace
 
             Player.statLifeMax2 = currentHP;
             Player.statManaMax2 = currentMana;
-
-
-                    switch (playerClass)
+            
+            // Add player buffs here instead (delete switch once config is populated with the required buffs)
+            try
+            {
+                ApplyPermBuffs(PlayerManager.currentClass.Buffs);
+            }
+            catch
+            {
+                Console.WriteLine("Failed to apply permanent buffs.");
+            }
+            
+            switch (playerClass)
         {
             case GameClass.Archer:
-                Player.AddBuff(107, 54000);
-                Player.AddBuff(115, 54000);
-                Player.AddBuff(257, 54000);
-                Player.AddBuff(321, 54000);
                 break;
 
             case GameClass.Ninja:
