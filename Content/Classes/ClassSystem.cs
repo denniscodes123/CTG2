@@ -62,6 +62,12 @@ namespace ClassesNamespace
     {
         public GameClass playerClass = GameClass.None;
         private string lastPlayerClass = "";
+        private string lastUpgrade = "";
+        private int bonusHP = 0;
+        private int bonusRegen = 0;
+        private int bonusDef = 0;
+        private float bonusMoveSpeed = 0;
+        
         private int currentHP = 100;
         private int currentMana = 20;
 
@@ -137,11 +143,47 @@ namespace ClassesNamespace
             Player.QuickSpawnItem(null, item, 1);
         }
 
-        private void ApplyPermBuffs(List<int> buffs)
-        {   
-            foreach(int id in buffs) Player.AddBuff(id, 54000);
-        }
+    private void ApplyPermBuffs(List<int> buffs)
+    {   
+        foreach(int id in buffs) Player.AddBuff(id, 54000);
+    }
 
+    public void ApplyUpgrade(UpgradeConfig upgrade)
+    {   
+        // reset all bonus stats
+        bonusHP = 0;
+        bonusRegen = 0;
+        bonusDef = 0;
+        bonusMoveSpeed = 0;
+        
+        switch (upgrade.Id)
+        {
+            case "charge_bow":
+                Item newItem = new Item();
+                var itemType = 5549;
+                newItem.SetDefaults(itemType);
+                newItem.stack = 1;
+                newItem.prefix = 0;
+                Player.inventory[2] = newItem;
+                break;
+            case "bonus_regen":
+                bonusRegen += 2 * upgrade.Value;
+                break;
+            case "bonus_speed":
+                bonusMoveSpeed += upgrade.Value/100f;
+                break;
+            case "bonus_health":
+                bonusHP += upgrade.Value;
+                break;
+            case "bonus_def":
+                bonusDef += upgrade.Value;
+                break;
+            default:
+                Main.NewText("upgrade id not found");
+                break;
+        }
+    }
+    
    public override void ResetEffects()
         {
             Player.AddBuff(BuffID.Shine, 54000);
@@ -176,15 +218,29 @@ namespace ClassesNamespace
                 }
 
                 SetInventory(classInfo);
+                
+                // Apply First upgrade by default when new class selected
+                ApplyUpgrade(PlayerManager.currentClass.Upgrades[0]);
             }
-
+            
             Player.statLifeMax2 = currentHP;
             Player.statManaMax2 = currentMana;
             
+            if (PlayerManager.currentUpgrade.Name != lastUpgrade)
+            {
+                // apply upgrades here
+                ApplyUpgrade(PlayerManager.currentUpgrade);
+            }
+            
+            Player.lifeRegen += bonusRegen;
+            Player.moveSpeed += bonusMoveSpeed;
+            Player.statDefense += bonusDef;
+            Player.statLifeMax2 += bonusHP;
+            
             // Add player buffs here instead (delete switch once config is populated with the required buffs)
             try
-            {
-                ApplyPermBuffs(PlayerManager.currentClass.Buffs);
+            {   
+                if (!Main.dedServ) ApplyPermBuffs(PlayerManager.currentClass.Buffs);
             }
             catch
             {
@@ -192,6 +248,7 @@ namespace ClassesNamespace
             }
 
             lastPlayerClass = PlayerManager.currentClass.Inventory;
+            lastUpgrade = PlayerManager.currentUpgrade.Name;
         }
         public override void UpdateEquips()
     {

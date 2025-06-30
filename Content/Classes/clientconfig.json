@@ -18,7 +18,7 @@
       "ability-id": 1,
       "upgrades": [
         {
-          "id":    "new_weapon",
+          "id":    "charge_bow",
           "name":  "Charge Bow",
           "icon":  89,
           "value": 20
@@ -27,13 +27,13 @@
           "id":    "bonus_regen",
           "name":  "Bonus Regeneration",
           "icon":  0,
-          "value": 1
+          "value": 2
         },
         {
           "id":    "bonus_speed",
           "name":  "Speed Boost",
           "icon":  0,
-          "value": 2
+          "value": 10
         }
       ]
     },
