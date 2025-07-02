@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using ClassesNamespace;
+using CTG2.Content.ServerSide;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -47,6 +48,14 @@ public class PlayerManager : ModPlayer
         int blueBaseY = 10940 / 16;
         int redBaseX = 20385 / 16;
         int redBaseY = 10940 / 16;
+        int spectatorSpawnX = (13332 + 19316) / 32;
+        int spectatorSpawnY =  11000 / 32;
+        if (Player.ghost)
+        {
+            Player.SpawnX = spectatorSpawnX;
+            Player.SpawnY = spectatorSpawnY;
+            return; 
+        }
         switch (GameInfo.matchStage)
         {
             case 0:
@@ -75,6 +84,7 @@ public class PlayerManager : ModPlayer
                     Player.SpawnY = redBaseY;
                 }
                 break;
+
         }
         
     }

@@ -28,6 +28,11 @@ public class GameManager : ModSystem
     
     public GameMap Map { get; private set; }
 
+    // Spectator tracking
+    private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
+    private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
+    private Vector2 spectatorSpawnPoint = new Vector2((13332 + 19316) / 2, 11000); // Center area for spectators
+
     public override void OnWorldLoad()
     {
         // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
@@ -54,6 +59,16 @@ public class GameManager : ModSystem
 
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
+
+        // Auto-spectate players not on teams (team 0)
+        foreach (Player player in Main.player)
+        {
+            if (player.active && player.team == 0)
+            {
+                SetPlayerSpectator(player.whoAmI, true);
+                Console.WriteLine($"Auto-spectating player {player.name} (not on a team)");
+            }
+        }
 
         // Map Set
 
@@ -85,6 +100,30 @@ public class GameManager : ModSystem
     public void EndGame()
     {
         IsGameActive = false;
+   
+        foreach (var kvp in playerSpectatorStatus)
+        {
+            int playerIndex = kvp.Key;
+            if (Main.player[playerIndex].active && kvp.Value) 
+            {
+                Main.player[playerIndex].ghost = false;
+                Main.player[playerIndex].respawnTimer = 0;
+                
+              
+                var mod_ = ModContent.GetInstance<CTG2>();
+                ModPacket statusPacket = mod_.GetPacket();
+                statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
+                statusPacket.Write(playerIndex);
+                statusPacket.Write(false); 
+                statusPacket.Send(toClient: playerIndex);
+            }
+        }
+        
+        playerSpectatorStatus.Clear();
+        spectatorOriginalTeams.Clear();
+        
+        Console.WriteLine("Cleared all spectator tracking on game end");
+        
         var mod = ModContent.GetInstance<CTG2>();
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerGameEnd);
@@ -182,6 +221,118 @@ public class GameManager : ModSystem
 
     public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
         mapQueue.Enqueue(mapType);
+    }
+
+    public bool IsPlayerSpectator(int playerIndex)
+    {
+        return playerSpectatorStatus.GetValueOrDefault(playerIndex, false);
+    }
+    
+    public void SetPlayerSpectator(int playerIndex, bool isSpectator)
+    {
+        if (!Main.player[playerIndex].active) return;
+        
+        var player = Main.player[playerIndex];
+        
+        if (isSpectator)
+        {
+            // Store original team for later purposes
+            if (player.team != 0)
+            {
+                spectatorOriginalTeams[playerIndex] = player.team;
+            }
+            
+            // Set spectator status
+            playerSpectatorStatus[playerIndex] = true;
+            
+            // Apply spectator mode
+            player.ghost = true;
+            player.respawnTimer = 9999;
+            player.team = 0; // Remove from teams
+            
+            // Teleport to spectator area
+            player.Teleport(spectatorSpawnPoint);
+            
+            // Send teleport packet to client
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.ServerTeleport);
+            packet.Write(playerIndex);
+            packet.Write((int)spectatorSpawnPoint.X);
+            packet.Write((int)spectatorSpawnPoint.Y);
+            packet.Send(toClient: playerIndex);
+            
+            // Send spectator status update
+            ModPacket statusPacket = mod.GetPacket();
+            statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
+            statusPacket.Write(playerIndex);
+            statusPacket.Write(true); // is spectator
+            statusPacket.Send(toClient: playerIndex);
+            
+            Console.WriteLine($"Player {player.name} entered spectator mode");
+        }
+        else
+        {
+            // Exit spectator mode
+            if (!spectatorOriginalTeams.TryGetValue(playerIndex, out int originalTeam) || originalTeam == 0)
+            {
+                // Player has no team to return to
+                Console.WriteLine($"Player {player.name} cannot exit spectator mode - no team assigned");
+                return; 
+            }
+
+            if (60 * 15 * 60 - MatchTime > 45 * 60)
+            {
+                // Player is cooked 
+                Console.WriteLine($"Player {player.name} cannot exit spectator mode - game is about to end soon");
+                return; 
+            }
+            
+            // Player has a valid team
+            playerSpectatorStatus[playerIndex] = false;
+            
+            // Restore original team
+            player.team = originalTeam;
+            
+            // Send team change packet to sync with clients
+            var mod = ModContent.GetInstance<CTG2>();
+            NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, originalTeam);
+            
+            // Remove spectator mode
+            player.ghost = false;
+            player.respawnTimer = 0;
+            
+            // Teleport to appropriate team spawn
+            if (IsGameActive)
+            {
+ 
+                Vector2 classLocation = originalTeam == 3 ? 
+                    new Vector2(12346, 10940) : // Blue team class location
+                    new Vector2(20385, 10940);  // Red team class location
+                
+                player.Teleport(classLocation);
+                
+                ModPacket teleportPacket = mod.GetPacket();
+                teleportPacket.Write((byte)MessageType.ServerTeleport);
+                teleportPacket.Write(playerIndex);
+                teleportPacket.Write((int)classLocation.X);
+                teleportPacket.Write((int)classLocation.Y);
+                teleportPacket.Send(toClient: playerIndex);
+                
+                Console.WriteLine($"Player {player.name} joined class selection");
+            
+          
+            }
+            
+
+            ModPacket statusPacket = mod.GetPacket();
+            statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
+            statusPacket.Write(playerIndex);
+            statusPacket.Write(false); // not spectator
+            statusPacket.Send(toClient: playerIndex);
+            
+            Console.WriteLine($"Player {player.name} exited spectator mode and rejoined team {originalTeam}");
+        }
     }
 
     public override void PostUpdateWorld()

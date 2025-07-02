@@ -34,25 +34,6 @@ namespace CTG2.Content
             myPacket.Write((byte)MessageType.RequestEndGame); // id
             myPacket.Send();
 
-            Game gameToEnd = caller.Player.GetModPlayer<AdminPlayer>().game;
-
-            if (gameToEnd == null)
-            {
-                caller.Reply($"No active game found with the name .", Color.Red);
-                return;
-            }
-
-            // End the match if one is running
-            if (gameToEnd.match != null)
-            {
-                gameToEnd.EndMatch();
-            }
-
-            // Remove the game from the handler
-            caller.Player.GetModPlayer<AdminPlayer>().game = null;
-            GameHandler.ActiveGames.Remove(gameToEnd);
-            gameToEnd.endGame();
-            caller.Reply($"Successfully removed game:", Color.Orange);
         }
     }
 }

@@ -47,13 +47,7 @@ namespace CTG2.Content
             myPacket.Send();
             
             return;
-            Game game = new Game();
-            modPlayer.game = game;
 
-            game.players.Add(caller.Player);
-            var myPlayer = caller.Player.GetModPlayer<MyPlayer>();
-            myPlayer.EnterSpectatorState(game);
-            //TODO
             //SpawnPoints.TeleportToGameSpawn(caller.Player, game); redo this method 
 
         }

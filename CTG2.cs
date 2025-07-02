@@ -32,7 +32,10 @@ namespace CTG2
         RequestMaxHealth = 14,
         SyncNpcIndex = 15,
         SetNpcTeam = 16,
-        RequestTeamChange = 17
+        RequestTeamChange = 17,
+        RequestEnterSpectator = 18, // client → server
+        RequestExitSpectator = 19,  // client → server  
+        ServerSpectatorUpdate = 20  // server → client
     }
     
     public class CTG2 : Mod
@@ -171,6 +174,18 @@ namespace CTG2
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target, teamID);
                     break;
                 
+                case (byte)MessageType.RequestEnterSpectator:
+                    int spectatorPlayerIndex = reader.ReadInt32();
+                    manager.SetPlayerSpectator(spectatorPlayerIndex, true);
+                    Console.WriteLine($"Server Received Enter Spectator Request from player {spectatorPlayerIndex}!");
+                    break;
+                
+                case (byte)MessageType.RequestExitSpectator:
+                    int exitSpectatorPlayerIndex = reader.ReadInt32();
+                    manager.SetPlayerSpectator(exitSpectatorPlayerIndex, false);
+                    Console.WriteLine($"Server Received Exit Spectator Request from player {exitSpectatorPlayerIndex}!");
+                    break;
+                
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
                     GameInfo.matchStage = 1;
@@ -206,6 +221,25 @@ namespace CTG2
                     GameInfo.redGemCarrier = reader.ReadString();
                     break;
                 
+                case (byte)MessageType.ServerSpectatorUpdate:
+                    int playerIndex = reader.ReadInt32();
+                    bool isSpectator = reader.ReadBoolean();
+                    if (playerIndex == Main.myPlayer)
+                    {
+                        // Update local spectator status if needed
+                        Main.player[playerIndex].ghost = isSpectator;
+                        if (isSpectator)
+                        {
+                            Main.player[playerIndex].respawnTimer = 9999;
+                        }
+                        else
+                        {
+                            Main.player[playerIndex].respawnTimer = 0;
+                        }
+                    }
+                    Console.WriteLine($"Client Received Spectator Update: Player {playerIndex} is now {(isSpectator ? "spectator" : "active")}!");
+                    break;
+                
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
@@ -220,6 +254,24 @@ namespace CTG2
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.SyncNpcIndex);
             packet.Write(index);
+            packet.Send();
+        }
+
+        public static void SendEnterSpectatorRequest(int playerIndex)
+        {
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestEnterSpectator);
+            packet.Write(playerIndex);
+            packet.Send();
+        }
+        
+        public static void SendExitSpectatorRequest(int playerIndex)
+        {
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestExitSpectator);
+            packet.Write(playerIndex);
             packet.Send();
         }
     }
