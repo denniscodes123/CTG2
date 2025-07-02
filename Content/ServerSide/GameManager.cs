@@ -287,22 +287,17 @@ public class GameManager : ModSystem
                 Console.WriteLine($"Player {player.name} cannot exit spectator mode - game is about to end soon");
                 return; 
             }
-            
-            // Player has a valid team
+        
             playerSpectatorStatus[playerIndex] = false;
             
-            // Restore original team
-            player.team = originalTeam;
-            
-            // Send team change packet to sync with clients
+            player.team = originalTeam; // this may need to be changed 
+
             var mod = ModContent.GetInstance<CTG2>();
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, originalTeam);
-            
-            // Remove spectator mode
+
             player.ghost = false;
             player.respawnTimer = 0;
-            
-            // Teleport to appropriate team spawn
+
             if (IsGameActive)
             {
  
