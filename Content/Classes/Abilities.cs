@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Runtime.CompilerServices;
 using ClassesNamespace;
 using CTG2.Content.ClientSide;
+using CTG2.Content.Classes;
 
 
 namespace CTG2.Content
