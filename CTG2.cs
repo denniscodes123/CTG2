@@ -5,6 +5,7 @@ using System.Text.Json;
 using ClassesNamespace;
 using Terraria;
 using CTG2.Content;
+using CTG2.Content.Classes;
 using CTG2.Content.ClientSide;
 using CTG2.Content.ServerSide;
 using Microsoft.Xna.Framework;
