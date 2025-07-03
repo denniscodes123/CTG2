@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 using System;
 using Terraria.Audio;
 
-namespace CTG2.Content.Accessories
+namespace CTG2.Content.Items
 {
 	[AutoloadEquip(EquipType.Shield)] // Load the spritesheet you create as a shield for the player when it is equipped.
 	public class ArcherDash : ModItem
