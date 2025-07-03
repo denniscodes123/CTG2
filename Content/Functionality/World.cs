@@ -6,59 +6,59 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
+
 namespace CTG2.Content
 {
-   public static class WorldProperties 
-{
-    public static TileSnapshot[,] savedRegion;
-    public static int savedX;
-    public static int savedY;
-    
-    public static TileSnapshot[,] SaveRegion(int x1, int y1, int x2, int y2)
+    public static class WorldProperties 
     {
-        int width = x2 - x1 + 1;
-        int height = y2 - y1 + 1;
-        TileSnapshot[,] region = new TileSnapshot[width, height];
-
-        for (int x = 0; x < width; x++)
+        public static TileSnapshot[,] savedRegion;
+        public static int savedX;
+        public static int savedY;
+        
+        public static TileSnapshot[,] SaveRegion(int x1, int y1, int x2, int y2)
         {
-            for (int y = 0; y < height; y++)
-            {
-                Tile tile = Main.tile[x1 + x, y1 + y];
-                region[x, y] = new TileSnapshot(tile);
-            }
-        }
+            int width = x2 - x1 + 1;
+            int height = y2 - y1 + 1;
+            TileSnapshot[,] region = new TileSnapshot[width, height];
 
-        return region;
-    }
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Tile tile = Main.tile[x1 + x, y1 + y];
+                    region[x, y] = new TileSnapshot(tile);
+                }
+            }
+
+            return region;
+        }
 
         public static TileSnapshot[,] loadMap(String name)
         {
-     string saveDirectory = Path.Combine(Main.SavePath, "Mods", "CTG2", "MapSaves");
-    string filePath = Path.Combine(saveDirectory, $"{name}.json");
+            string saveDirectory = Path.Combine(Main.SavePath, "Mods", "CTG2", "MapSaves");
+            string filePath = Path.Combine(saveDirectory, $"{name}.json");
 
-    if (!File.Exists(filePath))
-    {
-        Main.NewText($"Failure to locate world: {name}.json");
-        return null;
-    }
-    
-    try
-    {
-        string json = File.ReadAllText(filePath);
-        TileSnapshot[,] loadedTiles = JsonConvert.DeserializeObject<TileSnapshot[,]>(json);
-        return loadedTiles;
-    }
-    catch (Exception e)
-    {
-        ModContent.GetInstance<CTG2>().Logger.Error($"Failed to load or deserialize map '{name}.json'. Error: {e.Message}");
-        Main.NewText($"Error loading world: {name}.json. Check logs for details.");
-        return null;
-    }
-        
-    }
+            if (!File.Exists(filePath))
+            {
+                Main.NewText($"Failure to locate world: {name}.json");
+                return null;
+            }
+            
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                TileSnapshot[,] loadedTiles = JsonConvert.DeserializeObject<TileSnapshot[,]>(json);
+                return loadedTiles;
+            }
+            catch (Exception e)
+            {
+                ModContent.GetInstance<CTG2>().Logger.Error($"Failed to load or deserialize map '{name}.json'. Error: {e.Message}");
+                Main.NewText($"Error loading world: {name}.json. Check logs for details.");
+                return null;
+            }  
+        }
 
-    public static void RestoreRegion(int x1, int y1, TileSnapshot[,] region)
+        public static void RestoreRegion(int x1, int y1, TileSnapshot[,] region)
         {
             int width = region.GetLength(0);
             int height = region.GetLength(1);
@@ -86,12 +86,12 @@ namespace CTG2.Content
                     NetMessage.SendTileSquare(-1, sendX, sendY, chunkSize);
                 }
             }
-
         }
-}
+    }
 
-public class TimeControlSystem : ModSystem
-{
+
+    public class TimeControlSystem : ModSystem
+    {
         public override void PreUpdateWorld()
         {
             Main.dayTime = true;
@@ -105,17 +105,52 @@ public class TimeControlSystem : ModSystem
             Main.windSpeedCurrent = 0f;
             Main.windSpeedTarget = 0f;
         }
-    
 
-    public class NoEnemySpawns : GlobalNPC
-    {
-        public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
+        public class NoEnemySpawns : GlobalNPC
         {
+            public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
+            {
+                spawnRate = int.MaxValue;
+                maxSpawns = 0;
+            }
+        }
+    }
 
-            spawnRate = int.MaxValue;
-            maxSpawns = 0;
+
+    public class TileSnapshot
+    {
+        public ushort? TileType; 
+        public ushort? WallType; 
+        public byte TileColor;   // for painted blocks
+        public byte WallColor;   // for painted walls
+
+        public TileSnapshot(Tile tile)
+        {
+            if (tile.HasTile)
+                TileType = tile.TileType;
+
+            if (tile.WallType > 0)
+                WallType = tile.WallType;
+
+            TileColor = tile.TileColor;
+            WallColor = tile.WallColor;
+        }
+
+        public void ApplyTo(Tile tile)
+        {
+            if (TileType.HasValue)
+            {
+                tile.TileType = TileType.Value;
+                tile.HasTile = true;
+            }
+            else
+            {
+                tile.HasTile = false;
+            }
+
+            tile.WallType = WallType ?? 0;
+            tile.TileColor = TileColor;
+            tile.WallColor = WallColor;
         }
     }
 }
-}
-
