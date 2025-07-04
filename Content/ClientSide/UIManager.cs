@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CTG2.Content.ServerSide;
+using CTG2.Content.Classes;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -10,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
+
 
 namespace CTG2.Content.ClientSide;
 
@@ -141,5 +143,20 @@ public class UIManager : ModSystem
             Vector2.Zero,
             Vector2.One
         );
+
+        // draw ability timer
+
+        string abilText = $"Ability cooldown: {(int) Abilities.cooldown / 60}s";
+        Vector2 abilPos = new Vector2(Main.screenWidth - 320, 450);
+        Color abilCol = Color.Yellow;
+
+        if (Abilities.cooldown == 0)
+        {
+            Utils.DrawBorderString(Main.spriteBatch, "Ability ready!", abilPos, abilCol);
+        }
+        else
+        {
+            Utils.DrawBorderString(Main.spriteBatch, abilText, abilPos, abilCol);
+        }
     }
 }
