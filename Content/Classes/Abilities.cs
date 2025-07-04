@@ -18,6 +18,8 @@ namespace CTG2.Content
 {
     public class Abilities : ModPlayer
     {
+        public static int cooldown = 0;
+
         private int class4BuffTimer = 0;
         private bool class4PendingBuffs = false;
 
@@ -57,15 +59,37 @@ namespace CTG2.Content
                 Player.inventory[b] = newItem;
             }
 
-            for (int d = 0; d < Player.armor.Length; d++)
+            for (int c = 0; c < Player.armor.Length; c++)
             {
-                var itemData = classItems[Player.inventory.Length + d];
+                var itemData = classItems[Player.inventory.Length + c];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
-                Player.armor[d] = newItem;
+                Player.armor[c] = newItem;
+            }
+
+            for (int d = 0; d < Player.miscEquips.Length; d++)
+            {
+                var itemData = classItems[Player.inventory.Length + Player.armor.Length + d];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                Player.miscEquips[d] = newItem;
+            }
+
+            for (int e = 0; e < Player.miscDyes.Length; e++)
+            {
+                var itemData = classItems[Player.inventory.Length + Player.armor.Length + Player.miscEquips.Length + e];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                Player.miscDyes[e] = newItem;
             }
         }
 
@@ -128,7 +152,7 @@ namespace CTG2.Content
 
         private void SetCooldown(int seconds)
         {
-            Player.AddBuff(BuffID.ChaosState, seconds * 60);
+            cooldown = seconds * 60;
         }
 
 
@@ -412,8 +436,6 @@ namespace CTG2.Content
                     packet2.Write((int)tempPosition.X);
                     packet2.Write((int)tempPosition.Y);
                     packet2.Send();
-                    
-                    Player.AddBuff(BuffID.ChaosState, 26 * 60);
 
                     Main.NewText("Successfully swapped!");
                 }
@@ -446,15 +468,6 @@ namespace CTG2.Content
             packet1.Write(Player.team);
             packet1.Write(0f);
             packet1.Send();
-
-            /*var mod2 = ModContent.GetInstance<CTG2>();
-            ModPacket packet2 = mod2.GetPacket();
-            packet2.Write((byte)MessageType.SetNpcTeam);
-                Main.NewText($"{CTG2.requestedNpcIndex}, {Player.team}");
-            packet2.Write(CTG2.requestedNpcIndex);
-            packet2.Write(Player.team);
-            packet2.Send();
-            Main.npc[CTG2.requestedNpcIndex].GetGlobalNPC<AllNpcs>().team = Player.team;*/
         }
 
 
@@ -570,7 +583,7 @@ namespace CTG2.Content
                 initializedMutant = true;
             }
 
-            if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && !Player.HasBuff(BuffID.ChaosState)) // Only activate if not on cooldown
+            if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && cooldown == 0) // Only activate if not on cooldown
             {
                 int selectedClass = PlayerManager.currentClass.AbilityID;
 
@@ -681,6 +694,7 @@ namespace CTG2.Content
             }
         }
 
+
         //All timer logic below
         public override void PostUpdate()
         {
@@ -689,6 +703,27 @@ namespace CTG2.Content
             PsychicPostStatus();
             ClownPostStatus();
             TreePostStatus();
+
+            if (cooldown > 0)
+                cooldown--;
+        }
+    }
+
+
+    public class AbilitiesGlobal : ModSystem
+    {
+        public override void PostUpdatePlayers()
+        {
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+
+                if (player.active && player.dead)
+                {
+                    if (Abilities.cooldown > 0)
+                        Abilities.cooldown--;
+                }
+            }
         }
     }
 }
