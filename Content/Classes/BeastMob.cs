@@ -73,7 +73,7 @@ namespace CTG2.Content.Classes
 
                 if (NPC.Hitbox.Intersects(player.Hitbox) && player.team != beastTeam)
                 {
-                    int damage = 30;
+                    int damage = 80;
 
                     player.Hurt(PlayerDeathReason.LegacyEmpty(), damage, 1, false, false, -1, true,
                     100f /* Armor Penetration (Keeps damage persistent for all classes) */, 0f, 4.5f // knockback
