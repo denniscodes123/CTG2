@@ -24,8 +24,9 @@ public class PlayerManager : ModPlayer
     public static ClassConfig currentClass = new ClassConfig();
     public static UpgradeConfig currentUpgrade = new UpgradeConfig();
 
-    public PlayerState playerState = PlayerState.None; // UPDATE THIS 
+    public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;
+    public int team = 0; // TODO: THIS NEEDS TO BE UPDATED IN TEAMSET 
 
 
     //change player state
@@ -133,25 +134,38 @@ public class PlayerManager : ModPlayer
             ShowClassUI = false;
         }
 
-        
-            if (awaitingRespawn) //was lowkey angry while coding this will clean up later
-    {
-        customRespawnTimer--;
-
-        if (customRespawnTimer <= 0)
+        if (customRespawnTimer > 0)
         {
-            awaitingRespawn = false;
-
-            Player.ghost = false;
-            Player.dead = true;
-
-            Player.statLife = Player.statLifeMax2;
-            Player.HealEffect(Player.statLifeMax2);
-
-            
-            
+            customRespawnTimer--;
         }
-    }
+        else if (customRespawnTimer == 0) // or class has been selected TODO 
+        {
+            // END CLASS SELECTION 
+        }
+        else
+        {
+            // DO NOTHING
+        }
+        
+
+        if (awaitingRespawn) //was lowkey angry while coding this will clean up later
+        {
+            customRespawnTimer--;
+
+            if (customRespawnTimer <= 0)
+            {
+                awaitingRespawn = false;
+
+                Player.ghost = false;
+                Player.dead = true;
+
+                Player.statLife = Player.statLifeMax2;
+                Player.HealEffect(Player.statLifeMax2);
+
+
+
+            }
+        }
 
 
 
