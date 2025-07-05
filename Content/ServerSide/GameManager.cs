@@ -7,6 +7,8 @@ using Terraria.WorldBuilding;
 using System.Collections;
 using System.Collections.Generic;
 using Terraria.ID;
+using Terraria.Chat;
+using Terraria.Localization;
 
 namespace CTG2.Content.ServerSide;
 
@@ -269,63 +271,81 @@ public class GameManager : ModSystem
             statusPacket.Write(true); // is spectator
             statusPacket.Send(toClient: playerIndex);
             
+            // DEBUG: Global broadcast
             Console.WriteLine($"Player {player.name} entered spectator mode");
         }
         else
         {
-            // Exit spectator mode
-            if (!spectatorOriginalTeams.TryGetValue(playerIndex, out int originalTeam) || originalTeam == 0)
+            // DEBUG: Global broadcast start
+            
+            // Check if player has original team
+            if (!spectatorOriginalTeams.TryGetValue(playerIndex, out int originalTeam) || originalTeam == 0 || player.ghost != true)
             {
-                // Player has no team to return to
-                Console.WriteLine($"Player {player.name} cannot exit spectator mode - no team assigned");
-                return; 
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} CANNOT EXIT SPECTATOR"), Microsoft.Xna.Framework.Color.LimeGreen);
+                Console.WriteLine($"Player {player.name} cannot exit spectator mode - no team assigned (originalTeam: {originalTeam})");
+                return;
             }
-
-            if (60 * 15 * 60 - MatchTime > 45 * 60)
+            if (60 * 15 * 60 - MatchTime < 45 * 60)
             {
                 // Player is cooked 
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} TOO LATE GG"), Microsoft.Xna.Framework.Color.LimeGreen);
+                
                 Console.WriteLine($"Player {player.name} cannot exit spectator mode - game is about to end soon");
                 return; 
             }
-        
-            playerSpectatorStatus[playerIndex] = false;
             
-            player.team = originalTeam; // this may need to be changed 
+            
+            playerSpectatorStatus[playerIndex] = false;
+            player.team = originalTeam;
 
             var mod = ModContent.GetInstance<CTG2>();
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, originalTeam);
 
-            player.ghost = false;
-            player.respawnTimer = 0;
+            // Determine where to teleport based on game phase
+            Vector2 teleportLocation;
 
-            if (IsGameActive)
+            if (MatchTime < 1800) // Class selection phase (first 30 seconds)
             {
- 
-                Vector2 classLocation = originalTeam == 3 ? 
+                
+                // Teleport to class selection area
+                teleportLocation = originalTeam == 3 ? 
                     new Vector2(12346, 10940) : // Blue team class location
                     new Vector2(20385, 10940);  // Red team class location
-                
-                player.Teleport(classLocation);
-                
-                ModPacket teleportPacket = mod.GetPacket();
-                teleportPacket.Write((byte)MessageType.ServerTeleport);
-                teleportPacket.Write(playerIndex);
-                teleportPacket.Write((int)classLocation.X);
-                teleportPacket.Write((int)classLocation.Y);
-                teleportPacket.Send(toClient: playerIndex);
-                
-                Console.WriteLine($"Player {player.name} joined class selection");
-            
-          
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} in class selection"), Microsoft.Xna.Framework.Color.LimeGreen);
+                Console.WriteLine($"Player {player.name} joined class selection with {(1800-MatchTime)/60} seconds remaining");
             }
+            else // Active game phase
+            {
+                // Teleport to team base
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} should be in game?"), Microsoft.Xna.Framework.Color.LimeGreen);
+                teleportLocation = originalTeam == 3 ? 
+                    new Vector2(12346, 10940) : // Blue team base (same as class location)
+                    new Vector2(20385, 10940);  // Red team base (same as class location)
             
+                
+                Console.WriteLine($"Player {player.name} joined active game");
+            }
 
+            
+            // Always teleport the player
+            player.Teleport(teleportLocation);
+
+            ModPacket teleportPacket = mod.GetPacket();
+            teleportPacket.Write((byte)MessageType.ServerTeleport);
+            teleportPacket.Write(playerIndex);
+            teleportPacket.Write((int)teleportLocation.X);
+            teleportPacket.Write((int)teleportLocation.Y);
+            teleportPacket.Send(toClient: playerIndex);
+
+            // Send spectator status update
             ModPacket statusPacket = mod.GetPacket();
             statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
             statusPacket.Write(playerIndex);
             statusPacket.Write(false); // not spectator
             statusPacket.Send(toClient: playerIndex);
-            
+
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} SUCCESSFULLY exited spectator mode!"), Microsoft.Xna.Framework.Color.LimeGreen);
+            //NetMessage.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} SUCCESSFULLY exited spectator mode!"), Microsoft.Xna.Framework.Color.LimeGreen);
             Console.WriteLine($"Player {player.name} exited spectator mode and rejoined team {originalTeam}");
         }
     }

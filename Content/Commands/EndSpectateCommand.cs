@@ -20,7 +20,9 @@ namespace CTG2.Content.Commands
             }
 
             // Send request to server to exit spectator mode
+            
             CTG2.SendExitSpectatorRequest(caller.Player.whoAmI);
+
             
             caller.Reply("Requesting to exit spectator mode lol", Color.Yellow);
         }
