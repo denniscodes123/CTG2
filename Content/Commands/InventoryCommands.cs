@@ -60,6 +60,40 @@ namespace CTG2.Content.Commands
                 count++;
             }
 
+            foreach (Item item in player.miscEquips)
+            {
+                if (item != null)
+                {
+                    inventoryData.Add(new ItemData
+                    {
+                        Name = item.Name,
+                        Type = item.type,
+                        Stack = item.stack,
+                        Prefix = item.prefix,
+                        Slot = count
+                    });
+                }
+
+                count++;
+            }
+
+            foreach (Item item in player.miscDyes)
+            {
+                if (item != null)
+                {
+                    inventoryData.Add(new ItemData
+                    {
+                        Name = item.Name,
+                        Type = item.type,
+                        Stack = item.stack,
+                        Prefix = item.prefix,
+                        Slot = count
+                    });
+                }
+
+                count++;
+            }
+
             string[] inputSplit = input.Split(' ');
 
             var inventory = new CtgClass();
@@ -127,15 +161,37 @@ namespace CTG2.Content.Commands
                 player.inventory[b] = newItem;
             }
 
-            for (int d = 0; d < player.armor.Length; d++)
+            for (int c = 0; c < player.armor.Length; c++)
             {
-                var itemData = allItemData[player.inventory.Length + d];
+                var itemData = allItemData[player.inventory.Length + c];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
-                player.armor[d] = newItem;
+                player.armor[c] = newItem;
+            }
+
+            for (int d = 0; d < player.miscEquips.Length; d++)
+            {
+                var itemData = allItemData[player.inventory.Length + player.armor.Length + d];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                player.miscEquips[d] = newItem;
+            }
+
+            for (int e = 0; e < player.miscDyes.Length; e++)
+            {
+                var itemData = allItemData[player.inventory.Length + player.armor.Length + player.miscEquips.Length + e];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                player.miscDyes[e] = newItem;
             }
 
             Main.NewText("Inventory loaded successfully.", Microsoft.Xna.Framework.Color.LightGreen);

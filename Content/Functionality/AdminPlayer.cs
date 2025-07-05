@@ -7,8 +7,6 @@ namespace CTG2.Content
     {
         public bool IsAdmin = false;
 
-        public Game game;
-
         public override void OnEnterWorld()
         {
             IsAdmin = false; // Reset on join

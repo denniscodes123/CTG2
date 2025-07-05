@@ -5,6 +5,7 @@ using System.Text.Json;
 using ClassesNamespace;
 using Terraria;
 using CTG2.Content;
+using CTG2.Content.Classes;
 using CTG2.Content.ClientSide;
 using CTG2.Content.ServerSide;
 using Microsoft.Xna.Framework;
@@ -35,7 +36,7 @@ namespace CTG2
         RequestTeamChange = 17,
         RequestEnterSpectator = 18, // client → server
         RequestExitSpectator = 19,  // client → server  
-        ServerSpectatorUpdate = 20  // server → client
+        ServerSpectatorUpdate = 20,  // server → client
     }
     
     public class CTG2 : Mod

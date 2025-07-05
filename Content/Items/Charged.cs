@@ -18,7 +18,7 @@ namespace Dawn.Items.Weapons.Ranger.Bows.Mechanics
         {
             base.SetDefaults(item);
 
-            Affected = (item.type == 5549); // rancor item id
+            Affected = (item.type == 5551); // rancor item id
 
             if (item.useAmmo == AmmoID.Arrow && Affected)
             {

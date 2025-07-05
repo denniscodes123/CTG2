@@ -37,6 +37,5 @@ public class ClassCommand : ModCommand
         
         caller.Reply($"You selected {classPick.ToString()}.", Color.Green);
         modPlayer.playerClass = classPick;
-
     }
 }

@@ -15,8 +15,18 @@ namespace CTG2.Content.Items.ModifiedWeps
     public class OverloadedWeps : GlobalItem
     {
 
+        private uint rforkDelay = 40;
+        private uint rforkLastUsedCounter = 0;
+
+        private uint zapinatorDelay = 51;
+        private uint zapinatorLastUsedCounter = 0;
+        private uint grenadeDelay = 50;
+        private uint grenadeLastUsedCounter = 0;
         private uint bananarangDelay = 55;
         private uint bananarangLastUsedCounter = 0;
+
+        private uint ThornChakramDelay = 31;
+        private uint ThornChakramLastUsedCounter = 0;
 
         private uint blowgunDelay = 40;
         private uint blowgunLastUsedCounter = 0;
@@ -86,6 +96,74 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.crit = 0;
                     item.shoot = ProjectileID.VampireKnife;
                     break;
+
+                case ItemID.ThornChakram:
+                    item.damage = 40;
+                    item.useTime = 22;
+                    item.useAnimation = 22;
+                    item.crit = 0;
+                    item.shootSpeed = 12f;
+                    break; //change proj later
+
+                case 2586: //miner //maybe ovveride projectile to not do self damage or at least not self knockback
+                    item.damage = 40;
+                    item.useTime = 21;
+                    item.useAnimation = 21;
+                    item.crit = 0;
+                    break;
+
+                case 1446: //spectre staf
+                    item.shoot = 126;
+                    item.shootSpeed = 13f;
+                    item.scale = 0.86f;
+                    item.damage = 55;
+                    item.useTime = 17;
+                    item.useAnimation = 17;
+                    item.crit = 0;
+                    break;
+
+                case 1306: //ice sickle (ovveride projectile to last longere later)
+                    item.shoot = 263;
+                    item.shootSpeed = 4f;
+                    item.damage = 60;
+                    item.useTime = 28;
+                    item.useAnimation = 28;
+                    item.scale = 0f;
+                    item.crit = 0;
+                    break;
+
+                //psychic projectile still needs to be ovverided
+                case 272: //bmage wep
+                    item.damage = 38;
+                    item.shoot = 496;
+                    item.useAnimation = 18;
+                    item.useTime = 18;
+                    item.shootSpeed = 5f;
+                    item.crit = 0;
+                    break;
+
+                case 802: //rotted fork
+                    item.damage = 36;
+                    item.useAnimation = 22;
+                    item.useTime = 22;
+                    item.shootSpeed = 3.6f;
+                    item.crit = 0;
+                    break;
+
+                case 4347: //gray zapinator
+                    item.damage = 35;
+                    item.useAnimation = 18;
+                    item.useTime = 18;
+                    item.knockBack = 8;
+                    item.shoot = 285;
+                    item.shootSpeed = 10f;
+                    item.mana = 0;
+                    item.crit = 0;
+                    break;
+
+                    //all done except jman
+                
+
             }
         }
 
@@ -103,12 +181,57 @@ namespace CTG2.Content.Items.ModifiedWeps
                 else
                     return false;
             }
+            else if (item.type == ItemID.ThornChakram)
+            {
+                if (Main.GameUpdateCount - ThornChakramLastUsedCounter >= ThornChakramDelay)
+                {
+                    ThornChakramLastUsedCounter = Main.GameUpdateCount;
+        
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (item.type == 4347)
+            {
+                if (Main.GameUpdateCount - zapinatorLastUsedCounter >= zapinatorDelay)
+                {
+                    zapinatorLastUsedCounter = Main.GameUpdateCount;
+        
+                    return true;
+                }
+                else
+                    return false;
+            }
+            
+            else if (item.type == 802) //rottedfork
+            {
+                if (Main.GameUpdateCount - rforkLastUsedCounter >= rforkDelay)
+                {
+                    rforkLastUsedCounter = Main.GameUpdateCount;
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (item.type == ItemID.StickyGrenade)
+            {
+                if (Main.GameUpdateCount - grenadeLastUsedCounter >= grenadeDelay)
+                {
+                    grenadeLastUsedCounter = Main.GameUpdateCount;
+
+                    return true;
+                }
+                else
+                    return false;
+            }
             else if (item.type == ItemID.Blowgun)
             {
                 if (Main.GameUpdateCount - blowgunLastUsedCounter >= blowgunDelay)
                 {
                     blowgunLastUsedCounter = Main.GameUpdateCount;
-        
+
                     return true;
                 }
                 else
@@ -119,7 +242,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                 if (Main.GameUpdateCount - goldenShowerLastUsedCounter >= goldenShowerDelay)
                 {
                     goldenShowerLastUsedCounter = Main.GameUpdateCount;
-        
+
                     return true;
                 }
                 else
@@ -130,7 +253,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                 if (Main.GameUpdateCount - chainKnifeLastUsedCounter >= chainKnifeDelay)
                 {
                     chainKnifeLastUsedCounter = Main.GameUpdateCount;
-        
+
                     return true;
                 }
                 else
@@ -141,7 +264,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                 if (Main.GameUpdateCount - cursedFlamesLastUsedCounter >= cursedFlamesDelay)
                 {
                     cursedFlamesLastUsedCounter = Main.GameUpdateCount;
-        
+
                     return true;
                 }
                 else

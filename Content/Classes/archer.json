@@ -4,7 +4,7 @@
   "InventoryItems": [
     {
       "Name": "Shardstone Pickaxe",
-      "Type": 5550,
+      "Type": 5552,
       "Stack": 1,
       "Prefix": 0,
       "Slot": 0
@@ -18,7 +18,7 @@
     },
     {
       "Name": "Rancor",
-      "Type": 5549,
+      "Type": 5551,
       "Stack": 1,
       "Prefix": 0,
       "Slot": 2
@@ -554,7 +554,76 @@
       "Stack": 0,
       "Prefix": 0,
       "Slot": 78
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 79
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 80
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 81
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 82
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 83
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 84
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 85
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 86
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 87
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
+      "Slot": 88
     }
   ]
 }
-

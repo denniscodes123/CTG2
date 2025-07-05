@@ -112,15 +112,37 @@ namespace ClassesNamespace
                 Player.inventory[b] = newItem;
             }
 
-            for (int d = 0; d < Player.armor.Length; d++)
+            for (int c = 0; c < Player.armor.Length; c++)
             {
-                var itemData = classItems[Player.inventory.Length + d];
+                var itemData = classItems[Player.inventory.Length + c];
                 Item newItem = new Item();
                 newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
-                Player.armor[d] = newItem;
+                Player.armor[c] = newItem;
+            }
+
+            for (int d = 0; d < Player.miscEquips.Length; d++)
+            {
+                var itemData = classItems[Player.inventory.Length + Player.armor.Length + d];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                Player.miscEquips[d] = newItem;
+            }
+
+            for (int e = 0; e < Player.miscDyes.Length; e++)
+            {
+                var itemData = classItems[Player.inventory.Length + Player.armor.Length + Player.miscEquips.Length + e];
+                Item newItem = new Item();
+                newItem.SetDefaults(itemData.Type);
+                newItem.stack = itemData.Stack;
+                newItem.Prefix(itemData.Prefix);
+
+                Player.miscDyes[e] = newItem;
             }
         }
         

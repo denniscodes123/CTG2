@@ -12,14 +12,23 @@ public class ClientConfig
     [JsonPropertyName("blue-base")]
     public int[] BlueBase { get; set; }
     
+    [JsonPropertyName("blue-gem")]
+    public int[] BlueGem { get; set; }
+    
     [JsonPropertyName("red-class-select")]
     public int[] RedSelect { get; set; }
     
     [JsonPropertyName("red-base")]
     public int[] RedBase { get; set; }
     
+    [JsonPropertyName("red-gem")]
+    public int[] RedGem { get; set; }
+    
     [JsonPropertyName("lobby")]
     public int[] Lobby { get; set; }
+    
+    [JsonPropertyName("map-paste")]
+    public int[] MapPaste { get; set; }
     
     [JsonPropertyName("classes")]
     public List<ClassConfig> Classes { get; set; }

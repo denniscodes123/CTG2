@@ -34,12 +34,6 @@ namespace CTG2.Content
                 caller.Reply("You must be an admin to use this command.", Color.Red);
                 return;
             }
-
-            if (modPlayer.game != null)
-            {
-                caller.Reply("you are in a game end it to start a new one", Color.Red);
-                return;
-            }
             
             // Send a packet telling the server to start a game.
             ModPacket myPacket = Mod.GetPacket();
@@ -49,7 +43,6 @@ namespace CTG2.Content
             return;
 
             //SpawnPoints.TeleportToGameSpawn(caller.Player, game); redo this method 
-
         }
     }
 }
