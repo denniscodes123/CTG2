@@ -54,10 +54,20 @@ public class GameManager : ModSystem
     public void StartGame()
     {
         IsGameActive = true;
-
         MatchTime = 0;
         BlueGem.Reset();
         RedGem.Reset();
+        bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
+        if (isMapPicked)
+        {
+            Map.LoadMap(result);
+        }
+        else
+        {
+            Map.LoadMap((MapTypes)CTG2.randomGenerator.Next(0, 7));
+        }
+        
+
 
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
@@ -74,17 +84,7 @@ public class GameManager : ModSystem
 
         // Map Set
 
-        //TODO: Create MapLoad() function (maybe using a GameMap class?)
-        bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
-        if (isMapPicked)
-        {
-            Map.LoadMap(result);
-        }
-        else
-        {
-            Map.LoadMap((MapTypes)CTG2.randomGenerator.Next(0, 7));
-        }
-        
+
 
         BlueTeam.StartMatch();
         RedTeam.StartMatch();
@@ -243,7 +243,19 @@ public class GameManager : ModSystem
             {
                 spectatorOriginalTeams[playerIndex] = player.team;
             }
+            if (BlueGem.IsHeld && BlueGem.HeldBy == playerIndex)
+            {
+                BlueGem.Reset();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Blue Gem when entering spectator mode"), Microsoft.Xna.Framework.Color.Blue);
+                Console.WriteLine($"Player {player.name} dropped Blue Gem when entering spectator mode");
+            }
             
+            if (RedGem.IsHeld && RedGem.HeldBy == playerIndex)
+            {
+                RedGem.Reset();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Red Gem when entering spectator mode"), Microsoft.Xna.Framework.Color.Red);
+                Console.WriteLine($"Player {player.name} dropped Red Gem when entering spectator mode");
+            }
             // Set spectator status
             playerSpectatorStatus[playerIndex] = true;
             

@@ -99,6 +99,13 @@ public class Gem
             // Broadcast to everyone
             ChatHelper.BroadcastChatMessage(dropText, Color.Aqua);
         }
+        if (gemHolder.ghost == true)
+        {
+            IsHeld = false;
+            NetworkText dropText = NetworkText.FromLiteral($"{gemHolder.name} has dropped the gem!");
+            // Broadcast to everyone
+            ChatHelper.BroadcastChatMessage(dropText, Color.Aqua);
+        }
     }
     
 }
