@@ -37,13 +37,14 @@ public class GameManager : ModSystem
     {
         // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
 
-        BlueGem = new Gem(new Vector2(13332, 11504));
-        RedGem = new Gem(new Vector2(19316, 11504));
+        BlueGem = new Gem(new Vector2(CTG2.config.BlueGem[0], CTG2.config.BlueGem[1]));
+        RedGem = new Gem(new Vector2(CTG2.config.RedGem[0], CTG2.config.RedGem[1]));
 
-        BlueTeam = new GameTeam(new Vector2(12346, 10940), new Vector2(12346, 10940), 3);
-        RedTeam = new GameTeam(new Vector2(20385, 10940), new Vector2(20385, 10940), 1);
+        BlueTeam = new GameTeam(new Vector2(CTG2.config.BlueSelect[0], CTG2.config.BlueSelect[1]), new Vector2(CTG2.config.BlueBase[0], CTG2.config.BlueBase[1]), 3);
+        RedTeam = new GameTeam(new Vector2(CTG2.config.RedSelect[0], CTG2.config.RedSelect[1]), new Vector2(CTG2.config.RedBase[0], CTG2.config.RedBase[1]), 1);
         
-        Map = new GameMap();
+        // map paste takes Tile coords. spawn point takes pixel coords.
+        Map = new GameMap(CTG2.config.MapPaste[0], CTG2.config.MapPaste[1]);
 
         IsGameActive = false;
         MatchTime = 0;
@@ -98,7 +99,8 @@ public class GameManager : ModSystem
     }
 
     public void EndGame()
-    {
+    {   
+        
         IsGameActive = false;
    
         foreach (var kvp in playerSpectatorStatus)
@@ -135,12 +137,15 @@ public class GameManager : ModSystem
     public void UpdateGame()
     {
         // TODO: Check if each player has completed class selection (no == class select, yes == send to match)
-
+        
+        // force set team/pvp
+        BlueTeam.EnforceTeam();
+        RedTeam.EnforceTeam();
+        
         if (MatchTime == 1800)
         {
             BlueTeam.SendToBase();
             RedTeam.SendToBase();
-            
         }
         // Increase match duration by 1 tick
         MatchTime++;

@@ -36,7 +36,7 @@ namespace CTG2
         RequestTeamChange = 17,
         RequestEnterSpectator = 18, // client → server
         RequestExitSpectator = 19,  // client → server  
-        ServerSpectatorUpdate = 20  // server → client
+        ServerSpectatorUpdate = 20,  // server → client
     }
     
     public class CTG2 : Mod

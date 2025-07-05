@@ -10,5 +10,5 @@ public static class GameInfo
     public static int redGemX = 0;
     public static string blueGemCarrier = "At Base";
     public static string redGemCarrier = "At Base";
-    
+
 }

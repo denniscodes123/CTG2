@@ -5,6 +5,7 @@ using ClassesNamespace;
 using CTG2.Content.ServerSide;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace CTG2.Content.ClientSide;
@@ -13,6 +14,7 @@ public class PlayerManager : ModPlayer
 {   
     public static bool ShowClassUI = false;
     public static bool ShowGameUI = false;
+    public static int previousMatchStage = 0;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
     public static ClassConfig currentClass = new ClassConfig();
@@ -39,15 +41,16 @@ public class PlayerManager : ModPlayer
         // removed switch, using config-based respawn time.
         customRespawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
     }
-
+    
+    
     // Set Custom Spawn Points
     public override void OnRespawn()
     {
 
-        int blueBaseX = 12346 / 16;
-        int blueBaseY = 10940 / 16;
-        int redBaseX = 20385 / 16;
-        int redBaseY = 10940 / 16;
+        int blueBaseX = CTG2.config.BlueBase[0] / 16;
+        int blueBaseY = CTG2.config.BlueBase[1] / 16;
+        int redBaseX = CTG2.config.RedBase[0] / 16;
+        int redBaseY = CTG2.config.RedBase[1] / 16;
         int spectatorSpawnX = (13332 + 19316) / 32;
         int spectatorSpawnY =  11000 / 32;
         if (Player.ghost)
@@ -86,31 +89,36 @@ public class PlayerManager : ModPlayer
                 break;
 
         }
-        
     }
-
+    
+    // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
-    {
+    {   
+        
         if (GameInfo.matchStage == 1)
-        {
-            ShowClassUI = true;
-            if (GameInfo.matchTime == 1795)
+        {   
+            // as soon as class selection starts
+            if (previousMatchStage != GameInfo.matchStage)
             {
-                var player = Main.LocalPlayer.GetModPlayer<ClassSystem>();
-
-                if (player.playerClass == GameClass.None)
-                {
-                    Main.NewText($"You did not select a class! Assigning a random class.");
-                    var classes = Enum.GetValues(typeof(GameClass));
-                    player.playerClass = (GameClass)CTG2.randomGenerator.Next(1, classes.Length);
-                    player.ResetEffects();
-                }
+                ShowClassUI = true;
+            }
+            
+        }
+        else if (GameInfo.matchStage == 2)
+        {   
+            // as soon as match starts
+            if (previousMatchStage != GameInfo.matchStage)
+            {   
+                ShowClassUI = false;
             }
         }
+        // match stage 0 (no match going on)
         else
         {
             ShowClassUI = false;
         }
+
+        
             if (awaitingRespawn) //was lowkey angry while coding this will clean up later
     {
         customRespawnTimer--;

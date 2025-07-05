@@ -26,7 +26,15 @@ public class MapData
     public int? WallColor  { get; set; }
 }
 public class GameMap
-{
+{   
+    public int PasteX { get; set; }
+    public int PasteY { get; set; }
+
+    public GameMap(int pasteX, int pasteY)
+    {
+        PasteX = pasteX;
+        PasteY = pasteY;
+    }
     public List<List<MapData>> GetMap(MapTypes map)
     {
         string fileName = map.ToString().ToLower();
@@ -55,8 +63,8 @@ public class GameMap
 
         */
         var mapData = GetMap(mapPick);
-        int startX = 856;
-        int startY = 682;
+        int startX = PasteX;
+        int startY = PasteY;
         
         int mapWidth = mapData[0].Count;
         int mapHeight = mapData.Count;

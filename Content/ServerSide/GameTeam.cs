@@ -33,12 +33,29 @@ public class GameTeam
         }
     }
     
+    // locks team/pvp
+    public void EnforceTeam()
+    {
+        foreach (Player ply in Players)
+        {
+            ply.team = TeamColor;
+            if (ply.hostile == false)
+            {
+                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, ply.whoAmI);
+                ply.hostile = true;
+            }
+            NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, ply.whoAmI, TeamColor);
+        }
+    }
+
     public void StartMatch()
     {   
         var mod = ModContent.GetInstance<CTG2>();
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerGameStart);
         packet.Send();
+        
+        
         
         foreach (Player ply in Players)
         {   

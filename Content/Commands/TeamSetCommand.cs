@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using CTG2.Content.ClientSide;
 
 
 namespace CTG2.Content.Commands
