@@ -69,7 +69,7 @@ public class GameManager : ModSystem
         }
         
 
-
+        // TODO: send all players to class selection 
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
 
@@ -83,7 +83,7 @@ public class GameManager : ModSystem
             }
         }
 
-        // Map Set
+
 
 
 
@@ -146,6 +146,10 @@ public class GameManager : ModSystem
         
         if (MatchTime == 1800)
         {
+
+            // TODO: APPLY END CLASS SELECTION METHOD FOR ALL players 
+            // DO THIS BY ITERATING OVER ALL PLAYERS AND SEND RELEVANT PACKETS
+
             BlueTeam.SendToBase();
             RedTeam.SendToBase();
         }
@@ -263,14 +267,8 @@ public class GameManager : ModSystem
             }
             // Set spectator status
             playerSpectatorStatus[playerIndex] = true;
-            
-            // Apply spectator mode
-            player.ghost = true;
-            player.respawnTimer = 9999;
-            player.team = 0; // Remove from teams
-            
+            // UPDATE PLAYER STATE INDEX             
             // Teleport to spectator area
-            player.Teleport(spectatorSpawnPoint);
             
             // Send teleport packet to client
             var mod = ModContent.GetInstance<CTG2>();
@@ -310,7 +308,8 @@ public class GameManager : ModSystem
                 Console.WriteLine($"Player {player.name} cannot exit spectator mode - game is about to end soon");
                 return; 
             }
-            
+
+            // UPDATE PLAYER STATE HERE 
             
             playerSpectatorStatus[playerIndex] = false;
             player.team = originalTeam;
@@ -318,28 +317,43 @@ public class GameManager : ModSystem
             var mod = ModContent.GetInstance<CTG2>();
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, originalTeam);
 
-            // Determine where to teleport based on game phase
-            Vector2 teleportLocation;
+            
+            // THIS CODE IS CORRECT ONCE METHODS ARE FILLED IN 
+            // ModPacket statusPacket = mod.GetPacket();
+            // statusPacket.Write((byte)MessageType.EnterClassSelection);
+            // statusPacket.Write(playerIndex);
+            // statusPacket.Write(originalTeam);
+            // statusPacket.Write(false); // game has already started 
+            // statusPacket.Send(toClient: playerIndex);
 
+            // ModPacket statusPacket = mod.GetPacket();
+            // statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
+            // statusPacket.Write(playerIndex);
+            // statusPacket.Write(false); // not spectator
+            // statusPacket.Send(toClient: playerIndex);
+
+
+            // CODE BELOW ALL NEEDS TO BE DELETED ONCE CLASS IS FINISHED
+            Vector2 teleportLocation;
             if (MatchTime < 1800) // Class selection phase (first 30 seconds)
             {
-                
+
                 // Teleport to class selection area
-                teleportLocation = originalTeam == 3 ? 
+                teleportLocation = originalTeam == 3 ?
                     new Vector2(12346, 10940) : // Blue team class location
                     new Vector2(20385, 10940);  // Red team class location
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} in class selection"), Microsoft.Xna.Framework.Color.LimeGreen);
-                Console.WriteLine($"Player {player.name} joined class selection with {(1800-MatchTime)/60} seconds remaining");
+                Console.WriteLine($"Player {player.name} joined class selection with {(1800 - MatchTime) / 60} seconds remaining");
             }
             else // Active game phase
             {
                 // Teleport to team base
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} should be in game?"), Microsoft.Xna.Framework.Color.LimeGreen);
-                teleportLocation = originalTeam == 3 ? 
+                teleportLocation = originalTeam == 3 ?
                     new Vector2(12346, 10940) : // Blue team base (same as class location)
                     new Vector2(20385, 10940);  // Red team base (same as class location)
-            
-                
+
+
                 Console.WriteLine($"Player {player.name} joined active game");
             }
 
@@ -367,6 +381,32 @@ public class GameManager : ModSystem
         }
     }
 
+
+    public void startPlayerClassSelection(int playerIndex, int team, bool gameStarted)
+    {
+        // TODO (fill in this function):
+
+        // set player state index (in PlayerManagement in ClientSide) to 1
+
+        if (gameStarted)
+        {
+            // teleport player to correct location
+
+        }
+        else
+        {
+            // here we need to update Player class selection timer 
+            // 
+        }
+    }
+    public void endPlayerClassSelection(int playerIndex, int team)
+    {
+        // TODO (fill in this function)
+        // set player state index to 2
+        //  update plyaer class selection timer to -1
+        // teleport 
+        // update 
+    }
     public override void PostUpdateWorld()
     {
         if (!Main.dedServ) return;

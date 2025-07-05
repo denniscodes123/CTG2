@@ -12,6 +12,10 @@ namespace CTG2.Content.ClientSide;
 
 public class PlayerManager : ModPlayer
 {   
+    public enum PlayerState
+{
+    None, ClassSelection, Active, Spectator
+}
     public static bool ShowClassUI = false;
     public static bool ShowGameUI = false;
     public static int previousMatchStage = 0;
@@ -19,6 +23,16 @@ public class PlayerManager : ModPlayer
     public bool awaitingRespawn = false;
     public static ClassConfig currentClass = new ClassConfig();
     public static UpgradeConfig currentUpgrade = new UpgradeConfig();
+
+    public PlayerState playerState = PlayerState.None; // UPDATE THIS 
+    public double classSelectionTimer = -1;
+
+
+    //change player state
+    public void changePlayerState(PlayerState playerState)
+    {
+        this.playerState = playerState;
+    }
 
     // Set Custom Respawn Times
     public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
@@ -37,7 +51,7 @@ public class PlayerManager : ModPlayer
         int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
 
         Player.respawnTimer = 0;
-        
+
         // removed switch, using config-based respawn time.
         customRespawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
     }
@@ -94,21 +108,22 @@ public class PlayerManager : ModPlayer
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
     {   
+        // this needs to update player class selection time
         
         if (GameInfo.matchStage == 1)
-        {   
+        {
             // as soon as class selection starts
             if (previousMatchStage != GameInfo.matchStage)
             {
                 ShowClassUI = true;
             }
-            
+
         }
         else if (GameInfo.matchStage == 2)
-        {   
+        {
             // as soon as match starts
             if (previousMatchStage != GameInfo.matchStage)
-            {   
+            {
                 ShowClassUI = false;
             }
         }

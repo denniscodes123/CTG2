@@ -37,6 +37,9 @@ namespace CTG2
         RequestEnterSpectator = 18, // client → server
         RequestExitSpectator = 19,  // client → server  
         ServerSpectatorUpdate = 20,  // server → client
+
+        EnterClassSelection = 21,
+        ExitClassSelection = 22,
     }
     
     public class CTG2 : Mod
@@ -227,11 +230,11 @@ namespace CTG2
                     bool isSpectator = reader.ReadBoolean();
                     if (playerIndex == Main.myPlayer)
                     {
-                        // Update local spectator status if needed
                         Main.player[playerIndex].ghost = isSpectator;
                         if (isSpectator)
                         {
                             Main.player[playerIndex].respawnTimer = 9999;
+                            Main.player[playerIndex].team = 0; 
                         }
                         else
                         {
@@ -241,6 +244,17 @@ namespace CTG2
                     Console.WriteLine($"Client Received Spectator Update: Player {playerIndex} is now {(isSpectator ? "spectator" : "active")}!");
                     break;
                 
+                case (byte)MessageType.EnterClassSelection:
+                    int index = reader.ReadInt32();
+                    int team = reader.ReadInt32();
+                    bool gameStart = reader.ReadBoolean(); // different logic if game has started 
+                    manager.startPlayerClassSelection(index, team, gameStart);
+                    break;
+                case (byte)MessageType.ExitClassSelection:
+                    int pIndex = reader.ReadInt32();
+                    int pTeam = reader.ReadInt32();
+                    manager.endPlayerClassSelection(pIndex, pTeam);
+                    break;              
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
