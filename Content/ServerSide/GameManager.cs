@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.Chat;
 using Terraria.Localization;
+using CTG2.Content.ClientSide;
+using Terraria.Enums;
 
 namespace CTG2.Content.ServerSide;
 
@@ -23,6 +25,8 @@ public class GameManager : ModSystem
     public GameTeam BlueTeam { get; private set; }
     public GameTeam RedTeam { get; private set; }
 
+    public Dictionary<int, GameTeam> intToTeam;
+
     public Gem BlueGem { get; private set; }
     public Gem RedGem { get; private set; }
 
@@ -34,7 +38,7 @@ public class GameManager : ModSystem
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
     private Vector2 spectatorSpawnPoint = new Vector2((13332 + 19316) / 2, 11000); // Center area for spectators
-
+    
     public override void OnWorldLoad()
     {
         // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
@@ -44,6 +48,12 @@ public class GameManager : ModSystem
 
         BlueTeam = new GameTeam(new Vector2(CTG2.config.BlueSelect[0], CTG2.config.BlueSelect[1]), new Vector2(CTG2.config.BlueBase[0], CTG2.config.BlueBase[1]), 3);
         RedTeam = new GameTeam(new Vector2(CTG2.config.RedSelect[0], CTG2.config.RedSelect[1]), new Vector2(CTG2.config.RedBase[0], CTG2.config.RedBase[1]), 1);
+        
+        intToTeam = new Dictionary<int, GameTeam>
+        {
+            { 3, BlueTeam },
+            { 1, RedTeam }
+        };
         
         // map paste takes Tile coords. spawn point takes pixel coords.
         Map = new GameMap(CTG2.config.MapPaste[0], CTG2.config.MapPaste[1]);
@@ -67,28 +77,46 @@ public class GameManager : ModSystem
         {
             Map.LoadMap((MapTypes)CTG2.randomGenerator.Next(0, 7));
         }
-        
 
-        // TODO: send all players to class selection 
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
-
-        // Auto-spectate players not on teams (team 0)
         foreach (Player player in Main.player)
         {
-            if (player.active && player.team == 0)
+            if (!player.active) continue;
+            
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.ServerGameStart);
+            packet.Send(toClient:player.whoAmI);
+            
+            if (player.team == 0)
             {
                 SetPlayerSpectator(player.whoAmI, true);
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"ur not on a team bro"), Microsoft.Xna.Framework.Color.Olive);
                 Console.WriteLine($"Auto-spectating player {player.name} (not on a team)");
+                continue; // Use continue instead of return to handle all players
             }
+       
+            // Directly call startPlayerClassSelection instead of sending a packet
+            startPlayerClassSelection(player.whoAmI, true);
         }
 
 
+        // THE CODE UNDERNEATH NEEDS TO BE REPLACED BY CODE ABOVE EVENTUALLY 
 
 
+        // Auto-spectate players not on teams (team 0)
+        // foreach (Player player in Main.player)
+        // {
+        //     if (player.active && player.team == 0)
+        //     {
+        //         SetPlayerSpectator(player.whoAmI, true);
+        //         Console.WriteLine($"Auto-spectating player {player.name} (not on a team)");
+        //     }
+        // }
 
-        BlueTeam.StartMatch();
-        RedTeam.StartMatch();
+        // BlueTeam.StartMatch();
+        // RedTeam.StartMatch();
 
     }
 
@@ -146,10 +174,10 @@ public class GameManager : ModSystem
         
         if (MatchTime == 1800)
         {
-
-            // TODO: APPLY END CLASS SELECTION METHOD FOR ALL players 
-            // DO THIS BY ITERATING OVER ALL PLAYERS AND SEND RELEVANT PACKETS
-
+            // this code will handle class selection and stuff
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"class selection is ending"), Microsoft.Xna.Framework.Color.Olive);
+            Main.NewText($"GameManager: MatchTime reached 1800, calling SendToBase for teams", Microsoft.Xna.Framework.Color.Red);
+                
             BlueTeam.SendToBase();
             RedTeam.SendToBase();
         }
@@ -244,32 +272,27 @@ public class GameManager : ModSystem
         if (!Main.player[playerIndex].active) return;
         
         var player = Main.player[playerIndex];
-        
         if (isSpectator)
         {
-            // Store original team for later purposes
-            if (player.team != 0)
-            {
-                spectatorOriginalTeams[playerIndex] = player.team;
-            }
+            // drop gem if they have it 
             if (BlueGem.IsHeld && BlueGem.HeldBy == playerIndex)
             {
                 BlueGem.Reset();
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Blue Gem when entering spectator mode"), Microsoft.Xna.Framework.Color.Blue);
                 Console.WriteLine($"Player {player.name} dropped Blue Gem when entering spectator mode");
             }
-            
+
             if (RedGem.IsHeld && RedGem.HeldBy == playerIndex)
             {
                 RedGem.Reset();
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Red Gem when entering spectator mode"), Microsoft.Xna.Framework.Color.Red);
                 Console.WriteLine($"Player {player.name} dropped Red Gem when entering spectator mode");
             }
-            // Set spectator status
+
+
+            // Set spectator status (REMOVE THIS EVENTUALLY)
             playerSpectatorStatus[playerIndex] = true;
-            // UPDATE PLAYER STATE INDEX             
-            // Teleport to spectator area
-            
+
             // Send teleport packet to client
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
@@ -278,134 +301,145 @@ public class GameManager : ModSystem
             packet.Write((int)spectatorSpawnPoint.X);
             packet.Write((int)spectatorSpawnPoint.Y);
             packet.Send(toClient: playerIndex);
-            
-            // Send spectator status update
+
             ModPacket statusPacket = mod.GetPacket();
             statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
             statusPacket.Write(playerIndex);
             statusPacket.Write(true); // is spectator
             statusPacket.Send(toClient: playerIndex);
-            
+
             // DEBUG: Global broadcast
             Console.WriteLine($"Player {player.name} entered spectator mode");
         }
         else
         {
-            // DEBUG: Global broadcast start
-            
-            // Check if player has original team
-            if (!spectatorOriginalTeams.TryGetValue(playerIndex, out int originalTeam) || originalTeam == 0 || player.ghost != true)
+            Console.WriteLine($"GameManager: SetPlayerSpectator called with isSpectator=false for player {playerIndex}");
+            if (player.team == 0)
             {
-                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} CANNOT EXIT SPECTATOR"), Microsoft.Xna.Framework.Color.LimeGreen);
-                Console.WriteLine($"Player {player.name} cannot exit spectator mode - no team assigned (originalTeam: {originalTeam})");
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} CANNOT EXIT SPECTATOR, bro got no team"), Microsoft.Xna.Framework.Color.LimeGreen);
+                Console.WriteLine($"Player {player.name} cannot exit spectator mode - no team assigned");
                 return;
             }
+            // Check if player has original team
             if (60 * 15 * 60 - MatchTime < 45 * 60)
             {
                 // Player is cooked 
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} TOO LATE GG"), Microsoft.Xna.Framework.Color.LimeGreen);
-                
+
                 Console.WriteLine($"Player {player.name} cannot exit spectator mode - game is about to end soon");
-                return; 
+                return;
             }
 
-            // UPDATE PLAYER STATE HERE 
-            
             playerSpectatorStatus[playerIndex] = false;
-            player.team = originalTeam;
+            int playerTeam = player.team;
 
             var mod = ModContent.GetInstance<CTG2>();
-            NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, originalTeam);
-
-            
-            // THIS CODE IS CORRECT ONCE METHODS ARE FILLED IN 
-            // ModPacket statusPacket = mod.GetPacket();
-            // statusPacket.Write((byte)MessageType.EnterClassSelection);
-            // statusPacket.Write(playerIndex);
-            // statusPacket.Write(originalTeam);
-            // statusPacket.Write(false); // game has already started 
-            // statusPacket.Send(toClient: playerIndex);
-
-            // ModPacket statusPacket = mod.GetPacket();
-            // statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
-            // statusPacket.Write(playerIndex);
-            // statusPacket.Write(false); // not spectator
-            // statusPacket.Send(toClient: playerIndex);
+            NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, playerTeam);
 
 
-            // CODE BELOW ALL NEEDS TO BE DELETED ONCE CLASS IS FINISHED
-            Vector2 teleportLocation;
-            if (MatchTime < 1800) // Class selection phase (first 30 seconds)
-            {
-
-                // Teleport to class selection area
-                teleportLocation = originalTeam == 3 ?
-                    new Vector2(12346, 10940) : // Blue team class location
-                    new Vector2(20385, 10940);  // Red team class location
-                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} in class selection"), Microsoft.Xna.Framework.Color.LimeGreen);
-                Console.WriteLine($"Player {player.name} joined class selection with {(1800 - MatchTime) / 60} seconds remaining");
-            }
-            else // Active game phase
-            {
-                // Teleport to team base
-                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} should be in game?"), Microsoft.Xna.Framework.Color.LimeGreen);
-                teleportLocation = originalTeam == 3 ?
-                    new Vector2(12346, 10940) : // Blue team base (same as class location)
-                    new Vector2(20385, 10940);  // Red team base (same as class location)
-
-
-                Console.WriteLine($"Player {player.name} joined active game");
-            }
-
-            
-            // Always teleport the player
-            player.Teleport(teleportLocation);
-
-            ModPacket teleportPacket = mod.GetPacket();
-            teleportPacket.Write((byte)MessageType.ServerTeleport);
-            teleportPacket.Write(playerIndex);
-            teleportPacket.Write((int)teleportLocation.X);
-            teleportPacket.Write((int)teleportLocation.Y);
-            teleportPacket.Send(toClient: playerIndex);
-
-            // Send spectator status update
-            ModPacket statusPacket = mod.GetPacket();
-            statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
-            statusPacket.Write(playerIndex);
-            statusPacket.Write(false); // not spectator
-            statusPacket.Send(toClient: playerIndex);
-
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} SUCCESSFULLY exited spectator mode!"), Microsoft.Xna.Framework.Color.LimeGreen);
-            //NetMessage.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} SUCCESSFULLY exited spectator mode!"), Microsoft.Xna.Framework.Color.LimeGreen);
-            Console.WriteLine($"Player {player.name} exited spectator mode and rejoined team {originalTeam}");
+            Console.WriteLine($"GameManager: Directly calling startPlayerClassSelection for player {playerIndex} (non-game-start)");
+            startPlayerClassSelection(playerIndex, false);
+            // TELL SERVER TO REMOVE GHOST AND NO LONGER A SPECTATOR
+            ModPacket statusPacket2 = mod.GetPacket();
+            statusPacket2.Write((byte)MessageType.ServerSpectatorUpdate);
+            statusPacket2.Write(playerIndex);
+            statusPacket2.Write(false);
+            statusPacket2.Send();
         }
     }
 
 
-    public void startPlayerClassSelection(int playerIndex, int team, bool gameStarted)
+    public void startPlayerClassSelection(int playerIndex, bool gameStarted)
     {
-        // TODO (fill in this function):
-
-        // set player state index (in PlayerManagement in ClientSide) to 1
-
+        // Don't try to access PlayerManager directly on server
+        // Instead, get the team from the vanilla Player.team
+        Player player = Main.player[playerIndex];
+        int team = player.team;
+        
+        Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
+        
         if (gameStarted)
         {
-            // teleport player to correct location
-
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection for game start"), Color.Beige);
         }
         else
         {
-            // here we need to update Player class selection timer 
-            // 
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection (non game)"), Color.Beige);
+            // Send packet to set class selection time on client
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket timePacket = mod.GetPacket();
+            timePacket.Write((byte)MessageType.SetClassSelectionTime);
+            timePacket.Write(playerIndex);
+            timePacket.Write(1800.0); // class selection time
+            timePacket.Send(toClient: playerIndex);
+            Console.WriteLine($"GameManager: Sent SetClassSelectionTime packet to player {playerIndex}");
         }
+        
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} team is {team}"), Color.Beige);
+        
+        if (!intToTeam.ContainsKey(team))
+        {
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[ERROR] Invalid team {team} for player {playerIndex}"), Color.Red);
+            return;
+        }
+        
+        GameTeam gameTeam = intToTeam[team];
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] Found team {team}, base location: {gameTeam.BaseLocation}"), Color.Cyan);
+        
+        var mod2 = ModContent.GetInstance<CTG2>();
+        
+        // Send packet to update client-side player state to ClassSelection
+        ModPacket statePacket = mod2.GetPacket();
+        statePacket.Write((byte)MessageType.UpdatePlayerState);
+        statePacket.Write(playerIndex);
+        statePacket.Write((byte)PlayerManager.PlayerState.ClassSelection);
+        statePacket.Send(toClient: playerIndex);
+        Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
+        
+        ModPacket packet = mod2.GetPacket();
+        packet.Write((byte)MessageType.ServerTeleport);
+        packet.Write(playerIndex);
+        packet.Write((int)gameTeam.BaseLocation.X);
+        packet.Write((int)gameTeam.BaseLocation.Y);
+        packet.Send(toClient: playerIndex);
+        Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
+        
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] Player {playerIndex} entering class selection, teleporting to {gameTeam.BaseLocation}"), Color.Yellow);
     }
-    public void endPlayerClassSelection(int playerIndex, int team)
+    public void endPlayerClassSelection(int playerIndex)
     {
-        // TODO (fill in this function)
-        // set player state index to 2
-        //  update plyaer class selection timer to -1
-        // teleport 
-        // update 
+        // Use vanilla Player.team instead of PlayerManager on server
+        Player player = Main.player[playerIndex];
+        int team = player.team;
+        
+        if (!intToTeam.ContainsKey(team))
+        {
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[ERROR] Invalid team {team} for player {playerIndex} during class selection end"), Color.Red);
+            return;
+        }
+        
+        GameTeam gameTeam = intToTeam[team];
+        
+        var mod = ModContent.GetInstance<CTG2>();
+        
+
+        ModPacket statePacket = mod.GetPacket();
+        statePacket.Write((byte)MessageType.UpdatePlayerState);
+        statePacket.Write(playerIndex);
+        statePacket.Write((byte)PlayerManager.PlayerState.Active);
+        statePacket.Send(toClient: playerIndex);
+        
+        // Send teleport packet to client
+        ModPacket packet = mod.GetPacket();
+        packet.Write((byte)MessageType.ServerTeleport);
+        packet.Write(playerIndex);
+        packet.Write((int)gameTeam.BaseLocation.X);
+        packet.Write((int)gameTeam.BaseLocation.Y);
+        packet.Send(toClient: playerIndex);
+        
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[SERVER] Sent ServerTeleport to ALL CLIENTS for player {playerIndex} at ({gameTeam.BaseLocation.X}, {gameTeam.BaseLocation.Y})"), Color.Purple);
+        
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] Player {playerIndex} finished class selection, teleporting to base at {gameTeam.BaseLocation}"), Color.Green);
     }
     public override void PostUpdateWorld()
     {

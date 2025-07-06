@@ -40,6 +40,9 @@ namespace CTG2
 
         EnterClassSelection = 21,
         ExitClassSelection = 22,
+        UpdatePlayerTeam = 23,  // server → client
+        SetClassSelectionTime = 24,  // server → client
+        UpdatePlayerState = 25,  // server → client
     }
     
     public class CTG2 : Mod
@@ -175,7 +178,17 @@ namespace CTG2
                     int target = reader.ReadInt32();
                     int teamID = reader.ReadInt32();
                     Main.player[target].team = teamID;
+
+                    // Send packet to update PlayerManager.team on client side
+                    var modInstance = ModContent.GetInstance<CTG2>();
+                    ModPacket updatePacket = modInstance.GetPacket();
+                    updatePacket.Write((byte)MessageType.UpdatePlayerTeam);
+                    updatePacket.Write(target);
+                    updatePacket.Write(teamID);
+                    updatePacket.Send(toClient: target);
+                    
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target, teamID);
+                    Console.WriteLine($"Set player {Main.player[target].name} to team {teamID}");
                     break;
                 
                 case (byte)MessageType.RequestEnterSpectator:
@@ -188,6 +201,19 @@ namespace CTG2
                     int exitSpectatorPlayerIndex = reader.ReadInt32();
                     manager.SetPlayerSpectator(exitSpectatorPlayerIndex, false);
                     Console.WriteLine($"Server Received Exit Spectator Request from player {exitSpectatorPlayerIndex}!");
+                    break;
+                
+                case (byte)MessageType.ExitClassSelection:
+                    int exitClassPlayerIndex = reader.ReadInt32();
+                    manager.endPlayerClassSelection(exitClassPlayerIndex);
+                    Console.WriteLine($"Server Received Exit Class Selection from player {exitClassPlayerIndex}!");
+                    break;
+                
+                case (byte)MessageType.EnterClassSelection:
+                    int enterClassIndex = reader.ReadInt32();
+                    bool enterGameStart = reader.ReadBoolean();
+                    manager.startPlayerClassSelection(enterClassIndex, enterGameStart);
+                    Console.WriteLine($"Server Received Enter Class Selection from player {enterClassIndex}, gameStart: {enterGameStart}!");
                     break;
                 
                 // Server->Client Packets (these cases will run on the Client)
@@ -203,8 +229,18 @@ namespace CTG2
                     var id = reader.ReadInt32();
                     int tpX = reader.ReadInt32();
                     int tpY = reader.ReadInt32();
-                    Main.player[id].Teleport(new Vector2(tpX, tpY));
-                    Console.WriteLine("Client Received Teleport!");
+                    Main.NewText($"CLIENT: Received ServerTeleport packet for player {id} to ({tpX}, {tpY}), myPlayer: {Main.myPlayer}", Color.Yellow);
+                    if (id == Main.myPlayer)
+                    {
+                        Vector2 oldPos = Main.player[id].position;
+                        Main.player[id].Teleport(new Vector2(tpX, tpY));
+                        Vector2 newPos = Main.player[id].position;
+                        Main.NewText($"CLIENT: Teleported from {oldPos} to {newPos}!", Color.Green);
+                    }
+                    else
+                    {
+                        Main.NewText($"CLIENT: Ignoring teleport packet - not for local player", Color.Orange);
+                    }
                     break;
                 case (byte)MessageType.ServerSetSpawn:
                     var localPlayer = Main.player[Main.myPlayer];
@@ -244,16 +280,58 @@ namespace CTG2
                     Console.WriteLine($"Client Received Spectator Update: Player {playerIndex} is now {(isSpectator ? "spectator" : "active")}!");
                     break;
                 
-                case (byte)MessageType.EnterClassSelection:
-                    int index = reader.ReadInt32();
-                    int team = reader.ReadInt32();
-                    bool gameStart = reader.ReadBoolean(); // different logic if game has started 
-                    manager.startPlayerClassSelection(index, team, gameStart);
+                case (byte)MessageType.UpdatePlayerTeam:
+                    int playerIdx = reader.ReadInt32();
+                    int newTeamID = reader.ReadInt32();
+                    if (playerIdx == Main.myPlayer)
+                    {
+                        var playerManager = Main.player[playerIdx].GetModPlayer<PlayerManager>();
+                        playerManager.team = newTeamID;
+                        Console.WriteLine($"Client: Updated PlayerManager team to {newTeamID}");
+                    }
                     break;
-                case (byte)MessageType.ExitClassSelection:
-                    int pIndex = reader.ReadInt32();
-                    int pTeam = reader.ReadInt32();
-                    manager.endPlayerClassSelection(pIndex, pTeam);
+                
+                case (byte)MessageType.SetClassSelectionTime:
+                    int targetPlayerIdx = reader.ReadInt32();
+                    double classTime = reader.ReadDouble();
+                    if (targetPlayerIdx == Main.myPlayer)
+                    {
+                        PlayerManager.setPlayerClassSelectionTime(targetPlayerIdx, classTime);
+                        Console.WriteLine($"Client: Set class selection time to {classTime}");
+                    }
+                    break;
+                
+                case (byte)MessageType.UpdatePlayerState:
+                    int statePlayerIdx = reader.ReadInt32();
+                    byte newState = reader.ReadByte();
+                    Main.NewText($"CLIENT: Received UpdatePlayerState packet for player {statePlayerIdx}, state: {(PlayerManager.PlayerState)newState}, myPlayer: {Main.myPlayer}", Color.Yellow);
+                    if (statePlayerIdx == Main.myPlayer)
+                    {
+                        var playerManager = Main.player[statePlayerIdx].GetModPlayer<PlayerManager>();
+                        var targetState = (PlayerManager.PlayerState)newState;
+                        
+                        // If entering ClassSelection state, determine if this is game start based on match stage
+                        if (targetState == PlayerManager.PlayerState.ClassSelection)
+                        {
+                            bool isGameStart = (GameInfo.matchStage == 1); // Stage 1 = Class Selection during game start
+                            playerManager.HandleEnterClassSelection(isGameStart);
+                            Main.NewText($"CLIENT: Entering class selection, isGameStart: {isGameStart}, matchStage: {GameInfo.matchStage}", Color.Cyan);
+                        }
+                        else if (targetState == PlayerManager.PlayerState.Active)
+                        {
+                            playerManager.HandleExitClassSelection();
+                        }
+                        else
+                        {
+                            playerManager.changePlayerState(targetState);
+                        }
+                        
+                        Main.NewText($"CLIENT: Updated player state to {targetState}", Color.Green);
+                    }
+                    else
+                    {
+                        Main.NewText($"CLIENT: Ignoring state update packet - not for local player", Color.Orange);
+                    }
                     break;              
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);

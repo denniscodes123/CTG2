@@ -26,15 +26,49 @@ public class PlayerManager : ModPlayer
 
     public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;
+    public bool isGameStartClassSelection = false; // Track if this is game start vs mid-game class selection
     public int team = 0; // TODO: THIS NEEDS TO BE UPDATED IN TEAMSET 
 
+    public static PlayerManager GetPlayerManager(int playerIndex)
+    {
+        if (playerIndex >= 0 && playerIndex < Main.player.Length && Main.player[playerIndex] != null)
+        {
+            return Main.player[playerIndex].GetModPlayer<PlayerManager>();
+        }
+        return null;
+    }
 
+    public void SetTeam(int newTeam)
+    {
+        this.team = newTeam;
+        Player.team = newTeam;
+    }
     //change player state
     public void changePlayerState(PlayerState playerState)
     {
         this.playerState = playerState;
+        
+        // Handle UI changes when state changes
+        if (playerState == PlayerState.Active)
+        {
+            ShowClassUI = false;
+            //Main.NewText("PlayerManager: Set ShowClassUI to false due to Active state", Microsoft.Xna.Framework.Color.Purple);
+        }
+        else if (playerState == PlayerState.ClassSelection)
+        {
+            ShowClassUI = true;
+            //Main.NewText("PlayerManager: Set ShowClassUI to true due to ClassSelection state", Microsoft.Xna.Framework.Color.Purple);
+        }
+        
+        Main.NewText($"PlayerManager: Changed state to {playerState}", Microsoft.Xna.Framework.Color.Purple);
     }
-
+    public static void setPlayerClassSelectionTime(int playerIndex, double val)
+    {
+        PlayerManager player = PlayerManager.GetPlayerManager(playerIndex);
+        player.classSelectionTimer = val;
+        Main.NewText($"PlayerManager: Server set class selection timer to {val} for player {playerIndex}", Microsoft.Xna.Framework.Color.LightBlue);
+    }
+    // =========================== OVERRIDE METHODS ====================================
     // Set Custom Respawn Times
     public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
     {
@@ -109,42 +143,47 @@ public class PlayerManager : ModPlayer
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
     {   
-        // this needs to update player class selection time
-        
-        if (GameInfo.matchStage == 1)
+        // Update UI state based on player state rather than match stage
+        if (this.playerState == PlayerState.ClassSelection)
         {
-            // as soon as class selection starts
-            if (previousMatchStage != GameInfo.matchStage)
-            {
-                ShowClassUI = true;
-            }
-
+            ShowClassUI = true;
+            
         }
-        else if (GameInfo.matchStage == 2)
-        {
-            // as soon as match starts
-            if (previousMatchStage != GameInfo.matchStage)
-            {
-                ShowClassUI = false;
-            }
-        }
-        // match stage 0 (no match going on)
-        else
+        else if (this.playerState == PlayerState.Active)
         {
             ShowClassUI = false;
         }
-
-        if (customRespawnTimer > 0)
+        else
         {
-            customRespawnTimer--;
+            // For None or Spectator states, keep UI hidden
+            ShowClassUI = false;
         }
-        else if (customRespawnTimer == 0) // or class has been selected TODO 
+
+        if (classSelectionTimer > 0 && !isGameStartClassSelection)
+        { //custom 
+            classSelectionTimer--;
+        }
+        else if (classSelectionTimer == 0 && !isGameStartClassSelection) // class selection time expired
         {
             // END CLASS SELECTION 
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket statusPacket = mod.GetPacket();
+            statusPacket.Write((byte)MessageType.ExitClassSelection);
+            statusPacket.Write(Player.whoAmI);  // Use Player.whoAmI instead of player
+            statusPacket.Send();   
+            
+            Main.NewText($"PlayerManager: Sent ExitClassSelection packet for player {Player.whoAmI}", Microsoft.Xna.Framework.Color.Purple);
+            
+            // Reset timer so this doesn't fire again
+            classSelectionTimer = -1;
         }
         else
         {
-            // DO NOTHING
+            // DO NOTHING - either timer is not active, or this is a game start class selection handled by server
+            if (classSelectionTimer > 0 && isGameStartClassSelection)
+            {
+                
+            }
         }
         
 
@@ -161,9 +200,6 @@ public class PlayerManager : ModPlayer
 
                 Player.statLife = Player.statLifeMax2;
                 Player.HealEffect(Player.statLifeMax2);
-
-
-
             }
         }
 
@@ -175,5 +211,31 @@ public class PlayerManager : ModPlayer
     public override void PlayerDisconnect()
     {
 
+    }
+
+    // Packet handlers for client-side state updates
+    public void HandleEnterClassSelection(bool gameStarted)
+    {
+        changePlayerState(PlayerState.ClassSelection);
+        isGameStartClassSelection = gameStarted;
+        
+        if (!gameStarted)
+        {
+            classSelectionTimer = 1800;
+            Main.NewText($"PlayerManager: Started client-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Green);
+        }
+        else
+        {
+            classSelectionTimer = 1800; // Set but don't countdown - server controls this
+            Main.NewText($"PlayerManager: Started server-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Orange);
+        }
+    }
+    
+    public void HandleExitClassSelection()
+    {
+        changePlayerState(PlayerState.Active);
+        classSelectionTimer = -1;
+        isGameStartClassSelection = false;
+        Main.NewText($"PlayerManager: Exited class selection", Microsoft.Xna.Framework.Color.Green);
     }
 }

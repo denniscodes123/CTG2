@@ -11,8 +11,8 @@ namespace CTG2.Content.ServerSide;
 public class GameTeam
 {   
     public List<Player> Players { get; set; }
-    private Vector2 ClassLocation { get; set; }
-    private Vector2 BaseLocation { get; set; }
+    public Vector2 ClassLocation { get; set; }
+    public Vector2 BaseLocation { get; set; }
     
     private int TeamColor { get; set; }
     
@@ -78,19 +78,18 @@ public class GameTeam
     public void SendToBase()
     {   
         var mod = ModContent.GetInstance<CTG2>();
+        var manager = ModContent.GetInstance<GameManager>();
+        
         foreach (Player ply in Players)
         {
-
-            ply.Teleport(BaseLocation);
+            // Call endPlayerClassSelection directly on the server instead of sending a packet
+            manager.endPlayerClassSelection(ply.whoAmI);
+            
+            Console.WriteLine($"GameTeam.SendToBase: Called endPlayerClassSelection for player {ply.whoAmI}");
+            
             int tpX = (int)BaseLocation.X;
             int tpY = (int)BaseLocation.Y;
-            ModPacket packet2 = mod.GetPacket();
-            packet2.Write((byte)MessageType.ServerTeleport);
-            packet2.Write(ply.whoAmI);
-            packet2.Write(tpX);
-            packet2.Write(tpY);
-            packet2.Send(toClient: ply.whoAmI);
-
+            
             int spawnPosX = tpX / 16;
             int spawnPosY = tpY / 16;
 
