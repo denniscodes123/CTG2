@@ -160,8 +160,11 @@ public class PlayerManager : ModPlayer
         }
 
         if (classSelectionTimer > 0 && !isGameStartClassSelection)
-        { //custom 
+        {
+            // Only count down timer if this is NOT a game start class selection
+            // During game start, the server handles timing via SendToBase
             classSelectionTimer--;
+            Main.NewText($"PlayerManager: Class selection timer: {classSelectionTimer} (non-game-start)", Microsoft.Xna.Framework.Color.Magenta);
         }
         else if (classSelectionTimer == 0 && !isGameStartClassSelection) // class selection time expired
         {

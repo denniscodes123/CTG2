@@ -294,6 +294,7 @@ public class GameManager : ModSystem
             playerSpectatorStatus[playerIndex] = true;
 
             // Send teleport packet to client
+            
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerTeleport);
@@ -302,6 +303,7 @@ public class GameManager : ModSystem
             packet.Write((int)spectatorSpawnPoint.Y);
             packet.Send(toClient: playerIndex);
 
+            // Send spectator status update (THIS CAN PROBABLY BE REMOVED EVENTUALLY)
             ModPacket statusPacket = mod.GetPacket();
             statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
             statusPacket.Write(playerIndex);
@@ -313,7 +315,7 @@ public class GameManager : ModSystem
         }
         else
         {
-            Console.WriteLine($"GameManager: SetPlayerSpectator called with isSpectator=false for player {playerIndex}");
+            // DEBUG: Global broadcast start
             if (player.team == 0)
             {
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} CANNOT EXIT SPECTATOR, bro got no team"), Microsoft.Xna.Framework.Color.LimeGreen);
@@ -337,8 +339,12 @@ public class GameManager : ModSystem
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, playerTeam);
 
 
-            Console.WriteLine($"GameManager: Directly calling startPlayerClassSelection for player {playerIndex} (non-game-start)");
-            startPlayerClassSelection(playerIndex, false);
+            // TELL SERVER TO START CLASS SELECTION
+            ModPacket statusPacket = mod.GetPacket();
+            statusPacket.Write((byte)MessageType.EnterClassSelection);
+            statusPacket.Write(playerIndex);
+            statusPacket.Write(false); // game has already started 
+            statusPacket.Send();
             // TELL SERVER TO REMOVE GHOST AND NO LONGER A SPECTATOR
             ModPacket statusPacket2 = mod.GetPacket();
             statusPacket2.Write((byte)MessageType.ServerSpectatorUpdate);
@@ -356,8 +362,6 @@ public class GameManager : ModSystem
         Player player = Main.player[playerIndex];
         int team = player.team;
         
-        Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
-        
         if (gameStarted)
         {
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection for game start"), Color.Beige);
@@ -372,7 +376,6 @@ public class GameManager : ModSystem
             timePacket.Write(playerIndex);
             timePacket.Write(1800.0); // class selection time
             timePacket.Send(toClient: playerIndex);
-            Console.WriteLine($"GameManager: Sent SetClassSelectionTime packet to player {playerIndex}");
         }
         
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} team is {team}"), Color.Beige);
@@ -394,15 +397,14 @@ public class GameManager : ModSystem
         statePacket.Write(playerIndex);
         statePacket.Write((byte)PlayerManager.PlayerState.ClassSelection);
         statePacket.Send(toClient: playerIndex);
-        Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
         
+        // Send teleport packet to client
         ModPacket packet = mod2.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
         packet.Write((int)gameTeam.BaseLocation.X);
         packet.Write((int)gameTeam.BaseLocation.Y);
         packet.Send(toClient: playerIndex);
-        Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
         
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] Player {playerIndex} entering class selection, teleporting to {gameTeam.BaseLocation}"), Color.Yellow);
     }
@@ -422,7 +424,8 @@ public class GameManager : ModSystem
         
         var mod = ModContent.GetInstance<CTG2>();
         
-
+        // Send packet to update client-side player state to Active
+        // Send packet to update client-side player state to ClassSelection
         ModPacket statePacket = mod.GetPacket();
         statePacket.Write((byte)MessageType.UpdatePlayerState);
         statePacket.Write(playerIndex);
