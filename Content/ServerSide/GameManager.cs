@@ -39,6 +39,10 @@ public class GameManager : ModSystem
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
     private Vector2 spectatorSpawnPoint = new Vector2((13332 + 19316) / 2, 11000); // Center area for spectators
     
+    // New game delay tracking
+    private bool isWaitingForNewGame = false;
+    private int newGameTimer = 0;
+    
     public override void OnWorldLoad()
     {
         // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
@@ -101,23 +105,6 @@ public class GameManager : ModSystem
             startPlayerClassSelection(player.whoAmI, true);
         }
 
-
-        // THE CODE UNDERNEATH NEEDS TO BE REPLACED BY CODE ABOVE EVENTUALLY 
-
-
-        // Auto-spectate players not on teams (team 0)
-        // foreach (Player player in Main.player)
-        // {
-        //     if (player.active && player.team == 0)
-        //     {
-        //         SetPlayerSpectator(player.whoAmI, true);
-        //         Console.WriteLine($"Auto-spectating player {player.name} (not on a team)");
-        //     }
-        // }
-
-        // BlueTeam.StartMatch();
-        // RedTeam.StartMatch();
-
     }
 
     // Pauses/Unpauses game
@@ -129,38 +116,89 @@ public class GameManager : ModSystem
     }
 
     public void EndGame()
-    {   
-        
+    {
+        Console.WriteLine("GameManager: Starting EndGame sequence");
+
         IsGameActive = false;
-   
-        foreach (var kvp in playerSpectatorStatus)
+        HasRoundStarted = false;
+        MatchTime = 0;
+
+        // Reset gems
+        BlueGem.Reset();
+        RedGem.Reset();
+        Console.WriteLine("GameManager: Reset gems");
+
+        var mod = ModContent.GetInstance<CTG2>();
+
+        // Handle all active players
+        foreach (Player player in Main.player)
         {
-            int playerIndex = kvp.Key;
-            if (Main.player[playerIndex].active && kvp.Value) 
+            if (!player.active) continue;
+
+            Console.WriteLine($"GameManager: Processing player {player.whoAmI} ({player.name}) for game end");
+
+            // Reset player state to None
+            ModPacket statePacket = mod.GetPacket();
+            statePacket.Write((byte)MessageType.UpdatePlayerState);
+            statePacket.Write(player.whoAmI);
+            statePacket.Write((byte)PlayerManager.PlayerState.None);
+            statePacket.Send(toClient: player.whoAmI);
+
+            // Clear any spectator status
+            player.ghost = false;
+            player.respawnTimer = 0;
+
+            // Remove from spectator tracking if they were spectating
+            if (playerSpectatorStatus.GetValueOrDefault(player.whoAmI, false))
             {
-                Main.player[playerIndex].ghost = false;
-                Main.player[playerIndex].respawnTimer = 0;
-                
-              
-                var mod_ = ModContent.GetInstance<CTG2>();
-                ModPacket statusPacket = mod_.GetPacket();
-                statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
-                statusPacket.Write(playerIndex);
-                statusPacket.Write(false); 
-                statusPacket.Send(toClient: playerIndex);
+                ModPacket spectatorPacket = mod.GetPacket();
+                spectatorPacket.Write((byte)MessageType.ServerSpectatorUpdate);
+                spectatorPacket.Write(player.whoAmI);
+                spectatorPacket.Write(false);
+                spectatorPacket.Send(toClient: player.whoAmI);
             }
+
+            // Teleport all players to spectator area
+            ModPacket teleportPacket = mod.GetPacket();
+            teleportPacket.Write((byte)MessageType.ServerTeleport);
+            teleportPacket.Write(player.whoAmI);
+            teleportPacket.Write((int)spectatorSpawnPoint.X);
+            teleportPacket.Write((int)spectatorSpawnPoint.Y);
+            teleportPacket.Send(toClient: player.whoAmI);
+
+            // Clear inventory and reset player stats
+            player.statLife = player.statLifeMax;
+            player.statMana = player.statManaMax;
+
+            // Clear all player inventory and equipment
+            ClearPlayerInventory(player);
+
+            Console.WriteLine($"GameManager: Reset player {player.whoAmI} state and teleported to spectator area");
         }
-        
+
+        // Clear all tracking dictionaries
         playerSpectatorStatus.Clear();
         spectatorOriginalTeams.Clear();
+
+        // Update team lists
+        BlueTeam.UpdateTeam();
+        RedTeam.UpdateTeam();
+
+        Console.WriteLine("GameManager: Cleared all spectator tracking and updated teams");
+
+        // Send ServerGameEnd packet to all clients
+        ModPacket endPacket = mod.GetPacket();
+        endPacket.Write((byte)MessageType.ServerGameEnd);
+        endPacket.Send();
+
+        // Broadcast game end message
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended! New game starting in 15 seconds..."), Microsoft.Xna.Framework.Color.Yellow);
+
+        Console.WriteLine("GameManager: EndGame sequence completed");
         
-        Console.WriteLine("Cleared all spectator tracking on game end");
-        
-        var mod = ModContent.GetInstance<CTG2>();
-        ModPacket packet = mod.GetPacket();
-        packet.Write((byte)MessageType.ServerGameEnd);
-        packet.Send();
-        // TODO: Return all players to spectate area, clear inventories, etc. 
+        // Start the 15-second timer for new game
+        isWaitingForNewGame = true;
+        newGameTimer = 15 * 60; // 15 seconds * 60 ticks per second
     }
 
     // Runs every frame while game running. Runs all gem checks, draws timer and gem status.
@@ -255,7 +293,7 @@ public class GameManager : ModSystem
         {
             EndGame();
         }
-        // TODO: 
+    
     }
 
     public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
@@ -294,7 +332,6 @@ public class GameManager : ModSystem
             playerSpectatorStatus[playerIndex] = true;
 
             // Send teleport packet to client
-            
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerTeleport);
@@ -303,7 +340,6 @@ public class GameManager : ModSystem
             packet.Write((int)spectatorSpawnPoint.Y);
             packet.Send(toClient: playerIndex);
 
-            // Send spectator status update (THIS CAN PROBABLY BE REMOVED EVENTUALLY)
             ModPacket statusPacket = mod.GetPacket();
             statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
             statusPacket.Write(playerIndex);
@@ -315,7 +351,7 @@ public class GameManager : ModSystem
         }
         else
         {
-            // DEBUG: Global broadcast start
+            Console.WriteLine($"GameManager: SetPlayerSpectator called with isSpectator=false for player {playerIndex}");
             if (player.team == 0)
             {
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {player.name} CANNOT EXIT SPECTATOR, bro got no team"), Microsoft.Xna.Framework.Color.LimeGreen);
@@ -339,12 +375,8 @@ public class GameManager : ModSystem
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, playerTeam);
 
 
-            // TELL SERVER TO START CLASS SELECTION
-            ModPacket statusPacket = mod.GetPacket();
-            statusPacket.Write((byte)MessageType.EnterClassSelection);
-            statusPacket.Write(playerIndex);
-            statusPacket.Write(false); // game has already started 
-            statusPacket.Send();
+            Console.WriteLine($"GameManager: Directly calling startPlayerClassSelection for player {playerIndex} (non-game-start)");
+            startPlayerClassSelection(playerIndex, false);
             // TELL SERVER TO REMOVE GHOST AND NO LONGER A SPECTATOR
             ModPacket statusPacket2 = mod.GetPacket();
             statusPacket2.Write((byte)MessageType.ServerSpectatorUpdate);
@@ -362,6 +394,8 @@ public class GameManager : ModSystem
         Player player = Main.player[playerIndex];
         int team = player.team;
         
+        Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
+        
         if (gameStarted)
         {
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection for game start"), Color.Beige);
@@ -376,6 +410,7 @@ public class GameManager : ModSystem
             timePacket.Write(playerIndex);
             timePacket.Write(1800.0); // class selection time
             timePacket.Send(toClient: playerIndex);
+            Console.WriteLine($"GameManager: Sent SetClassSelectionTime packet to player {playerIndex}");
         }
         
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} team is {team}"), Color.Beige);
@@ -397,14 +432,15 @@ public class GameManager : ModSystem
         statePacket.Write(playerIndex);
         statePacket.Write((byte)PlayerManager.PlayerState.ClassSelection);
         statePacket.Send(toClient: playerIndex);
+        Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
         
-        // Send teleport packet to client
         ModPacket packet = mod2.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
         packet.Write((int)gameTeam.BaseLocation.X);
         packet.Write((int)gameTeam.BaseLocation.Y);
         packet.Send(toClient: playerIndex);
+        Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
         
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] Player {playerIndex} entering class selection, teleporting to {gameTeam.BaseLocation}"), Color.Yellow);
     }
@@ -424,8 +460,7 @@ public class GameManager : ModSystem
         
         var mod = ModContent.GetInstance<CTG2>();
         
-        // Send packet to update client-side player state to Active
-        // Send packet to update client-side player state to ClassSelection
+
         ModPacket statePacket = mod.GetPacket();
         statePacket.Write((byte)MessageType.UpdatePlayerState);
         statePacket.Write(playerIndex);
@@ -447,6 +482,49 @@ public class GameManager : ModSystem
     public override void PostUpdateWorld()
     {
         if (!Main.dedServ) return;
+        
+        // Handle new game timer
+        if (isWaitingForNewGame && newGameTimer > 0)
+        {
+            newGameTimer--;
+            
+            // Countdown announcements
+            if (newGameTimer == 10 * 60) // 10 seconds left
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] New game starting in 10 seconds..."), Microsoft.Xna.Framework.Color.Orange);
+            }
+            else if (newGameTimer == 5 * 60) // 5 seconds left
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] New game starting in 5 seconds..."), Microsoft.Xna.Framework.Color.Red);
+            }
+            else if (newGameTimer == 3 * 60) // 3 seconds left
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] 3..."), Microsoft.Xna.Framework.Color.Red);
+            }
+            else if (newGameTimer == 2 * 60) // 2 seconds left
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] 2..."), Microsoft.Xna.Framework.Color.Red);
+            }
+            else if (newGameTimer == 1 * 60) // 1 second left
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] 1..."), Microsoft.Xna.Framework.Color.Red);
+            }
+            
+            return; 
+        }
+        else if (isWaitingForNewGame && newGameTimer <= 0)
+        {
+            // Time to start new game
+            isWaitingForNewGame = false;
+            newGameTimer = 0;
+            
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Starting new game now!"), Microsoft.Xna.Framework.Color.LimeGreen);
+            Console.WriteLine("GameManager: Starting new game after 15-second delay");
+            
+            StartGame();
+            return;
+        }
+        
         if (!IsGameActive) return;
 
         UpdateGame();
@@ -454,6 +532,42 @@ public class GameManager : ModSystem
         base.PostUpdateWorld();
     }
     
-
+    private void ClearPlayerInventory(Player player)
+    {
+        // Clear main inventory
+        for (int i = 0; i < player.inventory.Length; i++)
+        {
+            player.inventory[i].TurnToAir();
+        }
+        
+        // Clear armor and accessories
+        for (int i = 0; i < player.armor.Length; i++)
+        {
+            player.armor[i].TurnToAir();
+        }
+        
+        // Clear dye slots
+        for (int i = 0; i < player.dye.Length; i++)
+        {
+            player.dye[i].TurnToAir();
+        }
+        
+        // Clear miscellaneous equipment
+        for (int i = 0; i < player.miscEquips.Length; i++)
+        {
+            player.miscEquips[i].TurnToAir();
+        }
+        
+        // Clear misc dyes
+        for (int i = 0; i < player.miscDyes.Length; i++)
+        {
+            player.miscDyes[i].TurnToAir();
+        }
+        
+        // Sync inventory changes to all clients
+        NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, player.whoAmI);
+        
+        Console.WriteLine($"GameManager: Cleared inventory for player {player.whoAmI} ({player.name})");
+    }
 
 }

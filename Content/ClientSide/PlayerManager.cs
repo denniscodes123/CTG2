@@ -52,12 +52,22 @@ public class PlayerManager : ModPlayer
         if (playerState == PlayerState.Active)
         {
             ShowClassUI = false;
+            ShowGameUI = true;
             //Main.NewText("PlayerManager: Set ShowClassUI to false due to Active state", Microsoft.Xna.Framework.Color.Purple);
         }
         else if (playerState == PlayerState.ClassSelection)
         {
             ShowClassUI = true;
-            //Main.NewText("PlayerManager: Set ShowClassUI to true due to ClassSelection state", Microsoft.Xna.Framework.Color.Purple);
+            ShowGameUI = true;
+            Main.NewText("PlayerManager: Set ShowClassUI to true due to ClassSelection state", Microsoft.Xna.Framework.Color.Purple);
+        }
+        else if (playerState == PlayerState.None || playerState == PlayerState.Spectator)
+        {
+            ShowClassUI = false;
+            ShowGameUI = true;
+            // Reset class selection timer when entering None state
+            classSelectionTimer = -1;
+            isGameStartClassSelection = false;
         }
         
         Main.NewText($"PlayerManager: Changed state to {playerState}", Microsoft.Xna.Framework.Color.Purple);
@@ -160,11 +170,8 @@ public class PlayerManager : ModPlayer
         }
 
         if (classSelectionTimer > 0 && !isGameStartClassSelection)
-        {
-            // Only count down timer if this is NOT a game start class selection
-            // During game start, the server handles timing via SendToBase
+        { //custom 
             classSelectionTimer--;
-            Main.NewText($"PlayerManager: Class selection timer: {classSelectionTimer} (non-game-start)", Microsoft.Xna.Framework.Color.Magenta);
         }
         else if (classSelectionTimer == 0 && !isGameStartClassSelection) // class selection time expired
         {
