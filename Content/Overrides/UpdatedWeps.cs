@@ -25,7 +25,7 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint bananarangDelay = 55;
         private uint bananarangLastUsedCounter = 0;
 
-        private uint ThornChakramDelay = 31;
+        private uint ThornChakramDelay = 23;
         private uint ThornChakramLastUsedCounter = 0;
 
         private uint blowgunDelay = 40;
@@ -102,13 +102,13 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.useTime = 22;
                     item.useAnimation = 22;
                     item.crit = 0;
-                    item.shootSpeed = 12f;
+                    item.shootSpeed = 13f;
                     break; //change proj later
 
                 case 2586: //miner //maybe ovveride projectile to not do self damage or at least not self knockback
                     item.damage = 40;
                     item.useTime = 21;
-                    item.useAnimation = 21;
+                    item.useAnimation = 20;
                     item.crit = 0;
                     break;
 
@@ -161,8 +161,30 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.crit = 0;
                     break;
 
-                    //all done except jman
-                
+                //all done except jman
+
+                case 742: //jman emerald staff
+                    item.crit = 0;
+                    item.shoot = 480;
+                    item.damage = 34;
+                    item.shootSpeed = 8f;
+                    item.scale = 0;
+                    item.useTime = 33;
+                    item.useAnimation = 33;
+                    break;
+
+                //drone damage 31
+                case 5451: //jman drone
+                    item.crit = 0;
+                    item.shoot = 513;
+                    item.damage = 31;
+                    item.shootSpeed = 2f;
+                    item.useAnimation = 37;
+                    item.useTime = 37;
+                    item.knockBack = 4;
+                    item.scale = 1;
+                    break;
+
 
             }
         }
