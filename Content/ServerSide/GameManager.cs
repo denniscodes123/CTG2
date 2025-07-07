@@ -346,6 +346,13 @@ public class GameManager : ModSystem
             statusPacket.Write(true); // is spectator
             statusPacket.Send(toClient: playerIndex);
 
+            ModPacket statePacket = mod.GetPacket();
+            statePacket.Write((byte)MessageType.UpdatePlayerState);
+            statePacket.Write(playerIndex);
+            statePacket.Write((byte)PlayerManager.PlayerState.Spectator);
+            statePacket.Send(toClient: playerIndex);
+            Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
+
             // DEBUG: Global broadcast
             Console.WriteLine($"Player {player.name} entered spectator mode");
         }
@@ -378,6 +385,7 @@ public class GameManager : ModSystem
             Console.WriteLine($"GameManager: Directly calling startPlayerClassSelection for player {playerIndex} (non-game-start)");
             startPlayerClassSelection(playerIndex, false);
             // TELL SERVER TO REMOVE GHOST AND NO LONGER A SPECTATOR
+
             ModPacket statusPacket2 = mod.GetPacket();
             statusPacket2.Write((byte)MessageType.ServerSpectatorUpdate);
             statusPacket2.Write(playerIndex);
