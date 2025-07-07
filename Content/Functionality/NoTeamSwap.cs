@@ -13,17 +13,24 @@ public class CTGPlayer : ModPlayer
         Player.team = teamId;
     }
 
-    public override void PreUpdate()
-    {
-        if (lockedTeam.HasValue && Player.team != lockedTeam.Value)
-        {
-            // Revert unauthorized team change
-            Player.team = lockedTeam.Value;
+public override void PreUpdate()
+{
+    if (!lockedTeam.HasValue)
+        return;
 
-            if (Main.netMode == NetmodeID.Server)
-            {
-                NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI);
-            }
+    if (Player.team != lockedTeam.Value)
+    {
+        Player.team = lockedTeam.Value;
+
+        if (Main.netMode != NetmodeID.SinglePlayer)
+        {
+            NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, lockedTeam.Value);
         }
     }
+}
+
+
+
+
+    
 }
