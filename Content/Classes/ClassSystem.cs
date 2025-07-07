@@ -282,9 +282,11 @@ namespace ClassesNamespace
 
     public override void PostUpdate()
         {
+                if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
+                return;
             //this is where dyes are set and forced on 
-            int redDyeType = ItemID.RedDye; //these arent the right dyes btw 
-            int blueDyeType = ItemID.BlueDye;
+            int redDyeType = 1031; 
+            int blueDyeType = 1035;
 
             if (Main.netMode == NetmodeID.Server)
                 return;
@@ -297,7 +299,7 @@ namespace ClassesNamespace
                 3 => blueDyeType, 
                 _ => 0 
             };
-                for (int i = 0; i <= 3; i++) //i<=3 just sets the armor for not can switch to i<=9 for all accessory slots later
+                for (int i = 0; i <= 9; i++) //i<=3 just sets the armor for not can switch to i<=9 for all accessory slots later
                 {
                     if (Player.dye[i] == null || Player.dye[i].type != dyeID)
                     {
