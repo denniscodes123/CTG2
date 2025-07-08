@@ -390,6 +390,8 @@ namespace CTG2.Content
         private void ClownOnUse() //not finished
         {
             Player.AddBuff(320, 60);
+
+            Player.GetModPlayer<ClassSystem>().clownSwapCaller = Player.whoAmI; //Gives this reference to clownpoststatus
             
             class12SwapTimer = 60;
 
@@ -399,13 +401,16 @@ namespace CTG2.Content
 
         private void ClownPostStatus()
         {
+                if (modPlayer.clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
+                return; 
+                
             if (class12SwapTimer != -1) class12SwapTimer--;
 
             if (class12SwapTimer == 0)
             {
                 foreach (Player other in Main.player)
                 {  
-                    if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
+                    if (!other.active || other.dead || other.whoAmI == Player.whoAmI || other.ghost)
                         continue;
 
                     if (Vector2.Distance(Player.Center, other.Center) <= 22 * 16 && Vector2.Distance(Player.Center, other.Center) < class12ClosestDist && Player.team != other.team) // 22 block radius
@@ -438,6 +443,7 @@ namespace CTG2.Content
                     packet2.Send();
 
                     Main.NewText("Successfully swapped!");
+                    modPlayer.clownSwapCaller = -1; //reset the caller after the logic is done
                 }
                 else
                 {
