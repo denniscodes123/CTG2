@@ -215,7 +215,7 @@ namespace ClassesNamespace
 
             CtgClass classInfo;
 
-            if (PlayerManager.currentClass.Inventory != lastPlayerClass)
+            if (PlayerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage!=0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
             {   
                 
                 for (int i = 0; i < Player.buffType.Length; i++)
