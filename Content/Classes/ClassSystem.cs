@@ -88,6 +88,25 @@ namespace ClassesNamespace
             base.OnEnterWorld();
             Player.statLifeMax = 100;
             Player.statLifeMax2 = 100;
+
+                        //Comment this out if you want this to not clear all inventory onenterwolrd
+            //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
+            for (int i = 0; i < Player.inventory.Length; i++)
+                        Player.inventory[i] = new Item();
+            
+            for (int i = 0; i < Player.armor.Length; i++)
+                Player.armor[i] = new Item();
+
+            for (int i = 0; i < Player.miscEquips.Length; i++)
+                Player.miscEquips[i] = new Item();
+
+            for (int i = 0; i < Player.dye.Length; i++)
+                Player.dye[i] = new Item();
+
+            for (int i = 0; i < Player.miscDyes.Length; i++)
+                Player.miscDyes[i] = new Item();
+
+            Player.trashItem = new Item();
         }
 
         private void SetInventory(CtgClass classData)
