@@ -67,6 +67,7 @@ namespace ClassesNamespace
         private int bonusRegen = 0;
         private int bonusDef = 0;
         private float bonusMoveSpeed = 0;
+        public int clownSwapCaller = -1; //Gets updated by clownonuse to store who the caller is
         
         private int currentHP = 100;
         private int currentMana = 20;
