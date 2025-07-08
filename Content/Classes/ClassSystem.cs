@@ -107,6 +107,8 @@ namespace ClassesNamespace
                 Player.miscDyes[i] = new Item();
 
             Player.trashItem = new Item();
+
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI); //sync state 
         }
 
         private void SetInventory(CtgClass classData)
