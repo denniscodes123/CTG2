@@ -45,6 +45,15 @@ namespace CTG2.Content.Items.ModifiedWeps
 
         public override bool InstancePerEntity => true;
 
+        
+	
+ 	public override void ModifyHitPvp(Item item, Player player, Player target, ref Player.HurtModifiers modifiers)
+        {
+            modifiers.SourceDamage.Base = item.damage;
+            //force weapons base damage and dont apply anything else for pvp
+            //this doesnt sync with inventory ui btw
+	}
+
 
         public override void SetDefaults(Item item)
         {
