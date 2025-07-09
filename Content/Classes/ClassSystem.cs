@@ -27,7 +27,7 @@ namespace ClassesNamespace
 
 
     public enum GameClass : int
-    {   
+    {
         None,
         Archer,
         Ninja,
@@ -51,12 +51,12 @@ namespace ClassesNamespace
 
 
     public class CtgClass
-    {   
+    {
         public int HealthPoints { get; set; }
         public int ManaPoints { get; set; }
         public List<ItemData> InventoryItems { get; set; }
     }
-    
+
 
     public class ClassSystem : ModPlayer
     {
@@ -68,12 +68,12 @@ namespace ClassesNamespace
         private int bonusDef = 0;
         private float bonusMoveSpeed = 0;
         public int clownSwapCaller = -1; //Gets updated by clownonuse to store who the caller is
-        
+
         private int currentHP = 100;
         private int currentMana = 20;
 
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
-        {   
+        {
             base.ModifyMaxStats(out health, out mana);
             if (!Main.dedServ)
             {
@@ -89,11 +89,11 @@ namespace ClassesNamespace
             Player.statLifeMax = 100;
             Player.statLifeMax2 = 100;
 
-                        //Comment this out if you want this to not clear all inventory onenterwolrd
+            //Comment this out if you want this to not clear all inventory onenterwolrd
             //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
             for (int i = 0; i < Player.inventory.Length; i++)
-                        Player.inventory[i] = new Item();
-            
+                Player.inventory[i] = new Item();
+
             for (int i = 0; i < Player.armor.Length; i++)
                 Player.armor[i] = new Item();
 
@@ -170,7 +170,7 @@ namespace ClassesNamespace
             */
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
         }
-        
+
 
         private void SpawnCustomItem(int itemID, int? prefix = null, int? damage = null, int? useTime = null, int? useAnimation = null, float? scale = null, float? knockBack = null, int? shoot = null, float? shootSpeed = null, Color? colorOverride = null)
         {
@@ -190,10 +190,10 @@ namespace ClassesNamespace
             Player.QuickSpawnItem(null, item, 1);
         }
 
-    private void ApplyPermBuffs(List<int> buffs)
-    {   
-        foreach(int id in buffs) Player.AddBuff(id, 54000);
-    }
+        private void ApplyPermBuffs(List<int> buffs)
+        {
+            foreach (int id in buffs) Player.AddBuff(id, 54000);
+        }
 
         public void ApplyUpgrade(UpgradeConfig upgrade)
         {
@@ -229,8 +229,8 @@ namespace ClassesNamespace
                     Main.NewText("upgrade id not found");
                     break;
             }
-        NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-    }
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+        }
 
         public override void ResetEffects()
         {
@@ -297,36 +297,37 @@ namespace ClassesNamespace
 
             lastPlayerClass = PlayerManager.currentClass.Inventory;
             lastUpgrade = PlayerManager.currentUpgrade.Name;
-            
+
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
         }
         public override void UpdateEquips()
-    {
-        if (Main.expertMode || Main.masterMode)
         {
-            Player.extraAccessory = true;
+            if (Main.expertMode || Main.masterMode)
+            {
+                Player.extraAccessory = true;
+            }
         }
-    }
 
-    public override void PostUpdate()
+        public override void PostUpdate()
         {
-                if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
+            if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
             //this is where dyes are set and forced on 
-            int redDyeType = 1031; 
+            int redDyeType = 1031;
             int blueDyeType = 1035;
 
             if (Main.netMode == NetmodeID.Server)
                 return;
 
-            if (playerClass != GameClass.None) {
-            int dyeID = Player.team switch
-            
+            if (playerClass != GameClass.None)
+            {
+                int dyeID = Player.team switch
+
                 {
-                    1 => redDyeType,  
-                3 => blueDyeType, 
-                _ => 0 
-            };
+                    1 => redDyeType,
+                    3 => blueDyeType,
+                    _ => 0
+                };
                 for (int i = 0; i <= 9; i++) //i<=3 just sets the armor for not can switch to i<=9 for all accessory slots later
                 {
                     if (Player.dye[i] == null || Player.dye[i].type != dyeID)
@@ -336,5 +337,12 @@ namespace ClassesNamespace
                 }
             }
         }
+        public void ForceClassReset()
+        {
+            lastPlayerClass = "";
+            ResetEffects();
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+        }
     }
+
 }

@@ -16,8 +16,8 @@ public class PlayerManager : ModPlayer
     {
         None, ClassSelection, Active, Spectator
     }
-    public static bool ShowClassUI = false;
-    public static bool ShowGameUI = false;
+    public bool ShowClassUI = false;
+    public bool ShowGameUI = false;
     public static int previousMatchStage = 0;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
@@ -154,7 +154,7 @@ public class PlayerManager : ModPlayer
     public override void PreUpdate()
     {
         EnforceTeamLock(); // lock team
-        // Update UI state based on player state rather than match stage
+        // wecan probably delete (state transitions handle all of this)
         if (this.playerState == PlayerState.ClassSelection)
         {
             ShowClassUI = true;
@@ -237,7 +237,7 @@ public class PlayerManager : ModPlayer
         }
         else
         {
-            classSelectionTimer = 1800; // Set but don't countdown - server controls this
+            classSelectionTimer = 1800; 
             Main.NewText($"PlayerManager: Started server-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Orange);
         }
     }
