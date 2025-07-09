@@ -17,13 +17,29 @@ public override void PreUpdateEntities()
         {
             Item item = Main.item[i];
 
-if (item.velocity.Y == -2f && item.active && (GameInfo.matchStage==1 || GameInfo.matchStage==2) && BlockRewardSystem.canBeDropped==false) {
-    //Dropped items y gets set to -2 (items from /item and breaking blocks don't get turned to air)
-    item.TurnToAir();
-    NetMessage.SendData(MessageID.SyncItem, -1, -1, null, i);
-    if (Main.myPlayer == i)
-        Main.NewText("Dropping items is disabled.", Color.Red);
+if (item.velocity.Y == -2f && item.active && (GameInfo.matchStage == 1 || GameInfo.matchStage == 2) && BlockRewardSystem.canBeDropped == false)
+{
+    for (int p = 0; p < Main.maxPlayers; p++)
+    {
+        Player player = Main.player[p];
+        if (player.active && player.Hitbox.Intersects(item.Hitbox))
+        {
+            Item returnedItem = item.Clone(); 
+            item.TurnToAir();
+            NetMessage.SendData(MessageID.SyncItem, -1, -1, null, i);
+
+
+            player.GetItem(player.whoAmI, returnedItem, GetItemSettings.InventoryUIToInventorySettings);    
+
+
+            if (p == Main.myPlayer)
+                Main.NewText("Dropping items is disabled. Item returned.", Color.Orange);
+
+            break; 
         }
+    }
+}
+
 }
         }
     }
