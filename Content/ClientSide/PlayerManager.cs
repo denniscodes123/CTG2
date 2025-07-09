@@ -21,8 +21,8 @@ public class PlayerManager : ModPlayer
     public static int previousMatchStage = 0;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
-    public static ClassConfig currentClass = new ClassConfig();
-    public static UpgradeConfig currentUpgrade = new UpgradeConfig();
+    public ClassConfig currentClass = new ClassConfig();
+    public UpgradeConfig currentUpgrade = new UpgradeConfig();
 
     public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;

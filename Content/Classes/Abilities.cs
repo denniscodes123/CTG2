@@ -611,7 +611,8 @@ namespace CTG2.Content
 
             if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && cooldown == 0) // Only activate if not on cooldown
             {
-                int selectedClass = PlayerManager.currentClass.AbilityID;
+                var playerManager = Player.GetModPlayer<PlayerManager>();
+                int selectedClass = playerManager.currentClass.AbilityID;
 
                 switch (selectedClass)
                 {

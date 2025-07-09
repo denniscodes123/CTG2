@@ -234,13 +234,14 @@ namespace ClassesNamespace
 
         public override void ResetEffects()
         {
+            // THIS METHOD IS BROKEN NEED TO FIX 
             Player.AddBuff(BuffID.Shine, 54000);
             Player.AddBuff(BuffID.NightOwl, 54000);
             Player.AddBuff(BuffID.Builder, 54000);
 
             CtgClass classInfo;
-
-            if (PlayerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
             {
 
                 for (int i = 0; i < Player.buffType.Length; i++)
@@ -249,7 +250,7 @@ namespace ClassesNamespace
                 }
 
 
-                string selectedClass = PlayerManager.currentClass.Inventory;
+                string selectedClass = playerManager.currentClass.Inventory;
                 using (var stream = Mod.GetFileStream($"Content/Classes/{selectedClass}.json"))
                 using (var fileReader = new StreamReader(stream))
                 {
@@ -268,16 +269,16 @@ namespace ClassesNamespace
                 SetInventory(classInfo);
 
                 // Apply First upgrade by default when new class selected
-                ApplyUpgrade(PlayerManager.currentClass.Upgrades[0]);
+                ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
             }
 
             Player.statLifeMax2 = currentHP;
             Player.statManaMax2 = currentMana;
 
-            if (PlayerManager.currentUpgrade.Name != lastUpgrade)
+            if (playerManager.currentUpgrade.Name != lastUpgrade)
             {
                 // apply upgrades here
-                ApplyUpgrade(PlayerManager.currentUpgrade);
+                ApplyUpgrade(playerManager.currentUpgrade);
             }
 
             Player.lifeRegen += bonusRegen;
@@ -288,15 +289,15 @@ namespace ClassesNamespace
             // Add player buffs here instead (delete switch once config is populated with the required buffs)
             try
             {
-                if (!Main.dedServ) ApplyPermBuffs(PlayerManager.currentClass.Buffs);
+                if (!Main.dedServ) ApplyPermBuffs(playerManager.currentClass.Buffs);
             }
             catch
             {
                 Console.WriteLine("Failed to apply permanent buffs.");
             }
 
-            lastPlayerClass = PlayerManager.currentClass.Inventory;
-            lastUpgrade = PlayerManager.currentUpgrade.Name;
+            lastPlayerClass = playerManager.currentClass.Inventory;
+            lastUpgrade = playerManager.currentUpgrade.Name;
 
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
         }
@@ -337,12 +338,7 @@ namespace ClassesNamespace
                 }
             }
         }
-        public void ForceClassReset()
-        {
-            lastPlayerClass = "";
-            ResetEffects();
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-        }
+
     }
 
 }

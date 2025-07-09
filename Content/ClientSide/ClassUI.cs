@@ -205,14 +205,18 @@ public class ClassUI : UIState
         
         
 
-        // default select first
-        if (CTG2.CTG2.config.Classes.Any())
-            SelectClass(CTG2.CTG2.config.Classes[0]);
+        // default select first (removed for debugging purposes)
+        // if (CTG2.CTG2.config.Classes.Any())
+        //     SelectClass(CTG2.CTG2.config.Classes[0]);
     }
 
     private void SelectClass(ClassConfig cfg)
     {
-        PlayerManager.currentClass = cfg;
+        var playerManager = Main.LocalPlayer.GetModPlayer<PlayerManager>();
+        playerManager.currentClass = cfg;
+        playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
+
+
         selectedClass = cfg;
         _classNameText.SetText(cfg.Name);
         _classSummaryText.SetText(cfg.Summary);
@@ -261,7 +265,7 @@ public class ClassUI : UIState
                     }
                 }
                 btn.BackgroundColor = selected;
-                PlayerManager.currentUpgrade = up;
+                playerManager.currentUpgrade = up;
             };
             _upgradeList.Add(btn);
         }
