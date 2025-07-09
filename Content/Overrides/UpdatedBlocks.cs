@@ -14,7 +14,7 @@ namespace CTG2.Content
 
             if (type == TileID.Platforms)
                 return false;
-                
+
             if (type == TileID.CrystalBlock)
                 return false;
 
@@ -23,7 +23,7 @@ namespace CTG2.Content
 
             if (type == TileID.Grate)
                 return false;
- 
+
             if (type == TileID.ConveyorBeltLeft)
                 return false;
 
@@ -59,13 +59,13 @@ namespace CTG2.Content
 
             if (type == TileID.Statues)
                 return false;
-            
+
             if (type == 128)
                 return false;
 
             if (type == TileID.ItemFrame)
                 return false;
-            
+
             if (type == TileID.Signs)
                 return false;
 
@@ -85,10 +85,10 @@ namespace CTG2.Content
                 return false;
 
             if (type == TileID.PinkDungeonBrick)
-                return false; 
+                return false;
 
             if (type == TileID.GreenDungeonBrick)
-                return false; 
+                return false;
 
             if (type == TileID.Candles)
                 return false;
@@ -102,10 +102,19 @@ namespace CTG2.Content
         public override bool CanExplode(int i, int j, int type)
         {
 
-            if (type == TileID.LihzahrdBrick || type == TileID.Platforms && Main.tile[i, j].TileFrameX == 270 || type == TileID.Asphalt)
+            if (type != TileID.Dirt)
                 return false;
 
             return base.CanExplode(i, j, type);
         }
     }
+    
+    public class NoExplosionWall : GlobalWall
+{
+    public override bool CanExplode(int i, int j, int type)
+    {
+        
+        return false;
+    }
+}
 }
