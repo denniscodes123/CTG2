@@ -166,6 +166,9 @@ namespace ClassesNamespace
 
                 Player.miscDyes[e] = newItem;
             }
+            /*this may not work lol
+            */
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
         }
         
 
