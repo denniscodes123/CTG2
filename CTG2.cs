@@ -10,6 +10,9 @@ using CTG2.Content.ClientSide;
 using CTG2.Content.ServerSide;
 using Microsoft.Xna.Framework;
 using Terraria.ID;
+using System.Collections.Generic;
+using Terraria.Chat;
+using Terraria.Localization;
 
 
 namespace CTG2
@@ -43,6 +46,7 @@ namespace CTG2
         UpdatePlayerTeam = 23,  // server → client
         SetClassSelectionTime = 24,  // server → client
         UpdatePlayerState = 25,  // server → client
+        RequestViewMap = 26,
     }
     
     public class CTG2 : Mod
@@ -332,7 +336,30 @@ namespace CTG2
                     {
                         Main.NewText($"CLIENT: Ignoring state update packet - not for local player", Color.Orange);
                     }
-                    break;              
+                    break;
+                case (byte)MessageType.RequestViewMap:
+                    int playerMapView = reader.ReadInt32();
+                    
+                    // Get the map queue
+                    var mapArray = manager.mapQueue.ToArray();
+                    
+                    if (mapArray.Length == 0)
+                    {
+                        ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral("Map queue is empty."), Color.Gray, playerMapView);
+                    }
+                    else
+                    {
+                        ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"=== Map Queue ({mapArray.Length} maps) ==="), Color.Yellow, playerMapView);
+                        
+                        for (int i = 0; i < mapArray.Length; i++)
+                        {
+                            ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"{i + 1}. {mapArray[i]}"), Color.White, playerMapView);
+                        }
+                    }
+                    
+                    Console.WriteLine($"Server: Sent map queue ({mapArray.Length} maps) to player {playerMapView}");
+                    break;
+
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;

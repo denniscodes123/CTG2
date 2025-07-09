@@ -59,7 +59,7 @@ public class PlayerManager : ModPlayer
         {
             ShowClassUI = true;
             ShowGameUI = true;
-            Main.NewText("PlayerManager: Set ShowClassUI to true due to ClassSelection state", Microsoft.Xna.Framework.Color.Purple);
+            //Main.NewText("PlayerManager: Set ShowClassUI to true due to ClassSelection state", Microsoft.Xna.Framework.Color.Purple);
         }
         else if (playerState == PlayerState.None || playerState == PlayerState.Spectator)
         {
