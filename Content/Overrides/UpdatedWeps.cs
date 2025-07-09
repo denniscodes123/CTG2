@@ -18,14 +18,14 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint rforkDelay = 40;
         private uint rforkLastUsedCounter = 0;
 
-        private uint zapinatorDelay = 51;
+        private uint zapinatorDelay = 51; //lowkey i think this is off rn but i cant tell 
         private uint zapinatorLastUsedCounter = 0;
         private uint grenadeDelay = 50;
         private uint grenadeLastUsedCounter = 0;
         private uint bananarangDelay = 55;
         private uint bananarangLastUsedCounter = 0;
 
-        private uint ThornChakramDelay = 23;
+        private uint ThornChakramDelay = 20;
         private uint ThornChakramLastUsedCounter = 0;
 
         private uint blowgunDelay = 40;
@@ -40,6 +40,8 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint cursedFlamesDelay = 50;
         private uint cursedFlamesLastUsedCounter = 0;
 
+        private uint sickleDelay = 147; //There should only be one ice sickle projectile on the field at once
+        private uint sickleLastUsedCounter = 0;
 
         public override bool InstancePerEntity => true;
 
@@ -73,7 +75,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                 case ItemID.Bananarang: // Tree
                     item.useTime = 20;
                     item.useAnimation = 20;
-                    item.shootSpeed = 11.4f;
+                    item.shootSpeed = 11f;
                     item.knockBack = 6f;
                     item.autoReuse = false;
                     item.damage = 35;
@@ -214,18 +216,29 @@ namespace CTG2.Content.Items.ModifiedWeps
                 else
                     return false;
             }
-            else if (item.type == 4347)
+            else if (item.type == 1306)
             {
-                if (Main.GameUpdateCount - zapinatorLastUsedCounter >= zapinatorDelay)
+                if (Main.GameUpdateCount - sickleLastUsedCounter >= sickleDelay)
                 {
-                    zapinatorLastUsedCounter = Main.GameUpdateCount;
+                    sickleLastUsedCounter = Main.GameUpdateCount;
         
                     return true;
                 }
                 else
                     return false;
             }
-            
+            else if (item.type == 4347)
+            {
+                if (Main.GameUpdateCount - zapinatorLastUsedCounter >= zapinatorDelay)
+                {
+                    zapinatorLastUsedCounter = Main.GameUpdateCount;
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+
             else if (item.type == 802) //rottedfork
             {
                 if (Main.GameUpdateCount - rforkLastUsedCounter >= rforkDelay)
