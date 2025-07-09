@@ -16,5 +16,11 @@ public class ToxicFlaskTimeOverride : GlobalProjectile
                 projectile.timeLeft = 120;
             }
         }
+        if (projectile.type == ProjectileID.ThornChakram) //this code makes clown one blocking easier
+        {
+            projectile.width = 32;
+            projectile.height = 32;
+
+        }
     }
 }
