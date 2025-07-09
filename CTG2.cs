@@ -47,6 +47,12 @@ namespace CTG2
         SetClassSelectionTime = 24,  // server → client
         UpdatePlayerState = 25,  // server → client
         RequestViewMap = 26,
+        RequestTeamChat = 27,
+        RequestDie = 28,
+        RequestKill = 29,
+
+                    
+                
     }
     
     public class CTG2 : Mod
@@ -54,7 +60,33 @@ namespace CTG2
         public static int requestedNpcIndex = 0;
         public static Random randomGenerator = new Random();
         public static ClientConfig config = new ClientConfig();
-        
+        // static methods
+        private static string GetTeamName(int teamId)
+        {
+            return teamId switch
+            {
+                1 => "RED",
+                2 => "GREEN",
+                3 => "BLUE", 
+                4 => "YELLOW",
+                5 => "PINK",
+                _ => $"TEAM {teamId}"
+            };
+        }
+
+        private static Color GetTeamColor(int teamId)
+        {
+            return teamId switch
+            {
+                1 => Color.Red,
+                2 => Color.Green,
+                3 => Color.Blue,
+                4 => Color.Yellow,
+                5 => Color.Pink,
+                _ => Color.White
+            };
+        }
+        // overrides
         public override void Load()
         {
             base.Load();
@@ -81,13 +113,14 @@ namespace CTG2
             var manager = ModContent.GetInstance<GameManager>();
             
             byte msgType = reader.ReadByte();
-            switch (msgType) {
+            switch (msgType)
+            {
                 // Client -> Server Packets (these cases will run on the Server)
                 case (byte)MessageType.RequestStartGame:
                     manager.StartGame();
                     Console.WriteLine("Server Received Game Start Request!");
                     break;
-                
+
                 case (byte)MessageType.RequestEndGame:
                     manager.EndGame();
                     Console.WriteLine("Server Received Game End Request!");
@@ -135,7 +168,7 @@ namespace CTG2
                     }
 
                     break;
-                
+
                 case (byte)MessageType.RequestNextMap:
                     string receivedMapName = reader.ReadString();
 
@@ -150,7 +183,7 @@ namespace CTG2
                         // log?
                     }
                     break;
-                
+
                 // mainly used for clown ability
                 case (byte)MessageType.RequestTeleport:
                     // teleport on server
@@ -169,7 +202,7 @@ namespace CTG2
                     packet2.Write(tpY2);
                     packet2.Send();
                     break;
-                
+
                 case (byte)MessageType.RequestMaxHealth:
                     // teleport on server
                     int sender = reader.ReadInt32();
@@ -190,36 +223,36 @@ namespace CTG2
                     updatePacket.Write(target);
                     updatePacket.Write(teamID);
                     updatePacket.Send(toClient: target);
-                    
+
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target, teamID);
                     Console.WriteLine($"Set player {Main.player[target].name} to team {teamID}");
                     break;
-                
+
                 case (byte)MessageType.RequestEnterSpectator:
                     int spectatorPlayerIndex = reader.ReadInt32();
                     manager.SetPlayerSpectator(spectatorPlayerIndex, true);
                     Console.WriteLine($"Server Received Enter Spectator Request from player {spectatorPlayerIndex}!");
                     break;
-                
+
                 case (byte)MessageType.RequestExitSpectator:
                     int exitSpectatorPlayerIndex = reader.ReadInt32();
                     manager.SetPlayerSpectator(exitSpectatorPlayerIndex, false);
                     Console.WriteLine($"Server Received Exit Spectator Request from player {exitSpectatorPlayerIndex}!");
                     break;
-                
+
                 case (byte)MessageType.ExitClassSelection:
                     int exitClassPlayerIndex = reader.ReadInt32();
                     manager.endPlayerClassSelection(exitClassPlayerIndex);
                     Console.WriteLine($"Server Received Exit Class Selection from player {exitClassPlayerIndex}!");
                     break;
-                
+
                 case (byte)MessageType.EnterClassSelection:
                     int enterClassIndex = reader.ReadInt32();
                     bool enterGameStart = reader.ReadBoolean();
                     manager.startPlayerClassSelection(enterClassIndex, enterGameStart);
                     Console.WriteLine($"Server Received Enter Class Selection from player {enterClassIndex}, gameStart: {enterGameStart}!");
                     break;
-                
+
                 // Server->Client Packets (these cases will run on the Client)
                 case (byte)MessageType.ServerGameStart:
                     GameInfo.matchStage = 1;
@@ -253,7 +286,7 @@ namespace CTG2
                     localPlayer.ChangeSpawn(spawnX, spawnY);
                     Console.WriteLine("Client Received Spawn Update!");
                     break;
-                
+
                 // Gems Status Updates
                 case (byte)MessageType.ServerGameUpdate:
                     // Populate GameInfo fields
@@ -264,7 +297,7 @@ namespace CTG2
                     GameInfo.blueGemCarrier = reader.ReadString();
                     GameInfo.redGemCarrier = reader.ReadString();
                     break;
-                
+
                 case (byte)MessageType.ServerSpectatorUpdate:
                     int playerIndex = reader.ReadInt32();
                     bool isSpectator = reader.ReadBoolean();
@@ -274,7 +307,7 @@ namespace CTG2
                         if (isSpectator)
                         {
                             Main.player[playerIndex].respawnTimer = 9999;
-                            Main.player[playerIndex].team = 0; 
+                            Main.player[playerIndex].team = 0;
                         }
                         else
                         {
@@ -283,7 +316,7 @@ namespace CTG2
                     }
                     Console.WriteLine($"Client Received Spectator Update: Player {playerIndex} is now {(isSpectator ? "spectator" : "active")}!");
                     break;
-                
+
                 case (byte)MessageType.UpdatePlayerTeam:
                     int playerIdx = reader.ReadInt32();
                     int newTeamID = reader.ReadInt32();
@@ -294,7 +327,7 @@ namespace CTG2
                         Console.WriteLine($"Client: Updated PlayerManager team to {newTeamID}");
                     }
                     break;
-                
+
                 case (byte)MessageType.SetClassSelectionTime:
                     int targetPlayerIdx = reader.ReadInt32();
                     double classTime = reader.ReadDouble();
@@ -304,7 +337,7 @@ namespace CTG2
                         Console.WriteLine($"Client: Set class selection time to {classTime}");
                     }
                     break;
-                
+
                 case (byte)MessageType.UpdatePlayerState:
                     int statePlayerIdx = reader.ReadInt32();
                     byte newState = reader.ReadByte();
@@ -313,7 +346,7 @@ namespace CTG2
                     {
                         var playerManager = Main.player[statePlayerIdx].GetModPlayer<PlayerManager>();
                         var targetState = (PlayerManager.PlayerState)newState;
-                        
+
                         // If entering ClassSelection state, determine if this is game start based on match stage
                         if (targetState == PlayerManager.PlayerState.ClassSelection)
                         {
@@ -329,7 +362,7 @@ namespace CTG2
                         {
                             playerManager.changePlayerState(targetState);
                         }
-                        
+
                         Main.NewText($"CLIENT: Updated player state to {targetState}", Color.Green);
                     }
                     else
@@ -339,10 +372,10 @@ namespace CTG2
                     break;
                 case (byte)MessageType.RequestViewMap:
                     int playerMapView = reader.ReadInt32();
-                    
+
                     // Get the map queue
                     var mapArray = manager.mapQueue.ToArray();
-                    
+
                     if (mapArray.Length == 0)
                     {
                         ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral("Map queue is empty."), Color.Gray, playerMapView);
@@ -350,19 +383,113 @@ namespace CTG2
                     else
                     {
                         ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"=== Map Queue ({mapArray.Length} maps) ==="), Color.Yellow, playerMapView);
-                        
+
                         for (int i = 0; i < mapArray.Length; i++)
                         {
                             ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"{i + 1}. {mapArray[i]}"), Color.White, playerMapView);
                         }
                     }
-                    
+
                     Console.WriteLine($"Server: Sent map queue ({mapArray.Length} maps) to player {playerMapView}");
                     break;
+                case (byte)MessageType.RequestTeamChat:
+                    int playerWhoTalked = reader.ReadInt32();
+                    string teamMessage = reader.ReadString();
+                    
+                    // Get the player who sent the message
+                    var senderPlayer = Main.player[playerWhoTalked];
+                    if (!senderPlayer.active)
+                    {
+                        Console.WriteLine($"Invalid player {playerWhoTalked} tried to send team chat");
+                        break;
+                    }
+                    
+                    int senderTeam = senderPlayer.team;
+                    
+                    // Check if player is on a team
+                    if (senderTeam == 0)
+                    {
+                        ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral("You are not on a team!"), Color.Red, playerWhoTalked);
+                        break;
+                    }
+                    
+                    // Get team name and color
+                    string teamName = GetTeamName(senderTeam);
+                    Color teamColor = GetTeamColor(senderTeam);
+                    
+            
+                    string formattedMessage = $"[{teamName}] {senderPlayer.name}: {teamMessage}";
 
+                    int messagesSent = 0;
+                    foreach (Player team_player in Main.player)
+                    {
+                        if (team_player.active && team_player.team == senderTeam)
+                        {
+                            ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(formattedMessage), teamColor, team_player.whoAmI);
+                            messagesSent++;
+                        }
+                    }
+                    
+                    Console.WriteLine($"Server: Sent team chat from {senderPlayer.name} to {messagesSent} players on {teamName} team");
+                    break;
+                case (byte)MessageType.RequestDie:
+                    int playerWhoDies = reader.ReadInt32();
+                    
+                    // Get the player who wants to die
+                    var dyingPlayer = Main.player[playerWhoDies];
+                    if (!dyingPlayer.active)
+                    {
+                        Console.WriteLine($"Invalid player {playerWhoDies} tried to die");
+                        break;
+                    }
+                    
+
+                    dyingPlayer.KillMe(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{dyingPlayer.name} committed suicide")), 9999, 0);
+
+                    // Sync the death to all clients
+                    NetworkText deathText = NetworkText.FromLiteral($"{dyingPlayer.name} committed suicide");
+                    NetMessage.SendData(MessageID.PlayerDeathV2, -1, -1, deathText, playerWhoDies, 0f, 0f, 0f);
+                    Console.WriteLine($"Server: Player {dyingPlayer.name} killed themselves");
+                    break;
+
+                case (byte)MessageType.RequestKill:
+                    int adminPlayer = reader.ReadInt32();
+                    string targetPlayerName = reader.ReadString();
+                    
+                    // Find the target player by name
+                    Player targetPlayer = null;
+                    foreach (Player p in Main.player)
+                    {
+                        if (p.active && p.name.Equals(targetPlayerName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            targetPlayer = p;
+                            break;
+                        }
+                    }
+                    
+                    if (targetPlayer == null)
+                    {
+                        ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"Player '{targetPlayerName}' not found or not online."), Color.Red, adminPlayer);
+                        break;
+                    }
+                    
+                    var adminPlayerObj = Main.player[adminPlayer];
+                    
+ 
+                    targetPlayer.KillMe(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{targetPlayer.name} was killed by admin {adminPlayerObj.name}")), 9999, 0);
+
+                    // Sync the death to all clients
+                    NetworkText killDeathText = NetworkText.FromLiteral($"{targetPlayer.name} was killed by admin {adminPlayerObj.name}");
+                    NetMessage.SendData(MessageID.PlayerDeathV2, -1, -1, killDeathText, targetPlayer.whoAmI, 0f, 0f, 0f);
+                                    
+                    ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"Killed player {targetPlayer.name}"), Color.Green, adminPlayer);
+                    
+                    Console.WriteLine($"Server: Admin {adminPlayerObj.name} killed player {targetPlayer.name}");
+                    break;
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
+
             }
         }
 
