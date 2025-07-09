@@ -56,7 +56,7 @@ namespace CTG2.Content.Commands
                 caller.Reply($"Invalid team color '{teamColor}'. Valid: red, green, blue, yellow, pink, none.", Color.Red);
                 return;
             }
-            target.GetModPlayer<CTGPlayer>().LockTeam(teamID); //Modplayer instace for CTGPlayer (where noteamswap.cs is)
+            //target.GetModPlayer<CTGPlayer>().LockTeam(teamID); //Modplayer instace for CTGPlayer (where noteamswap.cs is)
             
             var mod1 = ModContent.GetInstance<CTG2>();
             ModPacket packet1 = mod1.GetPacket();

@@ -11,11 +11,11 @@ using Terraria.ModLoader;
 namespace CTG2.Content.ClientSide;
 
 public class PlayerManager : ModPlayer
-{   
-    public enum PlayerState
 {
-    None, ClassSelection, Active, Spectator
-}
+    public enum PlayerState
+    {
+        None, ClassSelection, Active, Spectator
+    }
     public static bool ShowClassUI = false;
     public static bool ShowGameUI = false;
     public static int previousMatchStage = 0;
@@ -47,7 +47,7 @@ public class PlayerManager : ModPlayer
     public void changePlayerState(PlayerState playerState)
     {
         this.playerState = playerState;
-        
+
         // Handle UI changes when state changes
         if (playerState == PlayerState.Active)
         {
@@ -69,7 +69,7 @@ public class PlayerManager : ModPlayer
             classSelectionTimer = -1;
             isGameStartClassSelection = false;
         }
-        
+
         Main.NewText($"PlayerManager: Changed state to {playerState}", Microsoft.Xna.Framework.Color.Purple);
     }
     public static void setPlayerClassSelectionTime(int playerIndex, double val)
@@ -100,8 +100,8 @@ public class PlayerManager : ModPlayer
         // removed switch, using config-based respawn time.
         customRespawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
     }
-    
-    
+
+
     // Set Custom Spawn Points
     public override void OnRespawn()
     {
@@ -111,12 +111,12 @@ public class PlayerManager : ModPlayer
         int redBaseX = CTG2.config.RedBase[0] / 16;
         int redBaseY = CTG2.config.RedBase[1] / 16;
         int spectatorSpawnX = (13332 + 19316) / 32;
-        int spectatorSpawnY =  11000 / 32;
+        int spectatorSpawnY = 11000 / 32;
         if (Player.ghost)
         {
             Player.SpawnX = spectatorSpawnX;
             Player.SpawnY = spectatorSpawnY;
-            return; 
+            return;
         }
         switch (GameInfo.matchStage)
         {
@@ -149,15 +149,16 @@ public class PlayerManager : ModPlayer
 
         }
     }
-    
+
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
-    {   
+    {
+        EnforceTeamLock(); // lock team
         // Update UI state based on player state rather than match stage
         if (this.playerState == PlayerState.ClassSelection)
         {
             ShowClassUI = true;
-            
+
         }
         else if (this.playerState == PlayerState.Active)
         {
@@ -180,10 +181,10 @@ public class PlayerManager : ModPlayer
             ModPacket statusPacket = mod.GetPacket();
             statusPacket.Write((byte)MessageType.ExitClassSelection);
             statusPacket.Write(Player.whoAmI);  // Use Player.whoAmI instead of player
-            statusPacket.Send();   
-            
+            statusPacket.Send();
+
             Main.NewText($"PlayerManager: Sent ExitClassSelection packet for player {Player.whoAmI}", Microsoft.Xna.Framework.Color.Purple);
-            
+
             // Reset timer so this doesn't fire again
             classSelectionTimer = -1;
         }
@@ -192,10 +193,10 @@ public class PlayerManager : ModPlayer
             // DO NOTHING - either timer is not active, or this is a game start class selection handled by server
             if (classSelectionTimer > 0 && isGameStartClassSelection)
             {
-                
+
             }
         }
-        
+
 
         if (awaitingRespawn) //was lowkey angry while coding this will clean up later
         {
@@ -228,7 +229,7 @@ public class PlayerManager : ModPlayer
     {
         changePlayerState(PlayerState.ClassSelection);
         isGameStartClassSelection = gameStarted;
-        
+
         if (!gameStarted)
         {
             classSelectionTimer = 1800;
@@ -240,12 +241,60 @@ public class PlayerManager : ModPlayer
             Main.NewText($"PlayerManager: Started server-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Orange);
         }
     }
-    
+
     public void HandleExitClassSelection()
     {
         changePlayerState(PlayerState.Active);
         classSelectionTimer = -1;
         isGameStartClassSelection = false;
         Main.NewText($"PlayerManager: Exited class selection", Microsoft.Xna.Framework.Color.Green);
+    }
+    public void LockTeam()
+    {
+        var gameManager = ModContent.GetInstance<GameManager>();
+        
+        if (gameManager != null && gameManager.IsGameActive)
+        {
+            int blueTeamId = 3;
+            int redTeamId = 1;
+            
+            if (Player.team != blueTeamId && Player.team != redTeamId)
+            {
+              
+                Player.team = 0;
+                this.team = 0;
+                if (Main.netMode != NetmodeID.SinglePlayer)
+                {
+                    NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, 0);
+                }
+            }
+            else
+            {
+                int currentTeam = Player.team;
+                Player.team = currentTeam;
+                this.team = currentTeam;
+                
+                if (Main.netMode != NetmodeID.SinglePlayer)
+                {
+                    NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, currentTeam);
+                }
+            }
+        }
+        else
+        {
+            Player.team = 0;
+            this.team = 0;
+            
+            if (Main.netMode != NetmodeID.SinglePlayer)
+            {
+                NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, 0);
+            }
+        }
+    }
+
+
+    private void EnforceTeamLock()
+    {
+        LockTeam();
     }
 }

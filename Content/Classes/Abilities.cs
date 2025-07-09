@@ -41,6 +41,8 @@ namespace CTG2.Content
         private int mutantState = 1;
 
 
+
+
         private void SetInventory(CtgClass classData)
         {
             Player.statLifeMax2 = classData.HealthPoints;
@@ -318,15 +320,33 @@ namespace CTG2.Content
 
         private void PsychicPostStatus()
         {
-            if (class8HP != 0)
+
+            if (!Player.HasBuff(196)) 
             {
-                if (Player.HeldItem.type == ItemID.NebulaArcanum && Player.controlUseItem && Player.itemAnimation == 30) class8HP = (class8HP <= 20) ? 0 : class8HP - 20;
-
-                if (Player.statLife < class8HP) class8HP = Player.statLife;
-                Player.statLife = class8HP;
+                if (class8HP != 0)
+                {
+                    Player.statLife = Player.statLifeMax2;
+                    NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+                }
+                class8HP = 0;
+                return;
             }
+            
+            int previousHP = Player.statLife;
 
-            if (Player.statLife <= 0) Player.KillMe(PlayerDeathReason.ByCustomReason(""), 1, 0);
+            if (Player.HeldItem.type == ItemID.NebulaArcanum && Player.controlUseItem && Player.itemAnimation == 30)
+            {
+                class8HP = Math.Max(0, class8HP - 20);
+            }
+ 
+            if (Player.statLife < class8HP) class8HP = Player.statLife;
+            Player.statLife = class8HP;
+          
+            if (Player.statLife != previousHP)
+            {
+                NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            }
+            
         }
 
 
@@ -401,7 +421,7 @@ namespace CTG2.Content
 
         private void ClownPostStatus()
         {
-                if (modPlayer.clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
+                if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
                 return; 
                 
             if (class12SwapTimer != -1) class12SwapTimer--;
@@ -409,13 +429,13 @@ namespace CTG2.Content
             if (class12SwapTimer == 0)
             {
                 foreach (Player other in Main.player)
-                {  
+                {
                     if (!other.active || other.dead || other.whoAmI == Player.whoAmI || other.ghost)
                         continue;
 
                     if (Vector2.Distance(Player.Center, other.Center) <= 22 * 16 && Vector2.Distance(Player.Center, other.Center) < class12ClosestDist && Player.team != other.team) // 22 block radius
                     {
-                        class12ClosestDist = (int) Vector2.Distance(Player.Center, other.Center);
+                        class12ClosestDist = (int)Vector2.Distance(Player.Center, other.Center);
                         class12ClosestPlayer = other;
                     }
                 }
@@ -426,7 +446,7 @@ namespace CTG2.Content
                     Vector2 tempPosition2 = class12ClosestPlayer.position;
 
                     var mod = ModContent.GetInstance<CTG2>();
-                    
+
                     //class12ClosestPlayer.Teleport(tempPosition);
                     ModPacket packet1 = mod.GetPacket();
                     packet1.Write((byte)MessageType.RequestTeleport);
@@ -443,13 +463,13 @@ namespace CTG2.Content
                     packet2.Send();
 
                     Main.NewText("Successfully swapped!");
-                    modPlayer.clownSwapCaller = -1; //reset the caller after the logic is done
+                    Player.GetModPlayer<ClassSystem>().clownSwapCaller = -1; //reset the caller after the logic is done
                 }
                 else
                 {
                     Main.NewText("Swap was unsuccessful!");
                 }
-                
+
                 class12ClosestDist = 99999;
                 class12ClosestPlayer = null;
             }
