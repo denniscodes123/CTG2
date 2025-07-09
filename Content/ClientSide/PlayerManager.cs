@@ -218,6 +218,29 @@ public class PlayerManager : ModPlayer
 
     }
 
+    //Below is code to make ghost not get hit 
+    public override bool ImmuneTo(PlayerDeathReason damageSource, int cooldownCounter, bool dodgeable) //Try to intercept damage before its done
+    {
+        if (Player.ghost)
+        {
+            return true;
+        }
+    
+        return false;
+    }
+    
+    
+    public override void OnHurt(Player.HurtInfo info) //Fallback in case immuneto doesnt work
+    {
+        if (Player.ghost)
+        {
+            info.Damage = 0;
+            info.Knockback = 0f;
+            info.HitDirection = 0;
+            info.DamageSource = default; 
+        }
+    } 
+
     // When a player disconnects, this hook can clean up their data.
     public override void PlayerDisconnect()
     {
