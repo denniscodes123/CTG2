@@ -64,7 +64,7 @@ public class GameTeam
             
             int tpX = (int)ClassLocation.X;
             int tpY = (int)ClassLocation.Y;
-            
+            CTG2.WebPlayer(ply.whoAmI,60);
             ModPacket packet2 = mod.GetPacket();
             packet2.Write((byte)MessageType.ServerTeleport);
             packet2.Write(ply.whoAmI);
@@ -77,6 +77,7 @@ public class GameTeam
 
     public void SendToBase()
     {   
+        // all this does now is handle spawn
         var mod = ModContent.GetInstance<CTG2>();
         var manager = ModContent.GetInstance<GameManager>();
         

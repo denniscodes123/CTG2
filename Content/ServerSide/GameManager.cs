@@ -162,6 +162,9 @@ public class GameManager : ModSystem
             }
 
             // Teleport all players to spectator area
+            // web first
+            CTG2.WebPlayer(player.whoAmI,60);
+
             ModPacket teleportPacket = mod.GetPacket();
             teleportPacket.Write((byte)MessageType.ServerTeleport);
             teleportPacket.Write(player.whoAmI);
@@ -394,6 +397,8 @@ public class GameManager : ModSystem
             playerSpectatorStatus[playerIndex] = true;
 
             // Send teleport packet to client
+            CTG2.WebPlayer(player.whoAmI,60);
+
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerTeleport);
@@ -495,7 +500,7 @@ public class GameManager : ModSystem
         statePacket.Write((byte)PlayerManager.PlayerState.ClassSelection);
         statePacket.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
-        
+        CTG2.WebPlayer(player.whoAmI,60);
         ModPacket packet = mod2.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
@@ -530,8 +535,9 @@ public class GameManager : ModSystem
         statePacket.Send(toClient: playerIndex);
       
         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
-        
+
         // Send teleport packet to client
+        CTG2.WebPlayer(player.whoAmI,60);
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);

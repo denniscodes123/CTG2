@@ -50,13 +50,14 @@ namespace CTG2
         RequestTeamChat = 27,
         RequestDie = 28,
         RequestKill = 29,
+        RequestWeb = 30,
 
                     
                 
     }
-    
+
     public class CTG2 : Mod
-    {   
+    {
         public static int requestedNpcIndex = 0;
         public static Random randomGenerator = new Random();
         public static ClientConfig config = new ClientConfig();
@@ -67,7 +68,7 @@ namespace CTG2
             {
                 1 => "RED",
                 2 => "GREEN",
-                3 => "BLUE", 
+                3 => "BLUE",
                 4 => "YELLOW",
                 5 => "PINK",
                 _ => $"TEAM {teamId}"
@@ -108,10 +109,10 @@ namespace CTG2
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
-        {   
+        {
             // GameManager
             var manager = ModContent.GetInstance<GameManager>();
-            
+
             byte msgType = reader.ReadByte();
             switch (msgType)
             {
@@ -395,7 +396,7 @@ namespace CTG2
                 case (byte)MessageType.RequestTeamChat:
                     int playerWhoTalked = reader.ReadInt32();
                     string teamMessage = reader.ReadString();
-                    
+
                     // Get the player who sent the message
                     var senderPlayer = Main.player[playerWhoTalked];
                     if (!senderPlayer.active)
@@ -403,21 +404,21 @@ namespace CTG2
                         Console.WriteLine($"Invalid player {playerWhoTalked} tried to send team chat");
                         break;
                     }
-                    
+
                     int senderTeam = senderPlayer.team;
-                    
+
                     // Check if player is on a team
                     if (senderTeam == 0)
                     {
                         ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral("You are not on a team!"), Color.Red, playerWhoTalked);
                         break;
                     }
-                    
+
                     // Get team name and color
                     string teamName = GetTeamName(senderTeam);
                     Color teamColor = GetTeamColor(senderTeam);
-                    
-            
+
+
                     string formattedMessage = $"[{teamName}] {senderPlayer.name}: {teamMessage}";
 
                     int messagesSent = 0;
@@ -429,12 +430,12 @@ namespace CTG2
                             messagesSent++;
                         }
                     }
-                    
+
                     Console.WriteLine($"Server: Sent team chat from {senderPlayer.name} to {messagesSent} players on {teamName} team");
                     break;
                 case (byte)MessageType.RequestDie:
                     int playerWhoDies = reader.ReadInt32();
-                    
+
                     // Get the player who wants to die
                     var dyingPlayer = Main.player[playerWhoDies];
                     if (!dyingPlayer.active)
@@ -442,7 +443,7 @@ namespace CTG2
                         Console.WriteLine($"Invalid player {playerWhoDies} tried to die");
                         break;
                     }
-                    
+
 
                     dyingPlayer.KillMe(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{dyingPlayer.name} committed suicide")), 9999, 0);
 
@@ -455,7 +456,7 @@ namespace CTG2
                 case (byte)MessageType.RequestKill:
                     int adminPlayer = reader.ReadInt32();
                     string targetPlayerName = reader.ReadString();
-                    
+
                     // Find the target player by name
                     Player targetPlayer = null;
                     foreach (Player p in Main.player)
@@ -466,25 +467,43 @@ namespace CTG2
                             break;
                         }
                     }
-                    
+
                     if (targetPlayer == null)
                     {
                         ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"Player '{targetPlayerName}' not found or not online."), Color.Red, adminPlayer);
                         break;
                     }
-                    
+
                     var adminPlayerObj = Main.player[adminPlayer];
-                    
- 
+
+
                     targetPlayer.KillMe(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{targetPlayer.name} was killed by admin {adminPlayerObj.name}")), 9999, 0);
 
                     // Sync the death to all clients
                     NetworkText killDeathText = NetworkText.FromLiteral($"{targetPlayer.name} was killed by admin {adminPlayerObj.name}");
                     NetMessage.SendData(MessageID.PlayerDeathV2, -1, -1, killDeathText, targetPlayer.whoAmI, 0f, 0f, 0f);
-                                    
+
                     ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral($"Killed player {targetPlayer.name}"), Color.Green, adminPlayer);
-                    
+
                     Console.WriteLine($"Server: Admin {adminPlayerObj.name} killed player {targetPlayer.name}");
+                    break;
+                case (byte)MessageType.RequestWeb:
+                    int webPlayerIndex = reader.ReadInt32();
+                    int webTimeInTicks = reader.ReadInt32();
+
+                    // Get the player to web
+                    var playerToWeb = Main.player[webPlayerIndex];
+                    if (!playerToWeb.active)
+                    {
+                        Console.WriteLine($"Invalid player {webPlayerIndex} tried to be webbed");
+                        break;
+                    }
+
+                
+                    playerToWeb.AddBuff(BuffID.Webbed, webTimeInTicks);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, webPlayerIndex, BuffID.Webbed, webTimeInTicks);
+
+                    Console.WriteLine($"Server: Webbed player {playerToWeb.name} for {webTimeInTicks / 60} seconds");
                     break;
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
@@ -512,13 +531,23 @@ namespace CTG2
             packet.Write(playerIndex);
             packet.Send();
         }
-        
+
         public static void SendExitSpectatorRequest(int playerIndex)
         {
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.RequestExitSpectator);
             packet.Write(playerIndex);
+            packet.Send();
+        }
+
+        public static void WebPlayer(int playerIndex, int timeIntTicks)
+        {
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestWeb);
+            packet.Write(playerIndex);
+            packet.Write(timeIntTicks);
             packet.Send();
         }
     }
