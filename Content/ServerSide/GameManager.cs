@@ -437,8 +437,8 @@ public class GameManager : ModSystem
         ModPacket packet = mod2.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
-        packet.Write((int)gameTeam.BaseLocation.X);
-        packet.Write((int)gameTeam.BaseLocation.Y);
+        packet.Write((int)gameTeam.ClassLocation.X);
+        packet.Write((int)gameTeam.ClassLocation.Y);
         packet.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
         
