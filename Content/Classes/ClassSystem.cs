@@ -57,6 +57,194 @@ namespace ClassesNamespace
         public List<ItemData> InventoryItems { get; set; }
     }
 
+    // public class ClassPlayer : ModPlayer
+    // {
+    //     public ClassConfig currentClass = new ClassConfig();
+    //     public UpgradeConfig currentUpgrade = new UpgradeConfig();
+    //     private string lastPlayerClass = "";
+    //     private string lastUpgrade = "";
+
+    //     // Bonus stats from upgrades only
+    //     private int bonusHP = 0;
+    //     private int bonusRegen = 0;
+    //     private int bonusDef = 0;
+    //     private float bonusMoveSpeed = 0;
+    //     public int clownSwapCaller = -1;
+    //     public override void OnEnterWorld()
+    //     {
+    //         base.OnEnterWorld(); // game does base health automatically 
+    //         for (int i = 0; i < Player.inventory.Length; i++)
+    //             Player.inventory[i] = new Item();
+
+    //         for (int i = 0; i < Player.armor.Length; i++)
+    //             Player.armor[i] = new Item();
+
+    //         for (int i = 0; i < Player.miscEquips.Length; i++)
+    //             Player.miscEquips[i] = new Item();
+
+    //         for (int i = 0; i < Player.dye.Length; i++)
+    //             Player.dye[i] = new Item();
+
+    //         for (int i = 0; i < Player.miscDyes.Length; i++)
+    //             Player.miscDyes[i] = new Item();
+
+    //         Player.trashItem = new Item();
+
+    //         // Reset class tracking so ResetEffects will load the class
+    //         lastPlayerClass = "";
+    //         lastUpgrade = "";
+
+    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+    //     }
+    //     public void SetClass(ClassConfig classConfig)
+    //     {
+    //         currentClass = classConfig;
+    //         currentUpgrade = classConfig.Upgrades.FirstOrDefault() ?? new UpgradeConfig();
+
+    //         // Force immediate class change by clearing last class
+    //         lastPlayerClass = "";
+    //         lastUpgrade = "";
+
+    //         // Immediately load the class if we're in a match
+    //         if (GameInfo.matchStage != 0)
+    //         {
+    //             LoadAndApplyClass(classConfig.Inventory);
+    //             // ApplyUpgrade(currentUpgrade);
+    //             lastPlayerClass = classConfig.Inventory;
+    //             // lastUpgrade = currentUpgrade.Name;
+    //         }
+
+    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+    //     }
+    //     public override void ResetEffects()
+    //     {
+    //         // this goes off FIRST every tick before PreUpdate 
+
+    //         Player.statLifeMax2 += bonusHP;
+    //         Player.lifeRegen += bonusRegen;
+    //         Player.moveSpeed += bonusMoveSpeed;
+    //         Player.statDefense += bonusDef;
+
+    //         // Apply permanent buffs
+    //         Player.AddBuff(BuffID.Shine, 54000);
+    //         Player.AddBuff(BuffID.NightOwl, 54000);
+    //         Player.AddBuff(BuffID.Builder, 54000);
+
+    //         // Apply class buffs if available
+    //         try
+    //         {
+    //             if (currentClass?.Buffs != null && !Main.dedServ)
+    //                 ApplyPermBuffs(currentClass.Buffs);
+    //         }
+    //         catch
+    //         {
+    //             Console.WriteLine("Failed to apply permanent buffs.");
+    //         }
+    //     }
+    //     private void ApplyPermBuffs(List<int> buffs)
+    //     {
+    //         foreach (int id in buffs)
+    //             Player.AddBuff(id, 54000);
+    //     }
+    //     private void LoadAndApplyClass(string className)
+    //     {
+    //         // Load JSON and call SetInventory
+    //         using (var stream = Mod.GetFileStream($"Content/Classes/{className}.json"))
+    //         using (var reader = new StreamReader(stream))
+    //         {
+    //             var json = reader.ReadToEnd();
+    //             var classData = JsonSerializer.Deserialize<CtgClass>(json);
+    //             SetInventory(classData);
+    //         }
+    //     }
+    //     private void SetInventory(CtgClass classData)
+    //     {
+    //         Player.statLifeMax2 = classData.HealthPoints;
+    //         Player.statManaMax2 = classData.ManaPoints;
+    //         Player.statMana = classData.ManaPoints;
+
+
+    //         List<ItemData> classItems = classData.InventoryItems;
+
+    //         for (int b = 0; b < Player.inventory.Length; b++)
+    //         {
+    //             var itemData = classItems[b];
+    //             Item newItem = new Item();
+    //             newItem.SetDefaults(itemData.Type);
+    //             newItem.stack = itemData.Stack;
+    //             newItem.Prefix(itemData.Prefix);
+
+    //             Player.inventory[b] = newItem;
+    //         }
+
+    //         for (int c = 0; c < Player.armor.Length; c++)
+    //         {
+    //             var itemData = classItems[Player.inventory.Length + c];
+    //             Item newItem = new Item();
+    //             newItem.SetDefaults(itemData.Type);
+    //             newItem.stack = itemData.Stack;
+    //             newItem.Prefix(itemData.Prefix);
+
+    //             Player.armor[c] = newItem;
+    //         }
+
+    //         for (int d = 0; d < Player.miscEquips.Length; d++)
+    //         {
+    //             var itemData = classItems[Player.inventory.Length + Player.armor.Length + d];
+    //             Item newItem = new Item();
+    //             newItem.SetDefaults(itemData.Type);
+    //             newItem.stack = itemData.Stack;
+    //             newItem.Prefix(itemData.Prefix);
+
+    //             Player.miscEquips[d] = newItem;
+    //         }
+
+    //         for (int e = 0; e < Player.miscDyes.Length; e++)
+    //         {
+    //             var itemData = classItems[Player.inventory.Length + Player.armor.Length + Player.miscEquips.Length + e];
+    //             Item newItem = new Item();
+    //             newItem.SetDefaults(itemData.Type);
+    //             newItem.stack = itemData.Stack;
+    //             newItem.Prefix(itemData.Prefix);
+
+    //             Player.miscDyes[e] = newItem;
+    //         }
+    //         /*this may not work lol
+    //         */
+    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+    //     }
+    //     public override void PostUpdate()
+    //     {
+    //         //handle dyes
+    //         if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
+    //             return;
+    //         //this is where dyes are set and forced on 
+    //         int redDyeType = 1031;
+    //         int blueDyeType = 1035;
+
+    //         if (Main.netMode == NetmodeID.Server)
+    //             return;
+
+    //         if (Player.team != 0)
+    //         {
+    //             int dyeID = Player.team switch
+
+    //             {
+    //                 1 => redDyeType,
+    //                 3 => blueDyeType,
+    //                 _ => 0
+    //             };
+    //             for (int i = 0; i <= 9; i++) //i<=3 just sets the armor for not can switch to i<=9 for all accessory slots later
+    //             {
+    //                 if (Player.dye[i] == null || Player.dye[i].type != dyeID)
+    //                 {
+    //                     Player.dye[i] = dyeID == 0 ? new Item() : new Item(dyeID);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
 
     public class ClassSystem : ModPlayer
     {

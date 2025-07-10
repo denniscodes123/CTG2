@@ -42,9 +42,6 @@ public class GameManager : ModSystem
     // New game delay tracking
     private bool isWaitingForNewGame = false;
     private int newGameTimer = 0;
-    private int blueGemFireworkTimer = 0;
-    private int redGemFireworkTimer = 0;
-    private const int FIREWORK_INTERVAL = 240;
     
     public override void OnWorldLoad()
     {
@@ -55,13 +52,13 @@ public class GameManager : ModSystem
 
         BlueTeam = new GameTeam(new Vector2(CTG2.config.BlueSelect[0], CTG2.config.BlueSelect[1]), new Vector2(CTG2.config.BlueBase[0], CTG2.config.BlueBase[1]), 3);
         RedTeam = new GameTeam(new Vector2(CTG2.config.RedSelect[0], CTG2.config.RedSelect[1]), new Vector2(CTG2.config.RedBase[0], CTG2.config.RedBase[1]), 1);
-
+        
         intToTeam = new Dictionary<int, GameTeam>
         {
             { 3, BlueTeam },
             { 1, RedTeam }
         };
-
+        
         // map paste takes Tile coords. spawn point takes pixel coords.
         Map = new GameMap(CTG2.config.MapPaste[0], CTG2.config.MapPaste[1]);
 
@@ -162,9 +159,6 @@ public class GameManager : ModSystem
             }
 
             // Teleport all players to spectator area
-            // web first
-            CTG2.WebPlayer(player.whoAmI,60);
-
             ModPacket teleportPacket = mod.GetPacket();
             teleportPacket.Write((byte)MessageType.ServerTeleport);
             teleportPacket.Write(player.whoAmI);
@@ -210,6 +204,7 @@ public class GameManager : ModSystem
     // Runs every frame while game running. Runs all gem checks, draws timer and gem status.
     public void UpdateGame()
     {
+        // TODO: Check if each player has completed class selection (no == class select, yes == send to match)
         
         // force set team/pvp
         BlueTeam.EnforceTeam();
@@ -232,66 +227,6 @@ public class GameManager : ModSystem
             // Updates holding/capturing status of both gems.
             BlueGem.Update(RedGem, RedTeam.Players);
             RedGem.Update(BlueGem, BlueTeam.Players);
-
-            // fire works test?
-    
-            if (BlueGem.IsHeld)
-            {
-                blueGemFireworkTimer++;
-                if (blueGemFireworkTimer >= FIREWORK_INTERVAL)
-                {
-                    blueGemFireworkTimer = 0;
-                    var holder = Main.player[BlueGem.HeldBy];
-
-                    int projectileIndex = Projectile.NewProjectile(
-                        Entity.GetSource_NaturalSpawn(),
-                        holder.Center,
-                        new Vector2(0f, -8f),
-                        ProjectileID.RocketFireworkBlue,
-                        0,
-                        0f,
-                        Main.myPlayer
-                    );
-
-                    if (projectileIndex >= 0 && projectileIndex < Main.maxProjectiles)
-                    {
-                        NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, projectileIndex);
-                    }
-                }
-            }
-            else
-            {
-                blueGemFireworkTimer = 0;
-            }
-            
-            if (RedGem.IsHeld)
-            {
-                redGemFireworkTimer++;
-                if (redGemFireworkTimer >= FIREWORK_INTERVAL)
-                {
-                    redGemFireworkTimer = 0;
-                    var holder = Main.player[RedGem.HeldBy];
-
-                    int projectileIndex = Projectile.NewProjectile(
-                        Entity.GetSource_NaturalSpawn(), 
-                        holder.Center,
-                        new Vector2(0f, -8f), 
-                        ProjectileID.RocketFireworkRed,
-                        0, 
-                        0f, 
-                        Main.myPlayer 
-                    );
-                    
-                    if (projectileIndex >= 0 && projectileIndex < Main.maxProjectiles)
-                    {
-                        NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, projectileIndex);
-                    }
-                }
-            }
-            else
-            {
-                redGemFireworkTimer = 0; // Reset 
-            }
         }
 
         // Send updated GameInfo to clients every 6 ticks (every 0.1s)
@@ -397,8 +332,6 @@ public class GameManager : ModSystem
             playerSpectatorStatus[playerIndex] = true;
 
             // Send teleport packet to client
-            CTG2.WebPlayer(player.whoAmI,60);
-
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerTeleport);
@@ -500,12 +433,12 @@ public class GameManager : ModSystem
         statePacket.Write((byte)PlayerManager.PlayerState.ClassSelection);
         statePacket.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
-        CTG2.WebPlayer(player.whoAmI,60);
+        
         ModPacket packet = mod2.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
-        packet.Write((int)gameTeam.ClassLocation.X);
-        packet.Write((int)gameTeam.ClassLocation.Y);
+        packet.Write((int)gameTeam.BaseLocation.X);
+        packet.Write((int)gameTeam.BaseLocation.Y);
         packet.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
         
@@ -533,11 +466,8 @@ public class GameManager : ModSystem
         statePacket.Write(playerIndex);
         statePacket.Write((byte)PlayerManager.PlayerState.Active);
         statePacket.Send(toClient: playerIndex);
-      
-        NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
-
+        
         // Send teleport packet to client
-        CTG2.WebPlayer(player.whoAmI,60);
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);

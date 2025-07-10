@@ -42,7 +42,8 @@ public class UIManager : ModSystem
         int index = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Resource Bars"));
         if (index != -1)
         {
-            if (PlayerManager.ShowClassUI)
+            var modPlayer = Main.LocalPlayer.GetModPlayer<PlayerManager>();
+            if (modPlayer.ShowClassUI)
             {
                 layers.Insert(index, new LegacyGameInterfaceLayer(
                     "CTG2: Class Selection UI",

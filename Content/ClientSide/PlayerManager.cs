@@ -21,6 +21,8 @@ public class PlayerManager : ModPlayer
     public static int previousMatchStage = 0;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
+
+    // THIS NEEDS TO BE PUT IN CLASS PLAYER 
     public ClassConfig currentClass = new ClassConfig();
     public UpgradeConfig currentUpgrade = new UpgradeConfig();
 
@@ -281,32 +283,17 @@ public class PlayerManager : ModPlayer
     public void LockTeam()
     {
         var gameManager = ModContent.GetInstance<GameManager>();
-        
+
         if (gameManager != null && gameManager.IsGameActive)
         {
-            int blueTeamId = 3;
-            int redTeamId = 1;
-            int oldteam = Player.team;
-            
-            if (Player.team != blueTeamId && Player.team != redTeamId)
+            int properTeam = team; // this is the team stored in the PlayerManager instance (it is the correct team)
+            //int oldteam = Player.team;
+            if (Player.team != properTeam)
             {
-
-                Player.team = 0;
-                this.team = 0;
+                Player.team = properTeam;
                 if (Main.netMode != NetmodeID.SinglePlayer)
                 {
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, 0);
-                }
-            }
-            else if((GameInfo.matchStage == 2 || GameInfo.matchStage == 1) && !Player.ghost)
-            {
-                int currentTeam = Player.team;
-                Player.team = currentTeam;
-                this.team = currentTeam;
-
-                if (Main.netMode != NetmodeID.SinglePlayer)
-                {
-                    NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, currentTeam);
                 }
             }
         }
