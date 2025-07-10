@@ -156,13 +156,19 @@ public class PlayerManager : ModPlayer
         EnforceTeamLock(); // lock team
         // wecan probably delete (state transitions handle all of this)
         if (this.playerState == PlayerState.ClassSelection)
-        {
+        { 
             ShowClassUI = true;
-
+            if (!Player.hostile) //this is client side only btw should be fine but might need to be synced later
+            {
+                Player.hostile = true;
+            }
         }
         else if (this.playerState == PlayerState.Active)
         {
             ShowClassUI = false;
+            if (!Player.hostile) {
+                Player.hostile = true;
+            }
         }
         else
         {
