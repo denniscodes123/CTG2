@@ -280,10 +280,11 @@ public class PlayerManager : ModPlayer
         {
             int blueTeamId = 3;
             int redTeamId = 1;
+            int oldteam = Player.team;
             
             if (Player.team != blueTeamId && Player.team != redTeamId)
             {
-              
+
                 Player.team = 0;
                 this.team = 0;
                 if (Main.netMode != NetmodeID.SinglePlayer)
@@ -291,29 +292,20 @@ public class PlayerManager : ModPlayer
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, 0);
                 }
             }
-            else
+            else if((GameInfo.matchStage == 2 || GameInfo.matchStage == 1) && !Player.ghost)
             {
                 int currentTeam = Player.team;
                 Player.team = currentTeam;
                 this.team = currentTeam;
-                
+
                 if (Main.netMode != NetmodeID.SinglePlayer)
                 {
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, currentTeam);
                 }
             }
         }
-        else
-        {
-            Player.team = 0;
-            this.team = 0;
-            
-            if (Main.netMode != NetmodeID.SinglePlayer)
-            {
-                NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, 0);
-            }
-        }
     }
+
 
 
     private void EnforceTeamLock()
