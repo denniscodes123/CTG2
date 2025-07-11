@@ -317,13 +317,11 @@ namespace ClassesNamespace
             int redDyeType = 1031;
             int blueDyeType = 1035;
 
-            if (Main.netMode == NetmodeID.Server)
-                return;
-
-            if (playerClass != GameClass.None)
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            // Check if player has a class selected and is on a team
+            if (playerManager.currentClass != null && !string.IsNullOrEmpty(playerManager.currentClass.Name) && Player.team != 0)
             {
                 int dyeID = Player.team switch
-
                 {
                     1 => redDyeType,
                     3 => blueDyeType,
