@@ -4,8 +4,10 @@ using System.Text.Json;
 using ClassesNamespace;
 using CTG2.Content.ServerSide;
 using Terraria;
+using Terraria.Chat;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace CTG2.Content.ClientSide;
@@ -23,8 +25,8 @@ public class PlayerManager : ModPlayer
     public bool awaitingRespawn = false;
 
     // THIS NEEDS TO BE PUT IN CLASS PLAYER 
-    public ClassConfig currentClass = new ClassConfig();
-    public UpgradeConfig currentUpgrade = new UpgradeConfig();
+    // public ClassConfig currentClass = new ClassConfig();
+    // public UpgradeConfig currentUpgrade = new UpgradeConfig();
 
     public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;
@@ -82,26 +84,19 @@ public class PlayerManager : ModPlayer
     }
     // =========================== OVERRIDE METHODS ====================================
     // Set Custom Respawn Times
-    public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
-    {
-        var modPlayer = Player.GetModPlayer<ClassSystem>();
+    // public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+    // {
+    //     var classPlayer = Player.GetModPlayer<ClassPlayer>();
 
-        if (GameInfo.matchStage == 2)
-        {
-            awaitingRespawn = true;
-            Player.ghost = true;
-            Player.dead = true;
-        }
+    //     // How much time has passed since match started
+    //     int timeElapsed = GameInfo.matchTime / 60 - 30;
+    //     int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
 
-        // How much time has passed since match started
-        int timeElapsed = GameInfo.matchTime / 60 - 30;
-        int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
+    //     Player.respawnTimer = 0;
 
-        Player.respawnTimer = 0;
-
-        // removed switch, using config-based respawn time.
-        customRespawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
-    }
+    //     // removed switch, using config-based respawn time.
+    //     customRespawnTimer = (classPlayer.currentClass.RespawnTime + extraSeconds) * 60;
+    // }
 
 
     // Set Custom Spawn Points
@@ -155,6 +150,19 @@ public class PlayerManager : ModPlayer
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
     {
+            if (Main.GameUpdateCount % 180 == 0)
+    {
+        var classPlayer = Player.GetModPlayer<ClassPlayer>();
+        string serverOrClient = Main.netMode == NetmodeID.Server ? "SERVER" : "CLIENT";
+        
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(
+            $"[{serverOrClient}] P{Player.whoAmI} HP: {Player.statLife}/{Player.statLifeMax2} (base:{Player.statLifeMax}) dead:{Player.dead}"
+        ), Microsoft.Xna.Framework.Color.Yellow);
+        
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(
+            $"[{serverOrClient}] P{Player.whoAmI} Class: {classPlayer.currentClass?.Name ?? "null"}"
+        ), Microsoft.Xna.Framework.Color.Orange);
+    }
         EnforceTeamLock(); // lock team
         // wecan probably delete (state transitions handle all of this)
         if (this.playerState == PlayerState.ClassSelection)
@@ -206,21 +214,21 @@ public class PlayerManager : ModPlayer
         }
 
 
-        if (awaitingRespawn) //was lowkey angry while coding this will clean up later
-        {
-            customRespawnTimer--;
+        // if (awaitingRespawn) //was lowkey angry while coding this will clean up later
+        // {
+        //     customRespawnTimer--;
 
-            if (customRespawnTimer <= 0)
-            {
-                awaitingRespawn = false;
+        //     if (customRespawnTimer <= 0)
+        //     {
+        //         awaitingRespawn = false;
 
-                Player.ghost = false;
-                Player.dead = true;
+        //         Player.ghost = false;
+        //         Player.dead = true;
 
-                Player.statLife = Player.statLifeMax2;
-                Player.HealEffect(Player.statLifeMax2);
-            }
-        }
+        //         Player.statLife = Player.statLifeMax2;
+        //         Player.HealEffect(Player.statLifeMax2);
+        //     }
+        // }
 
 
 

@@ -9,8 +9,12 @@ using System.Linq;
 using ClassesNamespace;
 using CTG2.Content.ClientSide;
 using Terraria.GameContent;
+using Terraria.Chat;
+using Terraria.Localization;
 
-public class ClassUI : UIState
+namespace CTG2
+{
+    public class ClassUI : UIState
 {
     private UIPanel _mainPanel;
     private UIList _classList;
@@ -160,7 +164,7 @@ public class ClassUI : UIState
     private void PopulateClasses()
     {
         _classList.Clear();
-        foreach (var cls in CTG2.CTG2.config.Classes)
+        foreach (var cls in CTG2.config.Classes)
         {   
             var btn = new UITextPanel<string>(cls.Name) {
                 Width  = { Percent = 1f },
@@ -212,16 +216,25 @@ public class ClassUI : UIState
 
     private void SelectClass(ClassConfig cfg)
     {
-        var playerManager = Main.LocalPlayer.GetModPlayer<PlayerManager>();
-        playerManager.currentClass = cfg;
-        playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
+        // var playerManager = Main.LocalPlayer.GetModPlayer<PlayerManager>();
+        // playerManager.currentClass = cfg;
+        // playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
 
         // ultimately use this 
-        // var classPlayer = Main.LocalPlayer.GetModPlayer<ClassPlayer>();
-        // classPlayer.currentClass = cfg;
-        // classPlayer.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
-        // classPlayer.setClass(cfg)
+        
+        var classPlayer = Main.LocalPlayer.GetModPlayer<ClassPlayer>();
+        classPlayer.currentClass = cfg;
+        classPlayer.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
+        classPlayer.SetClass(cfg);
         selectedClass = cfg;
+
+
+        var mod = ModContent.GetInstance<CTG2>();
+        ModPacket packet = mod.GetPacket();
+        packet.Write((byte)MessageType.SelectClass);
+        packet.Write(Main.LocalPlayer.whoAmI);
+        packet.Write(cfg.Name);
+        packet.Send();
 
         _classNameText.SetText(cfg.Name);
         _classSummaryText.SetText(cfg.Summary);
@@ -270,9 +283,10 @@ public class ClassUI : UIState
                     }
                 }
                 btn.BackgroundColor = selected;
-                playerManager.currentUpgrade = up;
+                //playerManager.currentUpgrade = up; UPGRADES ARE NOT DONE 
             };
             _upgradeList.Add(btn);
         }
     }
+}
 }

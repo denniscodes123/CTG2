@@ -207,8 +207,8 @@ public class GameManager : ModSystem
         // TODO: Check if each player has completed class selection (no == class select, yes == send to match)
         
         // force set team/pvp
-        BlueTeam.EnforceTeam();
-        RedTeam.EnforceTeam();
+        // BlueTeam.EnforceTeam();
+        // RedTeam.EnforceTeam();
         
         if (MatchTime == 1800)
         {

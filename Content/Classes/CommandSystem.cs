@@ -31,11 +31,11 @@ public class ClassCommand : ModCommand
         }
 
         Player player = caller.Player;
-        var modPlayer = player.GetModPlayer<ClassSystem>();
+        var modPlayer = player.GetModPlayer<ClassPlayer>();
 
         GameClass classPick = (GameClass)classType;
         
-        caller.Reply($"You selected {classPick.ToString()}.", Color.Green);
-        modPlayer.playerClass = classPick;
+        caller.Reply($"You selected {classPick.ToString()} but nothing happens since its not implemented GG.", Color.Green);
+       
     }
 }

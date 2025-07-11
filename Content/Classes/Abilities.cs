@@ -411,7 +411,7 @@ namespace CTG2.Content
         {
             Player.AddBuff(320, 60);
 
-            Player.GetModPlayer<ClassSystem>().clownSwapCaller = Player.whoAmI; //Gives this reference to clownpoststatus
+            Player.GetModPlayer<ClassPlayer>().clownSwapCaller = Player.whoAmI; //Gives this reference to clownpoststatus
             
             class12SwapTimer = 60;
 
@@ -421,7 +421,7 @@ namespace CTG2.Content
 
         private void ClownPostStatus()
         {
-                if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
+                if (Player.GetModPlayer<ClassPlayer>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
                 return; 
                 
             if (class12SwapTimer != -1) class12SwapTimer--;
@@ -463,7 +463,7 @@ namespace CTG2.Content
                     packet2.Send();
 
                     Main.NewText("Successfully swapped!");
-                    Player.GetModPlayer<ClassSystem>().clownSwapCaller = -1; //reset the caller after the logic is done
+                    Player.GetModPlayer<ClassPlayer>().clownSwapCaller = -1; //reset the caller after the logic is done
                 }
                 else
                 {
@@ -611,8 +611,8 @@ namespace CTG2.Content
 
             if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && cooldown == 0) // Only activate if not on cooldown
             {
-                var playerManager = Player.GetModPlayer<PlayerManager>();
-                int selectedClass = playerManager.currentClass.AbilityID;
+                var classPlayer = Player.GetModPlayer<ClassPlayer>();
+                int selectedClass = classPlayer.currentClass.AbilityID;
 
                 switch (selectedClass)
                 {
