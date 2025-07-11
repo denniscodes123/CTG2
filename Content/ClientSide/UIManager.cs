@@ -33,8 +33,11 @@ public class UIManager : ModSystem
     
     public override void UpdateUI(GameTime gameTime)
     {
-        // Must call Update every tick
-        classInterface?.Update(gameTime);
+        // Only update the class interface when ShowClassUI is true
+        if (Main.LocalPlayer.GetModPlayer<PlayerManager>().ShowClassUI)
+        {
+            classInterface?.Update(gameTime);
+        }
     }
     
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -42,8 +45,8 @@ public class UIManager : ModSystem
         int index = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Resource Bars"));
         if (index != -1)
         {
-            var modPlayer = Main.LocalPlayer.GetModPlayer<PlayerManager>();
-            if (modPlayer.ShowClassUI)
+            
+            if (Main.LocalPlayer.GetModPlayer<PlayerManager>().ShowClassUI)
             {
                 layers.Insert(index, new LegacyGameInterfaceLayer(
                     "CTG2: Class Selection UI",

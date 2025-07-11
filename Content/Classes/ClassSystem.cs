@@ -12,9 +12,6 @@ using System.Text.Json;
 using System.Runtime.CompilerServices;
 using CTG2;
 using CTG2.Content.ClientSide;
-using Terraria.Localization;
-using Terraria.Chat;
-using Terraria.DataStructures;
 
 
 namespace ClassesNamespace
@@ -60,22 +57,40 @@ namespace ClassesNamespace
         public List<ItemData> InventoryItems { get; set; }
     }
 
-    public class ClassPlayer : ModPlayer
+
+    public class ClassSystem : ModPlayer
     {
-        public ClassConfig currentClass = new ClassConfig();
-        public UpgradeConfig currentUpgrade = new UpgradeConfig();
+        public GameClass playerClass = GameClass.None;
         private string lastPlayerClass = "";
         private string lastUpgrade = "";
-
-        // Bonus stats from upgrades only
         private int bonusHP = 0;
         private int bonusRegen = 0;
         private int bonusDef = 0;
         private float bonusMoveSpeed = 0;
-        public int clownSwapCaller = -1;
+        public int clownSwapCaller = -1; //Gets updated by clownonuse to store who the caller is
+
+        private int currentHP = 100;
+        private int currentMana = 20;
+
+        public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
+        {
+            base.ModifyMaxStats(out health, out mana);
+            if (!Main.dedServ)
+            {
+                health = new StatModifier(0f, 0f, 0f, 0f);
+                health.Flat = currentHP;
+                NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, currentHP, currentHP, currentHP, currentHP);
+            }
+        }
+
         public override void OnEnterWorld()
         {
-            base.OnEnterWorld(); // game does base health automatically 
+            base.OnEnterWorld();
+            Player.statLifeMax = 100;
+            Player.statLifeMax2 = 100;
+
+            //Comment this out if you want this to not clear all inventory onenterwolrd
+            //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
             for (int i = 0; i < Player.inventory.Length; i++)
                 Player.inventory[i] = new Item();
 
@@ -93,82 +108,18 @@ namespace ClassesNamespace
 
             Player.trashItem = new Item();
 
-            // Reset class tracking so ResetEffects will load the class
-            lastPlayerClass = "";
-            lastUpgrade = "";
-
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI); //sync state 
         }
-        public void SetClass(ClassConfig classConfig)
-        {
-            currentClass = classConfig;
-            currentUpgrade = classConfig.Upgrades.FirstOrDefault() ?? new UpgradeConfig();
 
-            // Force immediate class change by clearing last class
-            lastPlayerClass = "";
-            lastUpgrade = "";
-
-            // Immediately load the class if we're in a match
-            if (GameInfo.matchStage != 0)
-            {
-                LoadAndApplyClass(classConfig.Inventory);
-                // ApplyUpgrade(currentUpgrade);
-                lastPlayerClass = classConfig.Inventory;
-                // lastUpgrade = currentUpgrade.Name;
-            }
-
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-        }
-        public override void ResetEffects()
-        {
-            // this goes off FIRST every tick before PreUpdate 
-
-
-
-            // Apply permanent buffs
-            Player.AddBuff(BuffID.Shine, 54000);
-            Player.AddBuff(BuffID.NightOwl, 54000);
-            Player.AddBuff(BuffID.Builder, 54000);
-
-            // Apply class buffs if available
-            try
-            {
-                if (currentClass?.Buffs != null && !Main.dedServ)
-                    ApplyPermBuffs(currentClass.Buffs);
-            }
-            catch
-            {
-                Console.WriteLine("Failed to apply permanent buffs.");
-            }
-        }
-        private void ApplyPermBuffs(List<int> buffs)
-        {
-            foreach (int id in buffs)
-                Player.AddBuff(id, 54000);
-        }
-        private void LoadAndApplyClass(string className)
-        {
-            // Load JSON and call SetInventory
-            using (var stream = Mod.GetFileStream($"Content/Classes/{className}.json"))
-            using (var reader = new StreamReader(stream))
-            {
-                var json = reader.ReadToEnd();
-                var classData = JsonSerializer.Deserialize<CtgClass>(json);
-                SetInventory(classData);
-            }
-        }
         private void SetInventory(CtgClass classData)
         {
-
             Player.statLifeMax2 = classData.HealthPoints;
+            Player.statLife = classData.HealthPoints;
             Player.statManaMax2 = classData.ManaPoints;
             Player.statMana = classData.ManaPoints;
-            Player.statLife = Player.statLifeMax2;
-            Player.dead = false;
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"Here are the player stats {Player.statLife}, {Player.statLifeMax}, {Player.statLifeMax2}, {Player.dead}"), Microsoft.Xna.Framework.Color.Olive);
 
-            Player.Heal(Player.statLifeMax2);
-
+            currentHP = classData.HealthPoints;
+            currentMana = classData.ManaPoints;
 
             List<ItemData> classItems = classData.InventoryItems;
 
@@ -215,28 +166,151 @@ namespace ClassesNamespace
 
                 Player.miscDyes[e] = newItem;
             }
-            Player.trashItem = new Item();
-
-
-            if (Main.netMode == NetmodeID.Server)
-            {
-                NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax2, Player.statMana, Player.statManaMax2);
-                NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-            }
-            else
-            {
-                // On client, request server to sync
-                NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax2, Player.statMana, Player.statManaMax2);
-                NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-            }
-            
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(
-                $"SetInventory: Set player alive - Life:{Player.statLife}/{Player.statLifeMax2}, Dead:{Player.dead}"
-            ), Microsoft.Xna.Framework.Color.Lime);
+            /*this may not work lol
+            */
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
         }
+
+
+        private void SpawnCustomItem(int itemID, int? prefix = null, int? damage = null, int? useTime = null, int? useAnimation = null, float? scale = null, float? knockBack = null, int? shoot = null, float? shootSpeed = null, Color? colorOverride = null)
+        {
+            Item item = new Item();
+            item.SetDefaults(itemID);
+
+            if (prefix.HasValue) item.Prefix(prefix.Value);
+            if (damage.HasValue) item.damage = damage.Value;
+            if (useTime.HasValue) item.useTime = useTime.Value;
+            if (useAnimation.HasValue) item.useAnimation = useAnimation.Value;
+            if (scale.HasValue) item.scale = scale.Value;
+            if (knockBack.HasValue) item.knockBack = knockBack.Value;
+            if (shoot.HasValue) item.shoot = shoot.Value;
+            if (shootSpeed.HasValue) item.shootSpeed = shootSpeed.Value;
+            if (colorOverride.HasValue) item.color = colorOverride.Value;
+
+            Player.QuickSpawnItem(null, item, 1);
+        }
+
+        private void ApplyPermBuffs(List<int> buffs)
+        {
+            foreach (int id in buffs) Player.AddBuff(id, 54000);
+        }
+
+        public void ApplyUpgrade(UpgradeConfig upgrade)
+        {
+            // reset all bonus stats
+            bonusHP = 0;
+            bonusRegen = 0;
+            bonusDef = 0;
+            bonusMoveSpeed = 0;
+
+            switch (upgrade.Id)
+            {
+                case "charge_bow":
+                    Item newItem = new Item();
+                    var itemType = 5549;
+                    newItem.SetDefaults(itemType);
+                    newItem.stack = 1;
+                    newItem.prefix = 0;
+                    Player.inventory[2] = newItem;
+                    break;
+                case "bonus_regen":
+                    bonusRegen += 2 * upgrade.Value;
+                    break;
+                case "bonus_speed":
+                    bonusMoveSpeed += upgrade.Value / 100f;
+                    break;
+                case "bonus_health":
+                    bonusHP += upgrade.Value;
+                    break;
+                case "bonus_def":
+                    bonusDef += upgrade.Value;
+                    break;
+                default:
+                    Main.NewText("upgrade id not found");
+                    break;
+            }
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+        }
+
+        public override void ResetEffects()
+        {
+            // THIS METHOD IS BROKEN NEED TO FIX 
+            Player.AddBuff(BuffID.Shine, 54000);
+            Player.AddBuff(BuffID.NightOwl, 54000);
+            Player.AddBuff(BuffID.Builder, 54000);
+
+            CtgClass classInfo;
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
+            {
+
+                for (int i = 0; i < Player.buffType.Length; i++)
+                {
+                    Player.DelBuff(i);
+                }
+
+
+                string selectedClass = playerManager.currentClass.Inventory;
+                using (var stream = Mod.GetFileStream($"Content/Classes/{selectedClass}.json"))
+                using (var fileReader = new StreamReader(stream))
+                {
+                    var jsonData = fileReader.ReadToEnd();
+                    try
+                    {
+                        classInfo = JsonSerializer.Deserialize<CtgClass>(jsonData);
+                    }
+                    catch
+                    {
+                        Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
+                        return;
+                    }
+                }
+
+                SetInventory(classInfo);
+
+                // Apply First upgrade by default when new class selected
+                ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
+            }
+
+            Player.statLifeMax2 = currentHP;
+            Player.statManaMax2 = currentMana;
+
+            if (playerManager.currentUpgrade.Name != lastUpgrade)
+            {
+                // apply upgrades here
+                ApplyUpgrade(playerManager.currentUpgrade);
+            }
+
+            Player.lifeRegen += bonusRegen;
+            Player.moveSpeed += bonusMoveSpeed;
+            Player.statDefense += bonusDef;
+            Player.statLifeMax2 += bonusHP;
+
+            // Add player buffs here instead (delete switch once config is populated with the required buffs)
+            try
+            {
+                //if (!Main.dedServ) //ApplyPermBuffs(playerManager.currentClass.Buffs);
+            }
+            catch
+            {
+                Console.WriteLine("Failed to apply permanent buffs.");
+            }
+
+            lastPlayerClass = playerManager.currentClass.Inventory;
+            lastUpgrade = playerManager.currentUpgrade.Name;
+
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+        }
+        public override void UpdateEquips()
+        {
+            if (Main.expertMode || Main.masterMode)
+            {
+                Player.extraAccessory = true;
+            }
+        }
+
         public override void PostUpdate()
         {
-            //handle dyes
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
             //this is where dyes are set and forced on 
@@ -246,7 +320,7 @@ namespace ClassesNamespace
             if (Main.netMode == NetmodeID.Server)
                 return;
 
-            if (Player.team != 0)
+            if (playerClass != GameClass.None)
             {
                 int dyeID = Player.team switch
 
@@ -264,308 +338,7 @@ namespace ClassesNamespace
                 }
             }
         }
-        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
-        {
-            // if (GameInfo.matchStage == 2)
-            // {
-            //     // Handle custom respawn time
-            //     int timeElapsed = GameInfo.matchTime / 60 - 30;
-            //     int extraSeconds = Math.Max(0, timeElapsed / 120);
-            //     Player.respawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
-            // }
-        }
 
-        public override void OnRespawn()
-        {
-            // Heal to full HP immediately on respawn
-            Player.statLife = Player.statLifeMax2;
-            Player.statMana = Player.statManaMax2;
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-        }
     }
- }
 
-
-    // public class ClassSystem : ModPlayer
-    // {
-    //     public GameClass playerClass = GameClass.None;
-    //     private string lastPlayerClass = "";
-    //     private string lastUpgrade = "";
-    //     private int bonusHP = 0;
-    //     private int bonusRegen = 0;
-    //     private int bonusDef = 0;
-    //     private float bonusMoveSpeed = 0;
-    //     public int clownSwapCaller = -1; //Gets updated by clownonuse to store who the caller is
-
-    //     private int currentHP = 100;
-    //     private int currentMana = 20;
-
-    //     public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
-    //     {
-    //         base.ModifyMaxStats(out health, out mana);
-    //         if (!Main.dedServ)
-    //         {
-    //             health = new StatModifier(0f, 0f, 0f, 0f);
-    //             health.Flat = currentHP;
-    //             NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, currentHP, currentHP, currentHP, currentHP);
-    //         }
-    //     }
-
-    //     public override void OnEnterWorld()
-    //     {
-    //         base.OnEnterWorld();
-    //         Player.statLifeMax = 100;
-    //         Player.statLifeMax2 = 100;
-
-    //         //Comment this out if you want this to not clear all inventory onenterwolrd
-    //         //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
-    //         for (int i = 0; i < Player.inventory.Length; i++)
-    //             Player.inventory[i] = new Item();
-
-    //         for (int i = 0; i < Player.armor.Length; i++)
-    //             Player.armor[i] = new Item();
-
-    //         for (int i = 0; i < Player.miscEquips.Length; i++)
-    //             Player.miscEquips[i] = new Item();
-
-    //         for (int i = 0; i < Player.dye.Length; i++)
-    //             Player.dye[i] = new Item();
-
-    //         for (int i = 0; i < Player.miscDyes.Length; i++)
-    //             Player.miscDyes[i] = new Item();
-
-    //         Player.trashItem = new Item();
-
-    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI); //sync state 
-    //     }
-
-    //     private void SetInventory(CtgClass classData)
-    //     {
-    //         Player.statLifeMax2 = classData.HealthPoints;
-    //         Player.statLife = classData.HealthPoints;
-    //         Player.statManaMax2 = classData.ManaPoints;
-    //         Player.statMana = classData.ManaPoints;
-
-    //         currentHP = classData.HealthPoints;
-    //         currentMana = classData.ManaPoints;
-
-    //         List<ItemData> classItems = classData.InventoryItems;
-
-    //         for (int b = 0; b < Player.inventory.Length; b++)
-    //         {
-    //             var itemData = classItems[b];
-    //             Item newItem = new Item();
-    //             newItem.SetDefaults(itemData.Type);
-    //             newItem.stack = itemData.Stack;
-    //             newItem.Prefix(itemData.Prefix);
-
-    //             Player.inventory[b] = newItem;
-    //         }
-
-    //         for (int c = 0; c < Player.armor.Length; c++)
-    //         {
-    //             var itemData = classItems[Player.inventory.Length + c];
-    //             Item newItem = new Item();
-    //             newItem.SetDefaults(itemData.Type);
-    //             newItem.stack = itemData.Stack;
-    //             newItem.Prefix(itemData.Prefix);
-
-    //             Player.armor[c] = newItem;
-    //         }
-
-    //         for (int d = 0; d < Player.miscEquips.Length; d++)
-    //         {
-    //             var itemData = classItems[Player.inventory.Length + Player.armor.Length + d];
-    //             Item newItem = new Item();
-    //             newItem.SetDefaults(itemData.Type);
-    //             newItem.stack = itemData.Stack;
-    //             newItem.Prefix(itemData.Prefix);
-
-    //             Player.miscEquips[d] = newItem;
-    //         }
-
-    //         for (int e = 0; e < Player.miscDyes.Length; e++)
-    //         {
-    //             var itemData = classItems[Player.inventory.Length + Player.armor.Length + Player.miscEquips.Length + e];
-    //             Item newItem = new Item();
-    //             newItem.SetDefaults(itemData.Type);
-    //             newItem.stack = itemData.Stack;
-    //             newItem.Prefix(itemData.Prefix);
-
-    //             Player.miscDyes[e] = newItem;
-    //         }
-    //         /*this may not work lol
-    //         */
-    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-    //     }
-
-
-    //     private void SpawnCustomItem(int itemID, int? prefix = null, int? damage = null, int? useTime = null, int? useAnimation = null, float? scale = null, float? knockBack = null, int? shoot = null, float? shootSpeed = null, Color? colorOverride = null)
-    //     {
-    //         Item item = new Item();
-    //         item.SetDefaults(itemID);
-
-    //         if (prefix.HasValue) item.Prefix(prefix.Value);
-    //         if (damage.HasValue) item.damage = damage.Value;
-    //         if (useTime.HasValue) item.useTime = useTime.Value;
-    //         if (useAnimation.HasValue) item.useAnimation = useAnimation.Value;
-    //         if (scale.HasValue) item.scale = scale.Value;
-    //         if (knockBack.HasValue) item.knockBack = knockBack.Value;
-    //         if (shoot.HasValue) item.shoot = shoot.Value;
-    //         if (shootSpeed.HasValue) item.shootSpeed = shootSpeed.Value;
-    //         if (colorOverride.HasValue) item.color = colorOverride.Value;
-
-    //         Player.QuickSpawnItem(null, item, 1);
-    //     }
-
-    //     private void ApplyPermBuffs(List<int> buffs)
-    //     {
-    //         foreach (int id in buffs) Player.AddBuff(id, 54000);
-    //     }
-
-    //     public void ApplyUpgrade(UpgradeConfig upgrade)
-    //     {
-    //         // reset all bonus stats
-    //         bonusHP = 0;
-    //         bonusRegen = 0;
-    //         bonusDef = 0;
-    //         bonusMoveSpeed = 0;
-
-    //         switch (upgrade.Id)
-    //         {
-    //             case "charge_bow":
-    //                 Item newItem = new Item();
-    //                 var itemType = 5549;
-    //                 newItem.SetDefaults(itemType);
-    //                 newItem.stack = 1;
-    //                 newItem.prefix = 0;
-    //                 Player.inventory[2] = newItem;
-    //                 break;
-    //             case "bonus_regen":
-    //                 bonusRegen += 2 * upgrade.Value;
-    //                 break;
-    //             case "bonus_speed":
-    //                 bonusMoveSpeed += upgrade.Value / 100f;
-    //                 break;
-    //             case "bonus_health":
-    //                 bonusHP += upgrade.Value;
-    //                 break;
-    //             case "bonus_def":
-    //                 bonusDef += upgrade.Value;
-    //                 break;
-    //             default:
-    //                 Main.NewText("upgrade id not found");
-    //                 break;
-    //         }
-    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-    //     }
-
-    //     public override void ResetEffects()
-    //     {
-    //         // THIS METHOD IS BROKEN NEED TO FIX 
-    //         Player.AddBuff(BuffID.Shine, 54000);
-    //         Player.AddBuff(BuffID.NightOwl, 54000);
-    //         Player.AddBuff(BuffID.Builder, 54000);
-
-    //         CtgClass classInfo;
-    //         var playerManager = Player.GetModPlayer<PlayerManager>();
-    //         if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
-    //         {
-
-    //             for (int i = 0; i < Player.buffType.Length; i++)
-    //             {
-    //                 Player.DelBuff(i);
-    //             }
-
-
-    //             string selectedClass = playerManager.currentClass.Inventory;
-    //             using (var stream = Mod.GetFileStream($"Content/Classes/{selectedClass}.json"))
-    //             using (var fileReader = new StreamReader(stream))
-    //             {
-    //                 var jsonData = fileReader.ReadToEnd();
-    //                 try
-    //                 {
-    //                     classInfo = JsonSerializer.Deserialize<CtgClass>(jsonData);
-    //                 }
-    //                 catch
-    //                 {
-    //                     Main.NewText("Failed to load or parse inventory file.", Microsoft.Xna.Framework.Color.Red);
-    //                     return;
-    //                 }
-    //             }
-
-    //             SetInventory(classInfo);
-
-    //             // Apply First upgrade by default when new class selected
-    //             ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
-    //         }
-
-    //         Player.statLifeMax2 = currentHP;
-    //         Player.statManaMax2 = currentMana;
-
-    //         if (playerManager.currentUpgrade.Name != lastUpgrade)
-    //         {
-    //             // apply upgrades here
-    //             ApplyUpgrade(playerManager.currentUpgrade);
-    //         }
-
-    //         Player.lifeRegen += bonusRegen;
-    //         Player.moveSpeed += bonusMoveSpeed;
-    //         Player.statDefense += bonusDef;
-    //         Player.statLifeMax2 += bonusHP;
-
-    //         // Add player buffs here instead (delete switch once config is populated with the required buffs)
-    //         try
-    //         {
-    //             if (!Main.dedServ) ApplyPermBuffs(playerManager.currentClass.Buffs);
-    //         }
-    //         catch
-    //         {
-    //             Console.WriteLine("Failed to apply permanent buffs.");
-    //         }
-
-    //         lastPlayerClass = playerManager.currentClass.Inventory;
-    //         lastUpgrade = playerManager.currentUpgrade.Name;
-
-    //         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-    //     }
-    //     public override void UpdateEquips()
-    //     {
-    //         if (Main.expertMode || Main.masterMode)
-    //         {
-    //             Player.extraAccessory = true;
-    //         }
-    //     }
-
-    //     public override void PostUpdate()
-    //     {
-    //         if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
-    //             return;
-    //         //this is where dyes are set and forced on 
-    //         int redDyeType = 1031;
-    //         int blueDyeType = 1035;
-
-    //         if (Main.netMode == NetmodeID.Server)
-    //             return;
-
-    //         if (playerClass != GameClass.None)
-    //         {
-    //             int dyeID = Player.team switch
-
-    //             {
-    //                 1 => redDyeType,
-    //                 3 => blueDyeType,
-    //                 _ => 0
-    //             };
-    //             for (int i = 0; i <= 9; i++) //i<=3 just sets the armor for not can switch to i<=9 for all accessory slots later
-    //             {
-    //                 if (Player.dye[i] == null || Player.dye[i].type != dyeID)
-    //                 {
-    //                     Player.dye[i] = dyeID == 0 ? new Item() : new Item(dyeID);
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    // }
-
+}

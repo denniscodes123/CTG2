@@ -13,7 +13,6 @@ using Terraria.ID;
 using System.Collections.Generic;
 using Terraria.Chat;
 using Terraria.Localization;
-using System.Linq;
 
 
 namespace CTG2
@@ -52,7 +51,6 @@ namespace CTG2
         RequestDie = 28,
         RequestKill = 29,
         RequestWeb = 30,
-        SelectClass = 31,
 
                     
                 
@@ -507,32 +505,6 @@ namespace CTG2
 
                     Console.WriteLine($"Server: Webbed player {playerToWeb.name} for {webTimeInTicks / 60} seconds");
                     break;
-            case (byte)MessageType.SelectClass:
-                int playerWhoSelectedClass = reader.ReadInt32();
-                string selectedClassName = reader.ReadString();
-                
-                // Get the player and set their class on the server
-                var serverPlayer = Main.player[playerWhoSelectedClass];
-                    if (serverPlayer.active)
-                    {
-                        var classPlayer = serverPlayer.GetModPlayer<ClassPlayer>();
-
-                        // Find the class config by name
-                        var selectedClassConfig = CTG2.config.Classes.FirstOrDefault(c => c.Name == selectedClassName);
-                        if (selectedClassConfig != null)
-                        {
-                            classPlayer.SetClass(selectedClassConfig);
-                            Console.WriteLine($"Server: Set player {playerWhoSelectedClass} to class {selectedClassName}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Server: Class {selectedClassName} not found for player {playerWhoSelectedClass}");
-                        }
-                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(
-        $"SetInventory: Set player alive - Life:{serverPlayer.statLife}/{serverPlayer.statLifeMax2}, Dead:{serverPlayer.dead}"
-    ), Microsoft.Xna.Framework.Color.Lime);
-                }
-                break;
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
