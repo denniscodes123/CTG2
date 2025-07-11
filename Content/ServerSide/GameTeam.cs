@@ -38,12 +38,18 @@ public class GameTeam
     {
         foreach (Player ply in Players)
         {
+            if (!ply.active) continue;
+            
             ply.team = TeamColor;
-            if (ply.hostile == false)
+            
+            // Force PvP on for all team members
+            if (!ply.hostile)
             {
-                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, ply.whoAmI);
                 ply.hostile = true;
+                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, ply.whoAmI);
+                Console.WriteLine($"GameTeam: Enabled PvP for {ply.name} on team {TeamColor}");
             }
+            
             NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, ply.whoAmI, TeamColor);
         }
     }

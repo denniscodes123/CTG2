@@ -11,6 +11,7 @@ using Terraria.Chat;
 using Terraria.Localization;
 using CTG2.Content.ClientSide;
 using Terraria.Enums;
+using ClassesNamespace;
 
 namespace CTG2.Content.ServerSide;
 
@@ -215,6 +216,9 @@ public class GameManager : ModSystem
         BlueTeam.EnforceTeam();
         RedTeam.EnforceTeam();
         
+        // Additional PvP enforcement
+        EnsureAllPlayersHavePvP();
+        
         if (MatchTime == 1800)
         {
             // this code will handle class selection and stuff
@@ -300,15 +304,23 @@ public class GameManager : ModSystem
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerGameUpdate);
-            if (MatchTime >= 1800)
+            
+            foreach (Player p in Main.player) {
+                    ForcePlayerStatSync(p.whoAmI);
+            }
+
+            // Determine match stage based on game state
+            int matchStage;
+            if (MatchTime < 1800)
             {
-                packet.Write((int)2);
+                matchStage = 1; // Class Selection phase
             }
             else
             {
-                packet.Write((int)1);
+                matchStage = 2; // Active Gameplay phase
             }
-
+            
+            packet.Write(matchStage);
             packet.Write((int)MatchTime);
             // Blue and red Gem X positions
             var distBetweenGems = Math.Abs(RedGem.Position.X - BlueGem.Position.X);
@@ -535,6 +547,9 @@ public class GameManager : ModSystem
         statePacket.Send(toClient: playerIndex);
       
         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
+        
+        // Force sync player stats to ensure HP displays correctly to other players
+        ForcePlayerStatSync(playerIndex);
 
         // Send teleport packet to client
         CTG2.WebPlayer(player.whoAmI,60);
@@ -557,6 +572,23 @@ public class GameManager : ModSystem
         if (isWaitingForNewGame && newGameTimer > 0)
         {
             newGameTimer--;
+            
+            // Send game info updates during waiting phase every 6 ticks
+            if (newGameTimer % 6 == 0)
+            {
+                var mod = ModContent.GetInstance<CTG2>();
+                ModPacket packet = mod.GetPacket();
+                packet.Write((byte)MessageType.ServerGameUpdate);
+                packet.Write((int)3); // Waiting for new game phase
+                packet.Write(newGameTimer); // Send remaining time instead of match time
+                
+                // Send empty gem data during waiting phase
+                packet.Write((int)0); // Blue gem position
+                packet.Write((int)0); // Red gem position
+                packet.Write("Waiting for new game..."); // Blue gem status
+                packet.Write("Waiting for new game..."); // Red gem status
+                packet.Send();
+            }
             
             // Countdown announcements
             if (newGameTimer == 10 * 60) // 10 seconds left
@@ -595,7 +627,26 @@ public class GameManager : ModSystem
             return;
         }
         
-        if (!IsGameActive) return;
+        if (!IsGameActive) 
+        {
+            // Send game info updates when game is not active every 6 ticks
+            if (Main.GameUpdateCount % 6 == 0)
+            {
+                var mod = ModContent.GetInstance<CTG2>();
+                ModPacket packet = mod.GetPacket();
+                packet.Write((byte)MessageType.ServerGameUpdate);
+                packet.Write((int)0); // No game active
+                packet.Write((int)0); // No match time
+                
+                // Send empty gem data when no game is active
+                packet.Write((int)0); // Blue gem position
+                packet.Write((int)0); // Red gem position
+                packet.Write("No game active"); // Blue gem status
+                packet.Write("No game active"); // Red gem status
+                packet.Send();
+            }
+            return;
+        }
 
         UpdateGame();
 
@@ -638,6 +689,129 @@ public class GameManager : ModSystem
         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, player.whoAmI);
         
         Console.WriteLine($"GameManager: Cleared inventory for player {player.whoAmI} ({player.name})");
+    }
+
+    public void HandlePlayerTeamChange(int playerIndex, int newTeam)
+    {
+        if (!Main.player[playerIndex].active) return;
+        
+        Player player = Main.player[playerIndex];
+        int oldTeam = player.team;
+        
+        Console.WriteLine($"GameManager: HandlePlayerTeamChange called for player {playerIndex} from team {oldTeam} to team {newTeam}");
+        
+        // Check if too late to change teams during active game (similar to spectator logic)
+        if (IsGameActive && MatchTime >= 60 * 60 * 15 - 45 * 60)
+        {
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[TEAM] {player.name} cannot change teams - game ending soon"), Microsoft.Xna.Framework.Color.Red);
+            Console.WriteLine($"Player {player.name} cannot change teams - game ending soon");
+            return;
+        }
+        
+        // Set the new team
+        player.team = newTeam;
+        
+        // Update PlayerManager team
+        var playerManager = player.GetModPlayer<PlayerManager>();
+        playerManager.SetTeam(newTeam);
+        
+        // Send team update to all clients
+        NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, newTeam);
+        
+        var mod = ModContent.GetInstance<CTG2>();
+        
+        // Send packet to update PlayerManager.team on client side
+        ModPacket updatePacket = mod.GetPacket();
+        updatePacket.Write((byte)MessageType.UpdatePlayerTeam);
+        updatePacket.Write(playerIndex);
+        updatePacket.Write(newTeam);
+        updatePacket.Send(toClient: playerIndex);
+        
+        // Handle gem dropping if player was carrying one
+        if (BlueGem.IsHeld && BlueGem.HeldBy == playerIndex)
+        {
+            BlueGem.Reset();
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Blue Gem when changing teams"), Microsoft.Xna.Framework.Color.Blue);
+            Console.WriteLine($"Player {player.name} dropped Blue Gem when changing teams");
+        }
+        
+        if (RedGem.IsHeld && RedGem.HeldBy == playerIndex)
+        {
+            RedGem.Reset();
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Red Gem when changing teams"), Microsoft.Xna.Framework.Color.Red);
+            Console.WriteLine($"Player {player.name} dropped Red Gem when changing teams");
+        }
+        
+        // Update team rosters
+        BlueTeam.UpdateTeam();
+        RedTeam.UpdateTeam();
+        
+        // Handle different scenarios based on new team and game state
+        if (newTeam == 0)
+        {
+            // Player set to no team - make them spectator
+            SetPlayerSpectator(playerIndex, true);
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} has been moved to spectator (no team)"), Microsoft.Xna.Framework.Color.Olive);
+            Console.WriteLine($"Player {player.name} moved to spectator due to team change to 0");
+        }
+        else if (IsGameActive)
+        {
+            // Game is active - handle based on game phase
+            
+
+            
+            // Remove from spectator if they were spectating
+            if (playerSpectatorStatus.GetValueOrDefault(playerIndex, false))
+            {
+                playerSpectatorStatus[playerIndex] = false;
+                ModPacket spectatorPacket = mod.GetPacket();
+                spectatorPacket.Write((byte)MessageType.ServerSpectatorUpdate);
+                spectatorPacket.Write(playerIndex);
+                spectatorPacket.Write(false);
+                spectatorPacket.Send(toClient: playerIndex);
+            }
+            
+            // Start class selection for the player
+            startPlayerClassSelection(playerIndex, MatchTime < 1800); // true if during initial game start phase
+            
+            // Force sync stats after team change
+            ForcePlayerStatSync(playerIndex);
+            
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} has been moved to team {newTeam} and entered class selection"), Microsoft.Xna.Framework.Color.Green);
+            Console.WriteLine($"Player {player.name} moved to team {newTeam} and started class selection");
+        }
+        else
+        {
+            // No game active - just update team assignment
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} has been assigned to team {newTeam}"), Microsoft.Xna.Framework.Color.Yellow);
+            Console.WriteLine($"Player {player.name} assigned to team {newTeam} (no active game)");
+        }
+    }
+
+    private void EnsureAllPlayersHavePvP()
+    {
+        foreach (Player player in Main.player)
+        {
+            if (player.active && player.team != 0 && !player.hostile)
+            {
+                player.hostile = true;
+                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, player.whoAmI);
+                Console.WriteLine($"GameManager: Forced PvP on for player {player.name}");
+            }
+        }
+    }
+
+    public static void ForcePlayerStatSync(int playerIndex)
+    {
+        if (playerIndex < 0 || playerIndex >= Main.player.Length) return;
+        
+        Player player = Main.player[playerIndex];
+        if (!player.active) return;
+        
+        var classSystem = player.GetModPlayer<ClassSystem>();
+        classSystem.SyncPlayerStats();
+        
+        Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
     }
 
 }

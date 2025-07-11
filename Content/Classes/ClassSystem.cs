@@ -75,12 +75,12 @@ namespace ClassesNamespace
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {
             base.ModifyMaxStats(out health, out mana);
-            if (!Main.dedServ)
-            {
-                health = new StatModifier(0f, 0f, 0f, 0f);
-                health.Flat = currentHP;
-                NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, currentHP, currentHP, currentHP, currentHP);
-            }
+            
+            health = new StatModifier(0f, 0f, 0f, 0f);
+            health.Flat = currentHP;
+            
+            mana = new StatModifier(0f, 0f, 0f, 0f);
+            mana.Flat = currentMana;
         }
 
         public override void OnEnterWorld()
@@ -168,7 +168,7 @@ namespace ClassesNamespace
             }
             /*this may not work lol
             */
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            SyncPlayerStats();
         }
 
 
@@ -229,7 +229,7 @@ namespace ClassesNamespace
                     Main.NewText("upgrade id not found");
                     break;
             }
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            SyncPlayerStats();
         }
 
         public override void ResetEffects()
@@ -272,6 +272,7 @@ namespace ClassesNamespace
                 ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
             }
 
+            // Set base stats first
             Player.statLifeMax2 = currentHP;
             Player.statManaMax2 = currentMana;
 
@@ -285,6 +286,10 @@ namespace ClassesNamespace
             Player.moveSpeed += bonusMoveSpeed;
             Player.statDefense += bonusDef;
             Player.statLifeMax2 += bonusHP;
+            
+            // Update currentHP to include bonuses for proper sync
+            currentHP = Player.statLifeMax2;
+            currentMana = Player.statManaMax2;
 
             // Add player buffs here instead (delete switch once config is populated with the required buffs)
             try
@@ -299,7 +304,7 @@ namespace ClassesNamespace
             lastPlayerClass = playerManager.currentClass.Inventory;
             lastUpgrade = playerManager.currentUpgrade.Name;
 
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            SyncPlayerStats();
         }
         public override void UpdateEquips()
         {
@@ -335,6 +340,25 @@ namespace ClassesNamespace
                     }
                 }
             }
+        }
+
+        public void SyncPlayerStats()
+        {
+            // First ensure the player's max stats are updated
+            Player.statLifeMax = currentHP;
+            Player.statLifeMax2 = currentHP;
+            Player.statManaMax = currentMana;
+            Player.statManaMax2 = currentMana;
+            
+            // Set current life/mana to max if they're above the new max
+            if (Player.statLife > currentHP) Player.statLife = currentHP;
+            if (Player.statMana > currentMana) Player.statMana = currentMana;
+            
+            // Sync to ALL clients (including self)
+            NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax, Player.statMana, Player.statManaMax);
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            
+            Console.WriteLine($"ClassSystem: Synced stats for {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax}");
         }
 
     }

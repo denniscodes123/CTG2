@@ -215,18 +215,7 @@ namespace CTG2
                 case (byte)MessageType.RequestTeamChange:
                     int target = reader.ReadInt32();
                     int teamID = reader.ReadInt32();
-                    Main.player[target].team = teamID;
-
-                    // Send packet to update PlayerManager.team on client side
-                    var modInstance = ModContent.GetInstance<CTG2>();
-                    ModPacket updatePacket = modInstance.GetPacket();
-                    updatePacket.Write((byte)MessageType.UpdatePlayerTeam);
-                    updatePacket.Write(target);
-                    updatePacket.Write(teamID);
-                    updatePacket.Send(toClient: target);
-
-                    NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, target, teamID);
-                    Console.WriteLine($"Set player {Main.player[target].name} to team {teamID}");
+                    manager.HandlePlayerTeamChange(target, teamID);
                     break;
 
                 case (byte)MessageType.RequestEnterSpectator:
