@@ -46,6 +46,36 @@ public class GameManager : ModSystem
     private int blueGemFireworkTimer = 0;
     private int redGemFireworkTimer = 0;
     private const int FIREWORK_INTERVAL = 240;
+        public static void FillLavaInDesignatedArea()
+        {
+            //hard coded coords for the right.wld if you are on the wrong wld it will spawn lava in wrong spot!!!
+            int xMin = 13702 /16; 
+            int yMin = 11719 /16;
+            int xMax = 19030 /16;
+            int yMax = 11814 /16;
+    
+            for (int x = xMin; x <= xMax; x++)
+            {
+                for (int y = yMin; y <= yMax; y++)
+                {
+                    Tile tile = Framing.GetTileSafely(x, y);
+    
+    
+                    if (!tile.HasTile)
+                    {
+                        tile.LiquidAmount = 255;
+                        tile.LiquidType = LiquidID.Lava;
+                        Liquid.AddWater(x, y); // Schedule a liquid update at this position
+                        WorldGen.SquareTileFrame(x, y, true);
+                    }
+                }
+            }
+    
+            Liquid.UpdateLiquid();
+    
+    
+            Main.NewText("Lava region filled.");
+        }
     
     public override void OnWorldLoad()
     {
@@ -79,11 +109,14 @@ public class GameManager : ModSystem
         bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
         if (isMapPicked)
         {
+
             Map.LoadMap(result);
+            FillLavaInDesignatedArea();
         }
         else
         {
             Map.LoadMap((MapTypes)CTG2.randomGenerator.Next(0, 7));
+            FillLavaInDesignatedArea();
         }
 
         BlueTeam.UpdateTeam();
