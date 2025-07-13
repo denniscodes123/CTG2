@@ -582,7 +582,7 @@ public class GameManager : ModSystem
         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
         
         // Force sync player stats to ensure HP displays correctly to other players
-        ForcePlayerStatSync(playerIndex);
+        //ForcePlayerStatSync(playerIndex);
 
         // Send teleport packet to client
         CTG2.WebPlayer(player.whoAmI,60);
@@ -808,7 +808,7 @@ public class GameManager : ModSystem
             startPlayerClassSelection(playerIndex, MatchTime < 1800); // true if during initial game start phase
             
             // Force sync stats after team change
-            ForcePlayerStatSync(playerIndex);
+            //ForcePlayerStatSync(playerIndex);
             
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} has been moved to team {newTeam} and entered class selection"), Microsoft.Xna.Framework.Color.Green);
             Console.WriteLine($"Player {player.name} moved to team {newTeam} and started class selection");
@@ -844,7 +844,7 @@ public class GameManager : ModSystem
         var classSystem = player.GetModPlayer<ClassSystem>();
         classSystem.SyncPlayerStats();
         
-        Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
+        //Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
     }
 
 }

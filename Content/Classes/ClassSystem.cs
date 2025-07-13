@@ -12,6 +12,8 @@ using System.Text.Json;
 using System.Runtime.CompilerServices;
 using CTG2;
 using CTG2.Content.ClientSide;
+using Terraria.Localization;
+using Terraria.Chat;
 
 
 namespace ClassesNamespace
@@ -114,13 +116,17 @@ namespace ClassesNamespace
         private void SetInventory(CtgClass classData)
         {
             Player.statLifeMax2 = classData.HealthPoints;
+            Player.statLifeMax = classData.HealthPoints;
             Player.statLife = classData.HealthPoints;
             Player.statManaMax2 = classData.ManaPoints;
+            Player.statManaMax = classData.ManaPoints;
             Player.statMana = classData.ManaPoints;
 
             currentHP = classData.HealthPoints;
             currentMana = classData.ManaPoints;
 
+            Console.WriteLine($"Player hp is {currentHP}");
+            Console.WriteLine($" {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax2}");
             List<ItemData> classItems = classData.InventoryItems;
 
             for (int b = 0; b < Player.inventory.Length; b++)
@@ -168,7 +174,8 @@ namespace ClassesNamespace
             }
             /*this may not work lol
             */
-            SyncPlayerStats();
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{currentHP}, {Player.statLife}"), Microsoft.Xna.Framework.Color.Olive);
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
         }
 
 
@@ -232,13 +239,8 @@ namespace ClassesNamespace
             SyncPlayerStats();
         }
 
-        public override void ResetEffects()
+        public void setClass()
         {
-            // THIS METHOD IS BROKEN NEED TO FIX 
-            Player.AddBuff(BuffID.Shine, 54000);
-            Player.AddBuff(BuffID.NightOwl, 54000);
-            Player.AddBuff(BuffID.Builder, 54000);
-
             CtgClass classInfo;
             var playerManager = Player.GetModPlayer<PlayerManager>();
             if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
@@ -269,27 +271,38 @@ namespace ClassesNamespace
                 SetInventory(classInfo);
 
                 // Apply First upgrade by default when new class selected
-                ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
+                //ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
             }
+        }
+
+
+        public override void ResetEffects()
+        {
+            // THIS METHOD IS BROKEN NEED TO FIX 
+            Player.AddBuff(BuffID.Shine, 54000);
+            Player.AddBuff(BuffID.NightOwl, 54000);
+            Player.AddBuff(BuffID.Builder, 54000);
+
+
 
             // Set base stats first
-            Player.statLifeMax2 = currentHP;
-            Player.statManaMax2 = currentMana;
+            // Player.statLifeMax2 = currentHP;
+            // Player.statManaMax2 = currentMana;
 
-            if (playerManager.currentUpgrade.Name != lastUpgrade)
-            {
-                // apply upgrades here
-                ApplyUpgrade(playerManager.currentUpgrade);
-            }
+            // if (playerManager.currentUpgrade.Name != lastUpgrade)
+            // {
+            //     // apply upgrades here
+            //     ApplyUpgrade(playerManager.currentUpgrade);
+            // }
 
-            Player.lifeRegen += bonusRegen;
-            Player.moveSpeed += bonusMoveSpeed;
-            Player.statDefense += bonusDef;
-            Player.statLifeMax2 += bonusHP;
-            
-            // Update currentHP to include bonuses for proper sync
-            currentHP = Player.statLifeMax2;
-            currentMana = Player.statManaMax2;
+            // Player.lifeRegen += bonusRegen;
+            // Player.moveSpeed += bonusMoveSpeed;
+            // Player.statDefense += bonusDef;
+            // Player.statLifeMax2 += bonusHP;
+
+            // // Update currentHP to include bonuses for proper sync
+            // currentHP = Player.statLifeMax2;
+            // currentMana = Player.statManaMax2;
 
             // Add player buffs here instead (delete switch once config is populated with the required buffs)
             try
@@ -301,8 +314,6 @@ namespace ClassesNamespace
                 Console.WriteLine("Failed to apply permanent buffs.");
             }
 
-            lastPlayerClass = playerManager.currentClass.Inventory;
-            lastUpgrade = playerManager.currentUpgrade.Name;
 
             SyncPlayerStats();
         }
@@ -345,20 +356,23 @@ namespace ClassesNamespace
         public void SyncPlayerStats()
         {
             // First ensure the player's max stats are updated
-            Player.statLifeMax = currentHP;
-            Player.statLifeMax2 = currentHP;
-            Player.statManaMax = currentMana;
-            Player.statManaMax2 = currentMana;
-            
-            // Set current life/mana to max if they're above the new max
-            if (Player.statLife > currentHP) Player.statLife = currentHP;
-            if (Player.statMana > currentMana) Player.statMana = currentMana;
-            
+            // Player.statLifeMax = currentHP;
+            // Player.statLifeMax2 = currentHP;
+            // Player.statManaMax = currentMana;
+            // Player.statManaMax2 = currentMana;
+
+            // // Set current life/mana to max if they're above the new max
+            // if (Player.statLife > currentHP) Player.statLife = currentHP;
+            // if (Player.statMana > currentMana) Player.statMana = currentMana;
+
             // Sync to ALL clients (including self)
-            NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax, Player.statMana, Player.statManaMax);
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            Player.statLifeMax2 = currentHP + bonusHP;
+            Player.statLifeMax = Player.statLifeMax2;
             
-            Console.WriteLine($"ClassSystem: Synced stats for {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax}");
+            NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax, Player.statMana, Player.statManaMax);
+            //NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            
+            //Console.WriteLine($"ClassSystem: Synced stats for {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax}");
         }
 
     }

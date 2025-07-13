@@ -216,6 +216,9 @@ public class ClassUI : UIState
         playerManager.currentClass = cfg;
         playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
 
+        var classPlayer = Main.LocalPlayer.GetModPlayer<ClassSystem>();
+        classPlayer.setClass();
+        
 
         selectedClass = cfg;
         _classNameText.SetText(cfg.Name);
