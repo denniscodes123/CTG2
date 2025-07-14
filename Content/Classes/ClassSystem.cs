@@ -358,8 +358,8 @@ namespace ClassesNamespace
             // First ensure the player's max stats are updated
             // Player.statLifeMax = currentHP;
             // Player.statLifeMax2 = currentHP;
-            // Player.statManaMax = currentMana;
-            // Player.statManaMax2 = currentMana;
+            Player.statManaMax = currentMana;
+            Player.statManaMax2 = currentMana;
 
             // // Set current life/mana to max if they're above the new max
             // if (Player.statLife > currentHP) Player.statLife = currentHP;
