@@ -15,6 +15,9 @@ namespace CTG2.Content
             if (type == TileID.Platforms)
                 return false;
 
+            if (type == TileID.EchoBlock)
+                return false;
+
             if (type == TileID.CrystalBlock)
                 return false;
 
