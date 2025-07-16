@@ -77,10 +77,10 @@ namespace ClassesNamespace
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {
             base.ModifyMaxStats(out health, out mana);
-            
+
             health = new StatModifier(0f, 0f, 0f, 0f);
             health.Flat = currentHP;
-            
+
             mana = new StatModifier(0f, 0f, 0f, 0f);
             mana.Flat = currentMana;
         }
@@ -88,8 +88,6 @@ namespace ClassesNamespace
         public override void OnEnterWorld()
         {
             base.OnEnterWorld();
-            Player.statLifeMax = 100;
-            Player.statLifeMax2 = 100;
 
             //Comment this out if you want this to not clear all inventory onenterwolrd
             //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
@@ -115,9 +113,12 @@ namespace ClassesNamespace
 
         private void SetInventory(CtgClass classData)
         {
-            Player.statLifeMax2 = classData.HealthPoints;
-            Player.statLifeMax = classData.HealthPoints;
-            Player.statLife = classData.HealthPoints;
+                    for (int i = 0; i < Player.buffType.Length; i++)
+                {
+                    Player.DelBuff(i);
+                }
+            ApplyPermBuffs();
+            //Player.statLife = classData.HealthPoints; set this after modifymax
             Player.statManaMax2 = classData.ManaPoints;
             Player.statManaMax = classData.ManaPoints;
             Player.statMana = classData.ManaPoints;
@@ -174,8 +175,11 @@ namespace ClassesNamespace
             }
             /*this may not work lol
             */
+
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{currentHP}, {Player.statLife}"), Microsoft.Xna.Framework.Color.Olive);
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            SyncPlayer(-1, Player.whoAmI);
+
         }
 
 
@@ -197,10 +201,21 @@ namespace ClassesNamespace
             Player.QuickSpawnItem(null, item, 1);
         }
 
-        private void ApplyPermBuffs(List<int> buffs)
+        private void ApplyPermBuffs()
         {
-            foreach (int id in buffs) Player.AddBuff(id, 54000);
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            var classData = playerManager?.currentClass;
+
+            if (classData?.Buffs != null)
+            {
+                foreach (int buffId in classData.Buffs)
+                {
+                    if (!Player.HasBuff(buffId))
+                        Player.AddBuff(buffId, 54000);
+                }
+            }
         }
+
 
         public void ApplyUpgrade(UpgradeConfig upgrade)
         {
@@ -236,7 +251,7 @@ namespace ClassesNamespace
                     Main.NewText("upgrade id not found");
                     break;
             }
-            SyncPlayerStats();
+            
         }
 
         public void setClass()
@@ -305,18 +320,24 @@ namespace ClassesNamespace
             // currentMana = Player.statManaMax2;
 
             // Add player buffs here instead (delete switch once config is populated with the required buffs)
-            try
+           /* try
             {
-                //if (!Main.dedServ) //ApplyPermBuffs(playerManager.currentClass.Buffs);
+                var playerManager = Player.GetModPlayer<PlayerManager>();
+                if (!Main.dedServ) ApplyPermBuffs(playerManager.currentClass.Buffs);
             }
             catch
             {
                 Console.WriteLine("Failed to apply permanent buffs.");
             }
+*/
 
-
-            SyncPlayerStats();
+            
         }
+        public override void OnRespawn()
+        {
+            ApplyPermBuffs();
+        }
+
         public override void UpdateEquips()
         {
             if (Main.expertMode || Main.masterMode)
@@ -366,14 +387,59 @@ namespace ClassesNamespace
             // if (Player.statMana > currentMana) Player.statMana = currentMana;
 
             // Sync to ALL clients (including self)
-            Player.statLifeMax2 = currentHP + bonusHP;
-            Player.statLifeMax = Player.statLifeMax2;
-            
-            NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax, Player.statMana, Player.statManaMax);
-            //NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-            
+
+
+            //NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax, Player.statMana, Player.statManaMax);
+            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+
             //Console.WriteLine($"ClassSystem: Synced stats for {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax}");
         }
+        public void SyncPlayer(int toWho, int fromWho)
+        {
+            ModPacket packet = ModContent.GetInstance<global::CTG2.CTG2>().GetPacket(); ;
+            packet.Write((byte)MessageType.RequestSyncStats);
+            packet.Write((byte)Player.whoAmI);
+            packet.Write(currentHP);
+            packet.Write(currentMana);
+            packet.Write(bonusHP);
+            packet.Write(bonusRegen);
+            packet.Write(bonusDef);
+            packet.Write(bonusMoveSpeed);
+            packet.Send(toWho, fromWho);
+        }
+
+        public void ReceiveSync(BinaryReader reader)
+        {
+            currentHP = reader.ReadInt32();
+            currentMana = reader.ReadInt32();
+            bonusHP = reader.ReadInt32();
+            bonusRegen = reader.ReadInt32();
+            bonusDef = reader.ReadInt32();
+            bonusMoveSpeed = reader.ReadSingle();
+        }
+        public override void SendClientChanges(ModPlayer clientPlayer)
+        {
+            var clone = (ClassSystem)clientPlayer;
+            if (currentHP != clone.currentHP || currentMana != clone.currentMana || bonusHP != clone.bonusHP)
+            {
+                SyncPlayer(-1, Main.myPlayer);
+            }
+        }
+        public override void CopyClientState(ModPlayer targetCopy)
+        {
+            ClassSystem clone = (ClassSystem)targetCopy;
+            clone.currentHP = currentHP;
+            clone.currentMana = currentMana;
+            clone.bonusHP = bonusHP;
+            clone.bonusRegen = bonusRegen;
+            clone.bonusDef = bonusDef;
+            clone.bonusMoveSpeed = bonusMoveSpeed;
+        }
+
+
+
+        
+
 
     }
 
