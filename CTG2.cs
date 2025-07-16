@@ -51,6 +51,7 @@ namespace CTG2
         RequestDie = 28,
         RequestKill = 29,
         RequestWeb = 30,
+        RequestSyncStats=31,
 
                     
                 
@@ -494,6 +495,20 @@ namespace CTG2
 
                     Console.WriteLine($"Server: Webbed player {playerToWeb.name} for {webTimeInTicks / 60} seconds");
                     break;
+
+                    case (byte)MessageType.RequestSyncStats:
+                    {
+                        byte pIndex = reader.ReadByte();
+                        var modPlayer = Main.player[pIndex].GetModPlayer<ClassSystem>();
+                        modPlayer.ReceiveSync(reader);
+
+                        if (Main.netMode == NetmodeID.Server)
+                        {
+                            modPlayer.SyncPlayer(-1, pIndex);
+                        }
+                        break;
+                    }
+
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
