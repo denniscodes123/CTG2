@@ -1,6 +1,7 @@
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
+using Terraria.DataStructures;
 
 public class ToxicFlaskTimeOverride : GlobalProjectile
 {
@@ -22,5 +23,36 @@ public class ToxicFlaskTimeOverride : GlobalProjectile
             projectile.height = 32;
 
         }
+        if (projectile.type == 700) //kill ghast projectiles
+        {
+            projectile.Kill();
+        }
+        if (projectile.type == ProjectileID.NebulaArcanumExplosionShot) //Might have to ovveride the subshot shards as well
+        {
+            projectile.damage = 0; //make explosion 0 damage
+        }
+
     }
+
+    public override void OnSpawn(Projectile projectile, IEntitySource source)
+    {
+
+        if (projectile.type == 700) // Ghast
+        {
+            projectile.scale = 0f;
+            projectile.damage = 0;
+            projectile.alpha = 255;
+            projectile.tileCollide = false;
+            projectile.timeLeft = 1; // dies almost instantly
+        }
+        if (projectile.type == ProjectileID.NebulaArcanumExplosionShot)
+        {
+            projectile.damage = 0; //second check in case first fails for nebula epxlosion
+            projectile.knockBack = 0f;     
+            projectile.scale = 0.1f;       
+        }
+    }
+
+
+
 }
