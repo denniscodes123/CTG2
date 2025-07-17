@@ -332,5 +332,23 @@ namespace CTG2.Content.Items.ModifiedWeps
             else
                 return true;
 	 	}
+           public override void UpdateEquip(Item item, Player player)
+        {
+            switch (item.type)
+            {
+                case ItemID.ManaRegenerationBand:
+                    player.statManaMax2 -= 20;
+                    break;
+                case ItemID.JungleHat:
+                    player.statManaMax2 -= 20;
+                    break;
+                case ItemID.JungleShirt:
+                    player.statManaMax2 -= 20;
+                    break;
+                case ItemID.JunglePants:
+                    player.statManaMax2 -= 20;
+                    break;
+            }
+        }
     }
 }
