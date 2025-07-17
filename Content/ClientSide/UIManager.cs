@@ -149,12 +149,12 @@ public class UIManager : ModSystem
         );
 
         // draw ability timer
-
-        string abilText = $"Ability cooldown: {(int) Abilities.cooldown / 60}s";
+        int cooldown = Main.LocalPlayer.GetModPlayer<Abilities>().cooldown;
+        string abilText = $"Ability cooldown: {cooldown / 60}s";
         Vector2 abilPos = new Vector2(Main.screenWidth - 320, 450);
         Color abilCol = Color.Yellow;
 
-        if (Abilities.cooldown == 0)
+        if (cooldown == 0)
         {
             Utils.DrawBorderString(Main.spriteBatch, "Ability ready!", abilPos, abilCol);
         }
