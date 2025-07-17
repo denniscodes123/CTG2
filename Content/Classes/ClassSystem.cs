@@ -88,6 +88,12 @@ namespace ClassesNamespace
         public override void OnEnterWorld()
         {
             base.OnEnterWorld();
+            for (int i = Player.buffType.Length - 1; i >= 0; i--)
+            {
+                Player.DelBuff(i);
+            }
+
+
 
             //Comment this out if you want this to not clear all inventory onenterwolrd
             //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
