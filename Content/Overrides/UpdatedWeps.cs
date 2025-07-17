@@ -25,7 +25,7 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint bananarangDelay = 55;
         private uint bananarangLastUsedCounter = 0;
 
-        private uint ThornChakramDelay = 20;
+        private uint ThornChakramDelay = 18;
         private uint ThornChakramLastUsedCounter = 0;
 
         private uint blowgunDelay = 40;
@@ -34,7 +34,10 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint goldenShowerDelay = 50;
         private uint goldenShowerLastUsedCounter = 0;
 
-        private uint chainKnifeDelay = 50;
+        private uint ghastlyglaiveDelay = 45;
+        private uint ghastlyglaiveLastUsedCounter = 0;
+
+        private uint chainKnifeDelay = 55;
         private uint chainKnifeLastUsedCounter = 0;
 
         private uint cursedFlamesDelay = 50;
@@ -197,6 +200,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     break;
 
 
+
             }
         }
 
@@ -241,6 +245,17 @@ namespace CTG2.Content.Items.ModifiedWeps
                 if (Main.GameUpdateCount - zapinatorLastUsedCounter >= zapinatorDelay)
                 {
                     zapinatorLastUsedCounter = Main.GameUpdateCount;
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (item.type == 3836) //ghastly glaive
+            {
+                if (Main.GameUpdateCount - ghastlyglaiveLastUsedCounter >= ghastlyglaiveDelay)
+                {
+                    ghastlyglaiveLastUsedCounter = Main.GameUpdateCount;
 
                     return true;
                 }
