@@ -24,9 +24,9 @@
       "Slot": 2
     },
     {
-      "Name": "",
-      "Type": 0,
-      "Stack": 0,
+      "Name": "Dirt Block",
+      "Type": 2,
+      "Stack": 50,
       "Prefix": 0,
       "Slot": 3
     },
