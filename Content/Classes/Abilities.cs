@@ -18,7 +18,7 @@ namespace CTG2.Content
 {
     public class Abilities : ModPlayer
     {
-        public static int cooldown = 0;
+        public int cooldown = 0;
 
         private int class4BuffTimer = 0;
         private bool class4PendingBuffs = false;
@@ -695,7 +695,7 @@ namespace CTG2.Content
                         break;
 
                     case 14: //not finished
-                        SetCooldown(1); //20
+                        SetCooldown(25); //20
                         TikiPriestOnUse();
 
                         break;
@@ -736,7 +736,7 @@ namespace CTG2.Content
         }
     }
 
-
+/*
     public class AbilitiesGlobal : ModSystem
     {
         public override void PostUpdatePlayers()
@@ -752,5 +752,5 @@ namespace CTG2.Content
                 }
             }
         }
-    }
+    } Shouldnt be updated globally i believe*/
 }
