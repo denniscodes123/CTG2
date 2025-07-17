@@ -37,7 +37,7 @@ namespace CTG2.Content.Classes
             NPC.height = 48;
             NPC.damage = 0; 
             NPC.defense = 0;
-            NPC.lifeMax = 600;
+            NPC.lifeMax = 200;
             NPC.knockBackResist = 0; //make this higher for more knockback
 
             NPC.aiStyle = -1; 
