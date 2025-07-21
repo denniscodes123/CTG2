@@ -11,6 +11,7 @@ using Terraria.ModLoader;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics.Tracing;
 
 
 namespace CTG2.Content.ClientSide;
@@ -34,6 +35,7 @@ public class PlayerManager : ModPlayer
     public double classSelectionTimer = -1;
     public bool isGameStartClassSelection = false; // Track if this is game start vs mid-game class selection
     public int team = 0; // TODO: THIS NEEDS TO BE UPDATED IN TEAMSET 
+    GemDrawLayer gemLayer = null;
 
     public static PlayerManager GetPlayerManager(int playerIndex)
     {
@@ -330,34 +332,29 @@ public class PlayerManager : ModPlayer
         }
     }
 
+        public override void Initialize()
+        {
+            // We only need to create the layer for the client, not the server.
+            if (!Main.dedServ)
+            {
+                gemLayer = new GemDrawLayer();
+            }
+        }
+
+        public override void ModifyDrawLayerOrdering(IDictionary<PlayerDrawLayer, PlayerDrawLayer.Position> positions)
+        {
+            if (gemLayer == null)
+            {
+                return;
+            }
+            if (gemLayer != null)
+            {
+                positions[gemLayer] = gemLayer.GetDefaultPosition();
+            }
+        }
+
     private void EnforceTeamLock()
     {
         LockTeam();
-    }
-    public override bool OnPickup(Item item)
-    {
-        if ((item.type == ItemID.LargeSapphire && PlayerHasGem(ItemID.LargeSapphire)) ||
-            (item.type == ItemID.LargeRuby && PlayerHasGem(ItemID.LargeRuby)))
-            return false;
-        return base.OnPickup(item);
-    }
-
-
-    public override bool CanUseItem(Item item)
-    {
-        // Prevent using the gem item (optional)
-        if (item.type == ItemID.LargeSapphire || item.type == ItemID.LargeRuby)
-            return false;
-        return base.CanUseItem(item);
-    }
-
-
-
-    private bool PlayerHasGem(int gemType)
-    {
-        for (int i = 0; i < Player.inventory.Length; i++)
-            if (Player.inventory[i].type == gemType)
-                return true;
-        return false;
     }
 }

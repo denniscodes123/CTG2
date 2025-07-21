@@ -335,64 +335,7 @@ public class GameManager : ModSystem
                 redGemFireworkTimer = 0; // Reset 
             }
         }
-        // Large Sapphire for BlueGem holder
-        if (BlueGem.IsHeld && BlueGem.HeldBy >= 0 && BlueGem.HeldBy < Main.player.Length) {
-            var holder = Main.player[BlueGem.HeldBy];
-            int invSlot = 10; // first slot of second row
-            if (holder.active && !holder.dead) {
-                // Ensure only one Large Sapphire in the correct slot
-                if (holder.inventory[invSlot].type != ItemID.LargeSapphire) {
-                    holder.inventory[invSlot].SetDefaults(ItemID.LargeSapphire);
-                    NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, BlueGem.HeldBy, invSlot);
-                }
-                // Remove from all other slots
-                for (int i = 0; i < holder.inventory.Length; i++) {
-                    if (i != invSlot && holder.inventory[i].type == ItemID.LargeSapphire) {
-                        holder.inventory[i].TurnToAir();
-                        NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, BlueGem.HeldBy, i);
-                    }
-                }
-            }
-        } else {
-            // Remove Large Sapphire from all players
-            foreach (var ply in Main.player) {
-                if (!ply.active) continue;
-                for (int i = 0; i < ply.inventory.Length; i++) {
-                    if (ply.inventory[i].type == ItemID.LargeSapphire) {
-                        ply.inventory[i].TurnToAir();
-                        NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, ply.whoAmI, i);
-                    }
-                }
-            }
-        }
 
-        // Large Ruby for RedGem holder
-        if (RedGem.IsHeld && RedGem.HeldBy >= 0 && RedGem.HeldBy < Main.player.Length) {
-            var holder = Main.player[RedGem.HeldBy];
-            int invSlot = 10;
-            if (holder.active && !holder.dead) {
-                if (holder.inventory[invSlot].type != ItemID.LargeRuby) {
-                    holder.inventory[invSlot].SetDefaults(ItemID.LargeRuby);
-                    NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, RedGem.HeldBy, invSlot);
-                }
-                for (int i = 0; i < holder.inventory.Length; i++) {
-                    if (i != invSlot && holder.inventory[i].type == ItemID.LargeRuby) {
-                        holder.inventory[i].TurnToAir();
-                        NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, RedGem.HeldBy, i);
-                    }
-                }
-            }
-        } else {
-            foreach (var ply in Main.player) {
-                if (!ply.active) continue;
-                for (int i = 0; i < ply.inventory.Length; i++) {
-                    if (ply.inventory[i].type == ItemID.LargeRuby) {
-                        ply.inventory[i].TurnToAir();
-                        NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, ply.whoAmI, i);
-                    }
-                }
-            }
-        }
         // Send updated GameInfo to clients every 6 ticks (every 0.1s)
         if (MatchTime % 6 == 0)
         {
