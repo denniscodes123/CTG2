@@ -30,6 +30,7 @@ public class PlayerManager : ModPlayer
     public bool awaitingRespawn = false;
     public ClassConfig currentClass = new ClassConfig();
     public UpgradeConfig currentUpgrade = new UpgradeConfig();
+    public GameManager gameManager = ModContent.GetInstance<GameManager>();
 
     public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;
@@ -130,6 +131,9 @@ public class PlayerManager : ModPlayer
         int blueBaseY = CTG2.config.BlueBase[1] / 16;
         int redBaseX = CTG2.config.RedBase[0] / 16;
         int redBaseY = CTG2.config.RedBase[1] / 16;
+        int lobbyX = CTG2.config.Lobby[0] / 16;
+        int lobbyY = CTG2.config.Lobby[0] / 16;
+        
         int spectatorSpawnX = (13332 + 19316) / 32;
         int spectatorSpawnY = 11000 / 32;
         if (Player.ghost)
@@ -138,32 +142,37 @@ public class PlayerManager : ModPlayer
             Player.SpawnY = spectatorSpawnY;
             return;
         }
-        switch (GameInfo.matchStage)
+        switch (this.playerState)
         {
-            case 0:
+            case PlayerState.None:
                 break;
-            case 1:
+            case PlayerState.Active:
                 if (Player.team == 3)
                 {
                     Player.SpawnX = blueBaseX;
                     Player.SpawnY = blueBaseY;
                 }
-                else
+                else if (Player.team == 1)
                 {
                     Player.SpawnX = redBaseX;
                     Player.SpawnY = redBaseY;
+                }
+                else
+                {
+                    Player.SpawnX = lobbyX;
+                    Player.SpawnY = lobbyY;                    
                 }
                 break;
-            case 2:
+            case PlayerState.ClassSelection:
                 if (Player.team == 3)
                 {
-                    Player.SpawnX = blueBaseX;
-                    Player.SpawnY = blueBaseY;
+                    Player.SpawnX = (int) gameManager.BlueTeam.ClassLocation.X / 16;
+                    Player.SpawnY = (int) gameManager.BlueTeam.ClassLocation.Y / 16;
                 }
-                else
+                else if (Player.team == 1)
                 {
-                    Player.SpawnX = redBaseX;
-                    Player.SpawnY = redBaseY;
+                    Player.SpawnX = (int) gameManager.RedTeam.ClassLocation.X / 16;
+                    Player.SpawnY = (int) gameManager.RedTeam.ClassLocation.Y / 16;
                 }
                 break;
 
@@ -301,7 +310,7 @@ public class PlayerManager : ModPlayer
     }
     public void LockTeam()
     {
-        var gameManager = ModContent.GetInstance<GameManager>();
+        
 
         if (gameManager != null && gameManager.IsGameActive)
         {

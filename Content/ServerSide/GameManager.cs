@@ -335,7 +335,6 @@ public class GameManager : ModSystem
                 redGemFireworkTimer = 0; // Reset 
             }
         }
-
         // Send updated GameInfo to clients every 6 ticks (every 0.1s)
         if (MatchTime % 6 == 0)
         {
