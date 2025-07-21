@@ -45,6 +45,18 @@ namespace CTG2.Content.Classes
             NPC.noTileCollide = false;
             NPC.friendly = false;
         }
+            public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers)
+        {
+            NPC.immune[player.whoAmI] = 40;
+        }
+
+        public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers)
+        {
+            if (projectile.owner >= 0 && projectile.owner < Main.maxPlayers)
+            {
+                NPC.immune[projectile.owner] = 40;
+            }
+        }
 
 
         public override void AI()
