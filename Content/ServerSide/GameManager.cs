@@ -46,7 +46,7 @@ public class GameManager : ModSystem
     private int newGameTimer = 0;
     private int blueGemFireworkTimer = 0;
     private int redGemFireworkTimer = 0;
-    private const int FIREWORK_INTERVAL = 240;
+    private const int FIREWORK_INTERVAL = 120;
         public static void FillLavaInDesignatedArea()
         {
             //hard coded coords for the right.wld if you are on the wrong wld it will spawn lava in wrong spot!!!

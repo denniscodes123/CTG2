@@ -422,6 +422,8 @@ namespace ClassesNamespace
             packet.Write(bonusRegen);
             packet.Write(bonusDef);
             packet.Write(bonusMoveSpeed);
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            packet.Write((byte)playerManager.playerState);
             packet.Send(toWho, fromWho);
         }
 
