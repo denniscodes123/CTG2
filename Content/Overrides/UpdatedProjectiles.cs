@@ -88,6 +88,18 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.ClearBuff(BuffID.CursedInferno);
         }
+        else if (info.DamageSource.SourceProjectileType == 19) //flamebunny flamrang
+        {
+            Player.ClearBuff(24);
+        }
+        else if (info.DamageSource.SourceProjectileType == 15) //flamebunny fof
+        {
+            Player.ClearBuff(24);
+        }
+        else if (info.DamageSource.SourceProjectileType == 480) //Hardcodedjman proj as fallback
+        {
+            Player.ClearBuff(BuffID.CursedInferno);
+        }
     }
 }
 
