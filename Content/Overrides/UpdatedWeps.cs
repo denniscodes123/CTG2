@@ -238,7 +238,16 @@ namespace CTG2.Content.Items.ModifiedWeps
             }
         }
 
-
+        public override bool Shoot(Item item, Player player, Terraria.DataStructures.EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            if (item.type == ItemID.NebulaArcanum)
+            {
+                // Only shoot the Nebula Arcanum projectile
+                Projectile.NewProjectile(source, position, velocity, ProjectileID.NebulaArcanum, damage, knockback, player.whoAmI);
+                return false; // Prevent vanilla behavior (which spawns extra projectiles)
+            }
+            return base.Shoot(item, player, source, position, velocity, type, damage, knockback);
+        }
         public override bool CanUseItem(Item item, Player player)
         {
             if (item.type == ItemID.Bananarang)
