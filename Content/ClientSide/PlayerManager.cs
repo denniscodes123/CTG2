@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using ClassesNamespace;
@@ -7,6 +8,10 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 
 namespace CTG2.Content.ClientSide;
 
@@ -18,6 +23,7 @@ public class PlayerManager : ModPlayer
     }
     public bool ShowClassUI = false;
     public bool ShowGameUI = false;
+
     public static int previousMatchStage = 0;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
@@ -156,7 +162,7 @@ public class PlayerManager : ModPlayer
         EnforceTeamLock(); // lock team
         // wecan probably delete (state transitions handle all of this)
         if (this.playerState == PlayerState.ClassSelection)
-        { 
+        {
             ShowClassUI = true;
             if (!Player.hostile) //this is client side only btw should be fine but might need to be synced later
             {
@@ -166,7 +172,8 @@ public class PlayerManager : ModPlayer
         else if (this.playerState == PlayerState.Active)
         {
             ShowClassUI = false;
-            if (!Player.hostile) {
+            if (!Player.hostile)
+            {
                 Player.hostile = true;
             }
         }
@@ -231,11 +238,11 @@ public class PlayerManager : ModPlayer
         {
             return true;
         }
-    
+
         return false;
     }
-    
-    
+
+
     public override void OnHurt(Player.HurtInfo info) //Fallback in case immuneto doesnt work
     {
         if (Player.ghost)
@@ -243,9 +250,9 @@ public class PlayerManager : ModPlayer
             info.Damage = 0;
             info.Knockback = 0f;
             info.HitDirection = 0;
-            info.DamageSource = default; 
+            info.DamageSource = default;
         }
-    } 
+    }
 
     // When a player disconnects, this hook can clean up their data.
     public override void PlayerDisconnect()
@@ -266,7 +273,7 @@ public class PlayerManager : ModPlayer
         }
         else
         {
-            classSelectionTimer = 1800; 
+            classSelectionTimer = 1800;
             Main.NewText($"PlayerManager: Started server-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Orange);
         }
     }
@@ -281,13 +288,13 @@ public class PlayerManager : ModPlayer
     public void LockTeam()
     {
         var gameManager = ModContent.GetInstance<GameManager>();
-        
+
         if (gameManager != null && gameManager.IsGameActive)
         {
             int blueTeamId = 3;
             int redTeamId = 1;
             int oldteam = Player.team;
-            
+
             if (Player.team != blueTeamId && Player.team != redTeamId)
             {
 
@@ -298,7 +305,7 @@ public class PlayerManager : ModPlayer
                     NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, Player.whoAmI, 0);
                 }
             }
-            else if((GameInfo.matchStage == 2 || GameInfo.matchStage == 1) && !Player.ghost)
+            else if ((GameInfo.matchStage == 2 || GameInfo.matchStage == 1) && !Player.ghost)
             {
                 int currentTeam = Player.team;
                 Player.team = currentTeam;
@@ -312,10 +319,34 @@ public class PlayerManager : ModPlayer
         }
     }
 
-
-
     private void EnforceTeamLock()
     {
         LockTeam();
+    }
+    public override bool OnPickup(Item item)
+    {
+        if ((item.type == ItemID.LargeSapphire && PlayerHasGem(ItemID.LargeSapphire)) ||
+            (item.type == ItemID.LargeRuby && PlayerHasGem(ItemID.LargeRuby)))
+            return false;
+        return base.OnPickup(item);
+    }
+
+
+    public override bool CanUseItem(Item item)
+    {
+        // Prevent using the gem item (optional)
+        if (item.type == ItemID.LargeSapphire || item.type == ItemID.LargeRuby)
+            return false;
+        return base.CanUseItem(item);
+    }
+
+
+
+    private bool PlayerHasGem(int gemType)
+    {
+        for (int i = 0; i < Player.inventory.Length; i++)
+            if (Player.inventory[i].type == gemType)
+                return true;
+        return false;
     }
 }
