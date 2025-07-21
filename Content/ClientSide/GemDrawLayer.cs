@@ -1,3 +1,4 @@
+using CTG2.Content.ServerSide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -21,7 +22,10 @@ public class GemDrawLayer : PlayerDrawLayer
         if (gameManager == null) return;
 
         Texture2D gemTexture = null;
-
+        if (gameManager.BlueGem == null || gameManager.RedGem == null)
+        {
+            return;
+        }
         if (gameManager.BlueGem.IsHeld && gameManager.BlueGem.HeldBy == player.whoAmI)
         {
             gemTexture = Terraria.GameContent.TextureAssets.Item[ItemID.LargeSapphire].Value;
