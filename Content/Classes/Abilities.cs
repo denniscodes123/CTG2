@@ -28,7 +28,7 @@ namespace CTG2.Content
         public int class7HitCounter = 0;
 
         private int class8HP = 0;
-
+        public bool psychicActive = false;
         private int class12SwapTimer = -1;
         private int class12ClosestDist = 99999;
         private Player class12ClosestPlayer = null;
@@ -314,37 +314,32 @@ namespace CTG2.Content
             Player.AddBuff(178, 54000);
             Player.AddBuff(181, 54000);
             
-            class8HP = Player.statLife;
+            psychicActive = true;
         }
-
-
+        public override bool CanUseItem(Item item)
+        {
+            if (psychicActive)
+            {
+                // Only allow if enough HP
+                return true;
+            }
+            return base.CanUseItem(item);
+        }
+        public override void OnConsumeMana(Item item, int manaConsumed)
+        {
+            if (psychicActive && manaConsumed > 0)
+            {
+                int hpCost = manaConsumed;
+                Player.statLife -= hpCost;
+                if (Player.statLife <= 0)
+                {
+                    Player.KillMe(PlayerDeathReason.ByCustomReason(Terraria.Localization.NetworkText.FromLiteral($"{Player.name} finished ")), 9999, 0);
+                }
+                NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI); // Sync HP
+            }
+        }
         private void PsychicPostStatus()
         {
-
-            if (!Player.HasBuff(196)) 
-            {
-                if (class8HP != 0)
-                {
-                    Player.statLife = Player.statLifeMax2;
-                }
-                class8HP = 0;
-                return;
-            }
-            
-            int previousHP = Player.statLife;
-
-            if (Player.HeldItem.type == ItemID.NebulaArcanum && Player.controlUseItem && Player.itemAnimation == 30)
-            {
-                class8HP = Math.Max(0, class8HP - 20);
-            }
- 
-            if (Player.statLife < class8HP) class8HP = Player.statLife;
-            Player.statLife = class8HP;
-          
-            if (Player.statLife != previousHP)
-            {
-                NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
-            }
             
         }
 
