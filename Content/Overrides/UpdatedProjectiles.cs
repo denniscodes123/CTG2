@@ -44,6 +44,15 @@ public class ToxicFlaskTimeOverride : GlobalProjectile
         } //If nebula code doesnt work we have to kill the projectiles onspawn
 
     }
+        public override void OnHitPlayer(Projectile projectile, Player target, Player.HurtInfo info)
+    {
+            Player attacker = Main.player[projectile.owner];
+
+        if (attacker.HeldItem.type == 153) //mutant buffs
+        {
+            attacker.AddBuff(58, 180); //add the rest of the buffs here
+            }
+        }
 
     public override void OnSpawn(Projectile projectile, IEntitySource source)
     {
