@@ -97,6 +97,7 @@ public class PlayerManager : ModPlayer
 
             if (killerManager.currentClass.Name == "Gladiator")
             {
+                killer.statLife += 20;
                 killer.HealEffect(20, true);
             }
         }
