@@ -150,23 +150,40 @@ public class UIManager : ModSystem
         // Show gem carrier HP if gem is captured
         Vector2 carrierHpPos = new Vector2(Main.screenWidth - 320, 700);
 
-        // Get GameManager instance
-        var gameManager = ModContent.GetInstance<GameManager>();
-
-        // Blue Gem Carrier
-        if (gameManager.BlueGem != null && gameManager.BlueGem.IsHeld && gameManager.BlueGem.HeldBy >= 0)
+        if (GameInfo.blueGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.blueGemCarrier))
         {
-            var carrier = Main.player[gameManager.BlueGem.HeldBy];
-            string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
-            Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Blue);
-            carrierHpPos.Y += 40; // space out if both gems are held
+    
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player carrier = Main.player[i];
+    
+                if (carrier.active && carrier.name == GameInfo.blueGemCarrier)
+                {
+                
+                    string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
+                    Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Cyan);
+                  
+                    carrierHpPos.Y += 40; 
+                    
+                
+                    break; 
+                }
+            }
         }
-        // Red Gem Carrier
-        if (gameManager.RedGem != null && gameManager.RedGem.IsHeld && gameManager.RedGem.HeldBy >= 0)
+
+
+        if (GameInfo.redGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.redGemCarrier))
         {
-            var carrier = Main.player[gameManager.RedGem.HeldBy];
-            string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
-            Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Red);
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player carrier = Main.player[i];
+                if (carrier.active && carrier.name == GameInfo.redGemCarrier)
+                {
+                    string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
+                    Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Red);
+                    break; 
+                }
+            }
         }
 
         // draw ability timer

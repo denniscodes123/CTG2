@@ -100,8 +100,9 @@ namespace CTG2.Content
         {
             int projectileType = info.DamageSource.SourceProjectileType;
             int attackerIndex = info.DamageSource.SourcePlayerIndex;
-            
-            if (attackerIndex >= 0 && attackerIndex < Main.maxPlayers) {
+
+            if (attackerIndex >= 0 && attackerIndex < Main.maxPlayers)
+            {
                 Player attacker = Main.player[attackerIndex];
                 int damage = info.Damage;
 
@@ -116,8 +117,9 @@ namespace CTG2.Content
                             Player.AddBuff(323, 60);
                         }
                         break;
-                    
-                    case 15: case 19: // Flame Bunny ability
+
+                    case 15:
+                    case 19: // Flame Bunny ability
                         if (attacker.HasBuff(320) && attacker.HasBuff(137) && attacker.team != Player.team)
                         {
                             Player.AddBuff(20, 30);
@@ -127,7 +129,8 @@ namespace CTG2.Content
                         }
                         break;
 
-                    case 273: case 304: // Leech ability
+                    case 273:
+                    case 304: // Leech ability
                         if (attacker.HasBuff(320) && attacker.team != Player.team)
                         {
                             int healAmount = damage / 3;
@@ -142,7 +145,8 @@ namespace CTG2.Content
 
                             if (attacker.GetModPlayer<Abilities>().class7HitCounter < 10)
                                 Main.NewText($"{attacker.GetModPlayer<Abilities>().class7HitCounter}/10 hits");
-                            else {
+                            else
+                            {
                                 Main.NewText("10/10 hits");
                             }
                         }
@@ -182,7 +186,7 @@ namespace CTG2.Content
             packet.Write(0f);
             packet.Send();
         }
-        
+
 
         private void GladiatorOnUse()
         {
@@ -218,7 +222,7 @@ namespace CTG2.Content
 
 
         private void PaladinOnUse()
-        {   
+        {
             foreach (Player other in Main.player)
             {
                 if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
@@ -229,7 +233,7 @@ namespace CTG2.Content
                     other.AddBuff(58, 200);
                     other.AddBuff(119, 200);
                     other.AddBuff(2, 200);
-                    
+
                     NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 58, 200);
                     NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 119, 200);
                     NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 200);
@@ -254,7 +258,7 @@ namespace CTG2.Content
         private void JungleManPostStatus()
         {
             class6ReleaseTimer = (class6ReleaseTimer > -1) ? class6ReleaseTimer - 1 : -1;
-            
+
             if (class6ReleaseTimer == 0)
             {
                 Vector2 spawnPos = Player.Center + new Vector2(0, Player.height / 2);
@@ -313,7 +317,7 @@ namespace CTG2.Content
             Player.AddBuff(196, 54000);
             Player.AddBuff(178, 54000);
             Player.AddBuff(181, 54000);
-            
+
             psychicActive = true;
         }
         public override bool CanUseItem(Item item)
@@ -340,7 +344,7 @@ namespace CTG2.Content
         }
         private void PsychicPostStatus()
         {
-            
+
         }
 
 
@@ -356,7 +360,7 @@ namespace CTG2.Content
                     other.AddBuff(103, 480);
                     other.AddBuff(26, 480);
                     other.AddBuff(2, 480);
-                    
+
                     NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 480);
                     NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 26, 480);
                     NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 103, 480);
@@ -405,9 +409,10 @@ namespace CTG2.Content
         private void ClownOnUse() //not finished
         {
             Player.AddBuff(320, 60);
+            Player.AddBuff(BuffID.Electrified, this.class12SwapTimer);
 
             Player.GetModPlayer<ClassSystem>().clownSwapCaller = Player.whoAmI; //Gives this reference to clownpoststatus
-            
+
             class12SwapTimer = 60;
 
             Main.NewText("Swapping...");
@@ -416,11 +421,46 @@ namespace CTG2.Content
 
         private void ClownPostStatus()
         {
-                if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
-                return; 
-                
+            if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
+                return;
+
             if (class12SwapTimer != -1) class12SwapTimer--;
 
+            if (class12SwapTimer > 0 && class12SwapTimer % 10 == 0)
+            {
+                // If we haven't locked on to a target yet, search for one.
+                if (class12ClosestPlayer == null)
+                {
+                    Player potentialTarget = null;
+                    float closestDist = 22 * 16; // 22 block radius
+
+                    foreach (Player other in Main.player)
+                    {
+                        if (!other.active || other.dead || other.whoAmI == Player.whoAmI || other.ghost || other.team == Player.team)
+                            continue;
+
+                        float distance = Player.Distance(other.Center);
+                        if (distance < closestDist)
+                        {
+                            closestDist = distance;
+                            potentialTarget = other;
+                        }
+                    }
+                    if (potentialTarget != null)
+                    {
+                        class12ClosestPlayer = potentialTarget;
+                        int buffType = BuffID.Electrified;
+                        int buffDuration = 10;
+
+                        class12ClosestPlayer.AddBuff(buffType, buffDuration);
+                        NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, class12ClosestPlayer.whoAmI, buffType, buffDuration);
+                    }
+                }
+                else if (Player.Distance(class12ClosestPlayer.Center) > 22 * 16 || !class12ClosestPlayer.active || class12ClosestPlayer.dead)
+                {
+                    class12ClosestPlayer = null;
+                }
+            }
             if (class12SwapTimer == 0)
             {
                 foreach (Player other in Main.player)
@@ -458,7 +498,9 @@ namespace CTG2.Content
                     packet2.Send();
 
                     class12ClosestPlayer.AddBuff(BuffID.WaterWalking, 180);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, class12ClosestPlayer.whoAmI, BuffID.WaterWalking, 180);
                     class12ClosestPlayer.AddBuff(BuffID.ObsidianSkin, 180);
+                    NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, class12ClosestPlayer.whoAmI, BuffID.ObsidianSkin, 180);
 
                     Main.NewText("Successfully swapped!");
                     Player.GetModPlayer<ClassSystem>().clownSwapCaller = -1; //reset the caller after the logic is done
@@ -482,7 +524,7 @@ namespace CTG2.Content
 
 
         private void TikiPriestOnUse()
-        {   
+        {
             var mod1 = ModContent.GetInstance<CTG2>();
             ModPacket packet1 = mod1.GetPacket();
             packet1.Write((byte)MessageType.RequestSpawnNpc);
@@ -503,7 +545,7 @@ namespace CTG2.Content
                     Player.GetSource_Misc("Class15Ability"),
                     Player.Center,
                     Vector2.Zero,
-                    511, 
+                    511,
                     0,
                     0f,
                     Player.whoAmI
@@ -527,7 +569,7 @@ namespace CTG2.Content
                         {
                             other.AddBuff(160, 30);
                             other.AddBuff(197, 30);
-                                    
+
                             NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 160, 30);
                             NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 197, 30);
                         }
@@ -536,7 +578,7 @@ namespace CTG2.Content
             }
         }
 
-        
+
         private void MutantInitialize()
         {
             using (var stream = Mod.GetFileStream($"Content/Classes/rushmutant.json"))
@@ -600,7 +642,7 @@ namespace CTG2.Content
         public override void PostItemCheck() // Upon activation
         {
             if (Main.netMode == NetmodeID.Server) return;
-            
+
             if (!initializedMutant)
             {
                 MutantInitialize();
@@ -623,7 +665,7 @@ namespace CTG2.Content
                     case 2:
                         SetCooldown(10);
                         NinjaOnUse();
-                        
+
                         break;
 
                     case 3:
@@ -732,23 +774,37 @@ namespace CTG2.Content
             if (cooldown > 0)
                 cooldown--;
         }
+    public override void UpdateLifeRegen()
+{
+
+    if (Player.HasBuff(BuffID.Electrified))
+    {
+
+        if (Player.lifeRegen < 0)
+        {
+
+            Player.lifeRegen = 0;
+        }
+    }
+}
     }
 
-/*
-    public class AbilitiesGlobal : ModSystem
-    {
-        public override void PostUpdatePlayers()
-        {
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                Player player = Main.player[i];
 
-                if (player.active && player.dead)
+/*
+        public class AbilitiesGlobal : ModSystem
+        {
+            public override void PostUpdatePlayers()
+            {
+                for (int i = 0; i < Main.maxPlayers; i++)
                 {
-                    if (Abilities.cooldown > 0)
-                        Abilities.cooldown--;
+                    Player player = Main.player[i];
+
+                    if (player.active && player.dead)
+                    {
+                        if (Abilities.cooldown > 0)
+                            Abilities.cooldown--;
+                    }
                 }
             }
-        }
-    } Shouldnt be updated globally i believe*/
+        } Shouldnt be updated globally i believe*/
 }
