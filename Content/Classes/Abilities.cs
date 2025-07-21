@@ -385,6 +385,7 @@ namespace CTG2.Content
                             {
                                 WorldGen.KillTile(x, y, false, false, true);
                                 NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 0, x, y);
+                                Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, ItemID.DirtBlock);
                             }
                         }
                     }
