@@ -84,6 +84,17 @@ public class PlayerManager : ModPlayer
     {
         var modPlayer = Player.GetModPlayer<ClassSystem>();
 
+        if (pvp)
+        {
+            Player killer = Main.player[damageSource.SourcePlayerIndex];
+            var killerManager = killer.GetModPlayer<PlayerManager>();
+
+            if (killerManager.currentClass.Name == "Gladiator")
+            {
+                killer.HealEffect(20, true);
+            }
+        }
+
         if (GameInfo.matchStage == 2)
         {
             awaitingRespawn = true;
