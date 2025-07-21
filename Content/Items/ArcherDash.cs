@@ -92,15 +92,16 @@ namespace CTG2.Content.Items
 
 			if (DashDelay > 0) DashDelay--;
 
+			Player.eocDash = DashTimer;
+
 			if (DashTimer > 0) { // If dash is active
 				
 				// Afterimage effect
-				Player.eocDash = DashTimer;
 				Player.armorEffectDrawShadowEOCShield = true;
-
-				// Count down frames remaining
 				DashTimer--;
 			}
+			else
+				Player.armorEffectDrawShadowEOCShield = false;
 		}
 	}
 }

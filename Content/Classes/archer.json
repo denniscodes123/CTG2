@@ -1,5 +1,5 @@
 {
-  "HealthPoints": 160,
+  "HealthPoints": 100,
   "ManaPoints": 20,
   "InventoryItems": [
     {
@@ -458,8 +458,8 @@
       "Slot": 64
     },
     {
-      "Name": "Tsunami in a Bottle",
-      "Type": 3201,
+      "Name": "Archer Dash",
+      "Type": 5548,
       "Stack": 1,
       "Prefix": 0,
       "Slot": 65
@@ -472,9 +472,9 @@
       "Slot": 66
     },
     {
-      "Name": "Archer Dash",
-      "Type": 5548,
-      "Stack": 1,
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
       "Prefix": 0,
       "Slot": 67
     },

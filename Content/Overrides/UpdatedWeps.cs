@@ -232,6 +232,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.useTime = 20;
                     item.useAnimation = 20;
                     item.shootSpeed = 48f;
+                    item.crit = 0;
                     break;
 
 
