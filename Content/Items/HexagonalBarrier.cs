@@ -39,8 +39,10 @@ namespace CTG2.Content.Items {
 	public class HexagonalBarrierProjectile : ModProjectile
 	{
 		public override string Texture => "CTG2/Content/Items/HexagonalBarrierProjectile";
-		bool firstFrame = true;
-		bool broken = false;
+		private bool firstFrame = true;
+		private bool broken = false;
+		public bool alive = true;
+		public bool teamCheck = false;
 
 
 		public override void SetDefaults() {
@@ -83,14 +85,20 @@ namespace CTG2.Content.Items {
 			{
 				Projectile other = Main.projectile[i];
 
-				if (other.active && other.type != ModContent.ProjectileType<HexagonalBarrierProjectile>() && other.whoAmI != Projectile.whoAmI && other.owner != Projectile.owner && Main.player[other.owner].team != Main.player[Projectile.owner].team)
+				if (other.owner != Projectile.owner && Main.player[other.owner].team != Main.player[Projectile.owner].team)
+					teamCheck = true;
+				else
+					teamCheck = false;
+
+				if (other.active && other.type != ModContent.ProjectileType<HexagonalBarrierProjectile>() && other.whoAmI != Projectile.whoAmI && teamCheck)
 				{
 					if (Projectile.Hitbox.Intersects(other.Hitbox))
 					{
-						// Simulate collision effect
 						broken = true;
 						Projectile.Kill();
-						other.Kill();
+						if (other.type != ProjectileID.ThornChakram && other.type!= ProjectileID.Bananarang && other.type != ProjectileID.Flamarang)
+							other.Kill();
+						
 						break; // Prevent multiple collisions per frame
 					}
 				}
