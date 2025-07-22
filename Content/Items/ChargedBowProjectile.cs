@@ -9,6 +9,8 @@ using Terraria.GameContent;
 using Microsoft.Xna.Framework.Audio;
 using ReLogic.Utilities;
 using System;
+using CTG2.Content.Items;
+
 
 public class ChargedBowProjectile : ModProjectile
 {
@@ -164,7 +166,7 @@ public class ChargedBowProjectile : ModProjectile
 			if (Main.myPlayer == Projectile.owner)
 				{
 			Projectile.NewProjectile(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
-   				}
+				}
 			SoundEngine.PlaySound(SoundID.Item5, Projectile.position); // sound played when fired
 		}
 

@@ -8,7 +8,7 @@ namespace CTG2.Content.Items
 	{
 
 	   	private uint useDelay = 36; // Time between shots
-     	private uint lastUsedCounter = 0;
+     		private uint lastUsedCounter = 0;
 	    
 		public override void SetDefaults()
 		{
