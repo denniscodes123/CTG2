@@ -101,12 +101,14 @@ namespace CTG2.Content.Items {
 			{
 				// Lerp alpha from 0 (opaque) to 255 (invisible)
 				float fadeProgress = 0.7f * (1f - (Projectile.timeLeft / 30f));
-				Projectile.alpha = (int)(fadeProgress * 255f);
+				Projectile.alpha = (int)(fadeProgress * 205f + 50f);
 
 				// Clamp in case of rounding issues
 				if (Projectile.alpha > 255)
 					Projectile.alpha = 255;
 			}
+			else
+				Projectile.alpha = 50;
 		}
 
 
