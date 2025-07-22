@@ -85,10 +85,7 @@ namespace CTG2.Content.Items {
 			{
 				Projectile other = Main.projectile[i];
 
-				if (other.owner != Projectile.owner && Main.player[other.owner].team != Main.player[Projectile.owner].team)
-					teamCheck = true;
-				else
-					teamCheck = false;
+				teamCheck = other.owner != Projectile.owner && Main.player[other.owner].team != Main.player[Projectile.owner].team;
 
 				if (other.active && other.type != ModContent.ProjectileType<HexagonalBarrierProjectile>() && other.whoAmI != Projectile.whoAmI && teamCheck)
 				{
