@@ -40,6 +40,7 @@ namespace CTG2.Content.Items {
 	{
 		public override string Texture => "CTG2/Content/Items/HexagonalBarrierProjectile";
 		bool firstFrame = true;
+		bool broken = false;
 
 
 		public override void SetDefaults() {
@@ -82,11 +83,12 @@ namespace CTG2.Content.Items {
 			{
 				Projectile other = Main.projectile[i];
 
-				if (other.active && other.type != ModContent.ProjectileType<HexagonalBarrierProjectile>() && other.whoAmI != Projectile.whoAmI && other.owner != Projectile.owner && Main.player[other.owner].team != Main.player[Projectile.owner].team)
+				if (other.active && other.type != ModContent.ProjectileType<HexagonalBarrierProjectile>() && other.whoAmI != Projectile.whoAmI)//&& other.owner != Projectile.owner && Main.player[other.owner].team != Main.player[Projectile.owner].team)
 				{
 					if (Projectile.Hitbox.Intersects(other.Hitbox))
 					{
 						// Simulate collision effect
+						broken = true;
 						Projectile.Kill();
 						other.Kill();
 						break; // Prevent multiple collisions per frame
@@ -100,7 +102,7 @@ namespace CTG2.Content.Items {
 			if (Projectile.timeLeft <= 30)
 			{
 				// Lerp alpha from 0 (opaque) to 255 (invisible)
-				float fadeProgress = 0.7f * (1f - (Projectile.timeLeft / 30f));
+				float fadeProgress = 1f - (Projectile.timeLeft / 30f);
 				Projectile.alpha = (int)(fadeProgress * 205f + 50f);
 
 				// Clamp in case of rounding issues
@@ -132,25 +134,29 @@ namespace CTG2.Content.Items {
 
 		public override void Kill(int timeLeft)
 		{
-			// Play a sound (optional)
-			SoundEngine.PlaySound(SoundID.Item27, Projectile.position);
-
-			// Spawn 10 dust particles
-			for (int i = 0; i < 4; i++)
+			if (broken)
 			{
-				Dust.NewDust(
-					Projectile.position,                      // position
-					Projectile.width,                         // width
-					Projectile.height,                        // height
-					67,                             // type (try others like DustID.Fire, DustID.GoldCoin, etc.)
-					Projectile.velocity.X * 0.2f,             // X velocity
-					Projectile.velocity.Y * 0.2f,             // Y velocity
-					100,                                      // alpha
-					default,                                  // color
-					1f                                      // scale
-				);
+				// Play a sound (optional)
+				SoundEngine.PlaySound(SoundID.Item27, Projectile.position);
+
+				// Spawn 10 dust particles
+				for (int i = 0; i < 4; i++)
+				{
+					Dust.NewDust(
+						Projectile.position,                      // position
+						Projectile.width,                         // width
+						Projectile.height,                        // height
+						67,                             // type (try others like DustID.Fire, DustID.GoldCoin, etc.)
+						Projectile.velocity.X * 0.2f,             // X velocity
+						Projectile.velocity.Y * 0.2f,             // Y velocity
+						100,                                      // alpha
+						default,                                  // color
+						1f                                      // scale
+					);
+				}
+
+				broken = false;
 			}
 		}
-
 	}
 }
