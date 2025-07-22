@@ -2,8 +2,10 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.DataStructures;
+using CTG2.Content.Items;
+using Terraria.Audio;
 
-public class ToxicFlaskTimeOverride : GlobalProjectile
+public class ProjectileOverrides : GlobalProjectile
 {
     public override bool InstancePerEntity => true;
 
@@ -17,11 +19,62 @@ public class ToxicFlaskTimeOverride : GlobalProjectile
                 projectile.timeLeft = 120;
             }
         }
-        if (projectile.type == ProjectileID.ThornChakram) //this code makes clown one blocking easier
+        if (projectile.type == ProjectileID.ThornChakram)
         {
-            projectile.width = 30;
+            projectile.width = 30; //easier one blocking
             projectile.height = 30;
 
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile barrier = Main.projectile[i];
+
+                if (barrier.type == ModContent.ProjectileType<HexagonalBarrierProjectile>())
+                {
+                    HexagonalBarrierProjectile barrierProj = barrier.ModProjectile as HexagonalBarrierProjectile;
+                    if (projectile.Hitbox.Intersects(barrier.Hitbox) && barrierProj.alive && barrierProj.teamCheck)
+                    {
+                        barrierProj.alive = false;
+                        if (projectile.ai[1] > 40)
+                        {
+                            projectile.ai[0] = 1;
+                            projectile.netUpdate = true;
+                        }
+                        else
+                        {
+                            projectile.velocity.X *= -1f;
+                            projectile.velocity.Y *= -1f;
+                        }
+
+                        // Optional: play a sound or spawn dust for feedback
+                        SoundEngine.PlaySound(SoundID.Dig, projectile.Center);
+                        break;
+                    }
+                }
+            }
+        }
+        if (projectile.type == ProjectileID.Flamarang || projectile.type == ProjectileID.Bananarang) 
+        {
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile barrier = Main.projectile[i];
+
+                if (barrier.type == ModContent.ProjectileType<HexagonalBarrierProjectile>())
+                {
+                    HexagonalBarrierProjectile barrierProj = barrier.ModProjectile as HexagonalBarrierProjectile;
+                    if (projectile.Hitbox.Intersects(barrier.Hitbox) && barrierProj.alive && barrierProj.teamCheck)
+                    {
+                        barrierProj.alive = false;
+                        projectile.ai[0] = 1;
+                        projectile.netUpdate = true;
+                        projectile.velocity.X *= -0.8f;
+                        projectile.velocity.Y *= -0.8f;
+
+                        // Optional: play a sound or spawn dust for feedback
+                        SoundEngine.PlaySound(SoundID.Dig, projectile.Center);
+                        break;
+                    }
+                }
+            }
         }
         if (projectile.type == 700) //kill ghast projectiles
         {
@@ -44,15 +97,6 @@ public class ToxicFlaskTimeOverride : GlobalProjectile
         } //If nebula code doesnt work we have to kill the projectiles onspawn
 
     }
-        public override void OnHitPlayer(Projectile projectile, Player target, Player.HurtInfo info)
-    {
-            Player attacker = Main.player[projectile.owner];
-
-        if (attacker.HeldItem.type == 153) //mutant buffs
-        {
-            attacker.AddBuff(58, 180); //add the rest of the buffs here
-            }
-        }
 
     public override void OnSpawn(Projectile projectile, IEntitySource source)
     {
@@ -111,4 +155,3 @@ public class ModifyHurtModPlayer : ModPlayer
         }
     }
 }
-
