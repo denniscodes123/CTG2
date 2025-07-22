@@ -421,46 +421,11 @@ namespace CTG2.Content
 
         private void ClownPostStatus()
         {
-            if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
-                return;
-
+                if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
+                return; 
+                
             if (class12SwapTimer != -1) class12SwapTimer--;
 
-            if (class12SwapTimer > 0 && class12SwapTimer % 10 == 0)
-            {
-                // If we haven't locked on to a target yet, search for one.
-                if (class12ClosestPlayer == null)
-                {
-                    Player potentialTarget = null;
-                    float closestDist = 22 * 16; // 22 block radius
-
-                    foreach (Player other in Main.player)
-                    {
-                        if (!other.active || other.dead || other.whoAmI == Player.whoAmI || other.ghost || other.team == Player.team)
-                            continue;
-
-                        float distance = Player.Distance(other.Center);
-                        if (distance < closestDist)
-                        {
-                            closestDist = distance;
-                            potentialTarget = other;
-                        }
-                    }
-                    if (potentialTarget != null)
-                    {
-                        class12ClosestPlayer = potentialTarget;
-                        int buffType = BuffID.Electrified;
-                        int buffDuration = 10;
-
-                        class12ClosestPlayer.AddBuff(buffType, buffDuration);
-                        NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, class12ClosestPlayer.whoAmI, buffType, buffDuration);
-                    }
-                }
-                else if (Player.Distance(class12ClosestPlayer.Center) > 22 * 16 || !class12ClosestPlayer.active || class12ClosestPlayer.dead)
-                {
-                    class12ClosestPlayer = null;
-                }
-            }
             if (class12SwapTimer == 0)
             {
                 foreach (Player other in Main.player)
@@ -498,9 +463,7 @@ namespace CTG2.Content
                     packet2.Send();
 
                     class12ClosestPlayer.AddBuff(BuffID.WaterWalking, 180);
-                    NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, class12ClosestPlayer.whoAmI, BuffID.WaterWalking, 180);
                     class12ClosestPlayer.AddBuff(BuffID.ObsidianSkin, 180);
-                    NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, class12ClosestPlayer.whoAmI, BuffID.ObsidianSkin, 180);
 
                     Main.NewText("Successfully swapped!");
                     Player.GetModPlayer<ClassSystem>().clownSwapCaller = -1; //reset the caller after the logic is done
@@ -514,6 +477,7 @@ namespace CTG2.Content
                 class12ClosestPlayer = null;
             }
         }
+
 
 
         private void FlameBunnyOnUse()

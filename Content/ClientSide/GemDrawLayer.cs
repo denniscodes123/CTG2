@@ -18,19 +18,14 @@ public class GemDrawLayer : PlayerDrawLayer
     protected override void Draw(ref PlayerDrawSet drawInfo)
     {
         Player player = drawInfo.drawPlayer;
-        var gameManager = ModContent.GetInstance<ServerSide.GameManager>();
-        if (gameManager == null) return;
-
         Texture2D gemTexture = null;
-        if (gameManager.BlueGem == null || gameManager.RedGem == null)
-        {
-            return;
-        }
-        if (gameManager.BlueGem.IsHeld && gameManager.BlueGem.HeldBy == player.whoAmI)
+
+        if (!string.IsNullOrEmpty(GameInfo.blueGemCarrier) && player.name == GameInfo.blueGemCarrier)
         {
             gemTexture = Terraria.GameContent.TextureAssets.Item[ItemID.LargeSapphire].Value;
         }
-        else if (gameManager.RedGem.IsHeld && gameManager.RedGem.HeldBy == player.whoAmI)
+
+        else if (!string.IsNullOrEmpty(GameInfo.redGemCarrier) && player.name == GameInfo.redGemCarrier)
         {
             gemTexture = Terraria.GameContent.TextureAssets.Item[ItemID.LargeRuby].Value;
         }
@@ -38,19 +33,18 @@ public class GemDrawLayer : PlayerDrawLayer
         if (gemTexture != null)
         {
             float drawX = (int)(drawInfo.Position.X + player.width / 2f - Main.screenPosition.X);
-            float drawY = (int)(drawInfo.Position.Y - gemTexture.Height - 4f - Main.screenPosition.Y); 
+            float drawY = (int)(drawInfo.Position.Y - gemTexture.Height - 4f - Main.screenPosition.Y);
 
             var position = new Vector2(drawX, drawY);
 
-    
             var data = new DrawData(
                 gemTexture,
                 position,
-                null, 
+                null,
                 Color.White,
-                0f, 
-                gemTexture.Size() / 2f, 
-                1f, 
+                0f,
+                gemTexture.Size() / 2f,
+                1f,
                 SpriteEffects.None,
                 0
             );
