@@ -424,10 +424,11 @@ namespace CTG2.Content
                 if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
                 return; 
                 
-            if (class12SwapTimer != -1) class12SwapTimer--;
+            if (class12SwapTimer != -1){ class12SwapTimer--; Player.inferno = true;}
 
             if (class12SwapTimer == 0)
             {
+                Player.inferno = false;
                 foreach (Player other in Main.player)
                 {
                     if (!other.active || other.dead || other.whoAmI == Player.whoAmI || other.ghost)
