@@ -52,6 +52,7 @@ namespace CTG2
         RequestKill = 29,
         RequestWeb = 30,
         RequestSyncStats=31,
+        RequestFullHeal = 32,
 
                     
                 
@@ -507,6 +508,13 @@ namespace CTG2
                             modPlayer.SyncPlayer(-1, pIndex);
                         }
                         break;
+
+                    case(byte)MessageType.RequestFullHeal:
+                    {
+                        int plyrindex = reader.ReadInt32();
+                        Main.player[plyrindex].Heal(200);
+                    }
+                    break;
                     }
 
                 default:
