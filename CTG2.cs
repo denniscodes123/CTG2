@@ -497,7 +497,7 @@ namespace CTG2
                     Console.WriteLine($"Server: Webbed player {playerToWeb.name} for {webTimeInTicks / 60} seconds");
                     break;
 
-                    case (byte)MessageType.RequestSyncStats:
+                case (byte)MessageType.RequestSyncStats:
                     {
                         byte pIndex = reader.ReadByte();
                         var modPlayer = Main.player[pIndex].GetModPlayer<ClassSystem>();
@@ -508,14 +508,14 @@ namespace CTG2
                             modPlayer.SyncPlayer(-1, pIndex);
                         }
                         break;
+                    }
 
-                    case(byte)MessageType.RequestFullHeal:
+                case(byte)MessageType.RequestFullHeal:
                     {
                         int plyrindex = reader.ReadInt32();
                         Main.player[plyrindex].Heal(200);
                     }
                     break;
-                    }
 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
