@@ -675,6 +675,8 @@ public class GameManager : ModSystem
         packet.Write((int)gameTeam.BaseLocation.X);
         packet.Write((int)gameTeam.BaseLocation.Y);
         packet.Send(toClient: playerIndex);
+
+        Main.player[playerIndex].Heal(200); //Heal when teleported
         
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[SERVER] Sent ServerTeleport to ALL CLIENTS for player {playerIndex} at ({gameTeam.BaseLocation.X}, {gameTeam.BaseLocation.Y})"), Color.Purple);
         
