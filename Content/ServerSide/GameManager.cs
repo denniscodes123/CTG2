@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using Terraria;
 using Terraria.ModLoader;
@@ -77,12 +77,81 @@ public class GameManager : ModSystem
     
             Main.NewText("Lava region filled.");
         }
+        public static void FillHoneyForMap(MapTypes map)
+        {
+            // Define honey zones for specific maps
+            List<Rectangle> honeyZones = new();
+
+            switch (map)
+            {
+                case MapTypes.Kraken:
+                    honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+                    break;
+
+                case MapTypes.Stalactite:
+                    
+                    break;
+
+                default:
+                    return;
+            }
+
+            foreach (var zone in honeyZones)
+            {
+                for (int x = zone.Left; x < zone.Right; x++)
+                {
+                    for (int y = zone.Top; y < zone.Bottom; y++)
+                    {
+                        Tile tile = Framing.GetTileSafely(x, y);
+
+                        if (!tile.HasTile)
+                        {
+                            tile.LiquidAmount = 255;
+                            tile.LiquidType = LiquidID.Honey;
+                            Liquid.AddWater(x, y);
+                            WorldGen.SquareTileFrame(x, y, true);
+                        }
+                    }
+                }
+            }
+
+            Liquid.UpdateLiquid();
+        }
+        public static void ClearHoneyForMap()
+        {
+            List<Rectangle> honeyZones = new();
+
+            honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+
+            foreach (var zone in honeyZones)
+            {
+                for (int x = zone.Left; x < zone.Right; x++)
+                {
+                    for (int yPos = zone.Top; yPos < zone.Bottom; yPos++)
+                    {
+                        Tile tile = Framing.GetTileSafely(x, yPos);
+
+                        if (tile.LiquidAmount > 0 && tile.LiquidType == LiquidID.Honey)
+                        {
+                            tile.LiquidAmount = 0;
+                            tile.LiquidType = 0;
+                            Liquid.AddWater(x, yPos);
+                            WorldGen.SquareTileFrame(x, yPos, true);
+                        }
+                    }
+                }
+            }
+
+            Liquid.UpdateLiquid();
+        }
+
+
     
     public override void OnWorldLoad()
     {
         // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
-        Main.spawnTileX = 13317/16; //spawn coords for the world ONLY on world load (this is changed later)
-        Main.spawnTileY = 10855/16;
+        Main.spawnTileX = 13317 / 16; //spawn coords for the world ONLY on world load (this is changed later)
+        Main.spawnTileY = 10855 / 16;
 
         BlueGem = new Gem(new Vector2(CTG2.config.BlueGem[0], CTG2.config.BlueGem[1]), 3);
         RedGem = new Gem(new Vector2(CTG2.config.RedGem[0], CTG2.config.RedGem[1]), 1);
@@ -136,14 +205,24 @@ public class GameManager : ModSystem
 
             if (isMapPicked)
             {
-
+                ClearHoneyForMap();
                 Map.LoadMap(result);
+                if (result == MapTypes.Kraken || result == MapTypes.Stalactite)
+                {
+                    FillHoneyForMap(result);
+                }
                 FillLavaInDesignatedArea();
             }
             else
             {
-                Map.LoadMap((MapTypes)CTG2.randomGenerator.Next(0, 7));
+                var randomMap = (MapTypes)CTG2.randomGenerator.Next(0, 7);
+                ClearHoneyForMap();
+                Map.LoadMap(randomMap);
                 FillLavaInDesignatedArea();
+                if (randomMap == MapTypes.Kraken || randomMap == MapTypes.Stalactite)
+                {
+                    FillHoneyForMap(randomMap);
+                }
             }
         }
 
