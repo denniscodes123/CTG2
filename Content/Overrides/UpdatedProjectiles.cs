@@ -125,6 +125,13 @@ public class ModifyHurtModPlayer : ModPlayer
     //should make weps not inflict debuffs?
     public override void OnHurt(Player.HurtInfo info)
     {
+        var modPlayer = Player.GetModPlayer<PlayerManager>();
+    
+        if (modPlayer.currentClass.Name == "Paladin") //Paladin buffs when it's hit
+        {
+            Player.AddBuff(BuffID.Honey, 180);        
+            Player.AddBuff(BuffID.RapidHealing, 180); 
+        }
         if (info.DamageSource.SourceProjectileType == ProjectileID.Sunfury)
         {
             Player.ClearBuff(BuffID.OnFire);
