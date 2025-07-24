@@ -224,6 +224,8 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.shoot = 0;
                     item.scale = 0;
                     item.damage = 0;
+                    item.useTime =0;
+                    item.useAnimation=0;
                     break;
                 case 165:
                     item.shoot = 699;
