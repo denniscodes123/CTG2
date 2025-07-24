@@ -25,6 +25,7 @@ namespace ClassesNamespace
         public int Stack { get; set; }
         public int Prefix { get; set; }
         public int Slot { get; set; }
+        public bool Modded { get; set; }
     }
 
 
@@ -88,12 +89,12 @@ namespace ClassesNamespace
         public override void OnEnterWorld()
         {
             base.OnEnterWorld();
+            Player.ConsumedLifeFruit = 0;
+
             for (int i = Player.buffType.Length - 1; i >= 0; i--)
             {
                 Player.DelBuff(i);
             }
-
-
 
             //Comment this out if you want this to not clear all inventory onenterwolrd
             //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
@@ -119,11 +120,13 @@ namespace ClassesNamespace
 
         private void SetInventory(CtgClass classData)
         {
-                    for (int i = 0; i < Player.buffType.Length; i++)
-                {
-                    Player.DelBuff(i);
-                }
+            for (int i = Player.buffType.Length - 1; i >= 0; i--)
+            {
+                Player.DelBuff(i);
+            }
             ApplyPermBuffs();
+            
+            //Player.statLife = classData.HealthPoints; set this after modifymax
             //Player.statLife = classData.HealthPoints; set this after modifymax
             Player.statManaMax2 = classData.ManaPoints;
             Player.statManaMax = classData.ManaPoints;
@@ -131,6 +134,9 @@ namespace ClassesNamespace
 
             currentHP = classData.HealthPoints;
             currentMana = classData.ManaPoints;
+
+            currentHP = classData.HealthPoints;
+            
 
             Console.WriteLine($"Player hp is {currentHP}");
             Console.WriteLine($" {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax2}");
@@ -181,11 +187,15 @@ namespace ClassesNamespace
             }
             /*this may not work lol
             */
+            
+            currentMana = classData.ManaPoints;
+            Player.statMana = currentMana;
+            
 
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{currentHP}, {Player.statLife}"), Microsoft.Xna.Framework.Color.Olive);
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
             SyncPlayer(-1, Player.whoAmI);
-
+            
         }
 
 
@@ -267,10 +277,10 @@ namespace ClassesNamespace
             if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
             {
 
-                for (int i = 0; i < Player.buffType.Length; i++)
-                {
-                    Player.DelBuff(i);
-                }
+            for (int i = Player.buffType.Length - 1; i >= 0; i--)
+            {
+                Player.DelBuff(i);
+            }
 
 
                 string selectedClass = playerManager.currentClass.Inventory;
@@ -305,7 +315,7 @@ namespace ClassesNamespace
             Player.AddBuff(BuffID.Builder, 54000);
 
 
-
+            Player.statManaMax2 = currentMana;
             // Set base stats first
             // Player.statLifeMax2 = currentHP;
             // Player.statManaMax2 = currentMana;
@@ -342,6 +352,7 @@ namespace ClassesNamespace
         public override void OnRespawn()
         {
             ApplyPermBuffs();
+            Player.Heal(600);
         }
 
         public override void UpdateEquips()
@@ -385,8 +396,7 @@ namespace ClassesNamespace
             // First ensure the player's max stats are updated
             // Player.statLifeMax = currentHP;
             // Player.statLifeMax2 = currentHP;
-            Player.statManaMax = currentMana;
-            Player.statManaMax2 = currentMana;
+
 
             // // Set current life/mana to max if they're above the new max
             // if (Player.statLife > currentHP) Player.statLife = currentHP;
@@ -422,14 +432,20 @@ namespace ClassesNamespace
             bonusRegen = reader.ReadInt32();
             bonusDef = reader.ReadInt32();
             bonusMoveSpeed = reader.ReadSingle();
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            playerManager.playerState = (PlayerManager.PlayerState)reader.ReadInt32(); // new
         }
         public override void SendClientChanges(ModPlayer clientPlayer)
         {
-            var clone = (ClassSystem)clientPlayer;
-            if (currentHP != clone.currentHP || currentMana != clone.currentMana || bonusHP != clone.bonusHP)
-            {
-                SyncPlayer(-1, Main.myPlayer);
-            }
+        var clone = (ClassSystem)clientPlayer;
+        var clientPlayerManager = clientPlayer.Player.GetModPlayer<PlayerManager>();
+        var localPlayerManager = this.Player.GetModPlayer<PlayerManager>();
+
+        if (currentHP != clone.currentHP || currentMana != clone.currentMana || bonusHP != clone.bonusHP || clientPlayerManager.playerState != localPlayerManager.playerState)
+        {
+            SyncPlayer(-1, Main.myPlayer); //this is causing a lot of lag
+        }
+
         }
         public override void CopyClientState(ModPlayer targetCopy)
         {
@@ -440,13 +456,8 @@ namespace ClassesNamespace
             clone.bonusRegen = bonusRegen;
             clone.bonusDef = bonusDef;
             clone.bonusMoveSpeed = bonusMoveSpeed;
+            PlayerManager playerManager = targetCopy.Player.GetModPlayer<PlayerManager>();
+            playerManager.playerState = this.Player.GetModPlayer<PlayerManager>().playerState; 
         }
-
-
-
-        
-
-
     }
-
 }
