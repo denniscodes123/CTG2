@@ -12,7 +12,6 @@ using ClassesNamespace;
 
 namespace CTG2.Content.Commands
 {
-    
     public class SaveInventoryCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
@@ -25,18 +24,22 @@ namespace CTG2.Content.Commands
             Player player = caller.Player;
             var inventoryData = new List<ItemData>();
             int count = 0;
+            bool modded = false;
 
             foreach (Item item in player.inventory)
             {
                 if (item != null)
                 {
+                    modded = item.type >= 5546;
+
                     inventoryData.Add(new ItemData
                     {
                         Name = item.Name,
                         Type = item.type,
                         Stack = item.stack,
                         Prefix = item.prefix,
-                        Slot = count
+                        Slot = count,
+                        Modded = modded
                     });
                 }
 
@@ -47,13 +50,16 @@ namespace CTG2.Content.Commands
             {
                 if (item != null)
                 {
+                    modded = item.type >= 5546;
+
                     inventoryData.Add(new ItemData
                     {
                         Name = item.Name,
                         Type = item.type,
                         Stack = item.stack,
                         Prefix = item.prefix,
-                        Slot = count
+                        Slot = count,
+                        Modded = modded
                     });
                 }
 
@@ -64,13 +70,16 @@ namespace CTG2.Content.Commands
             {
                 if (item != null)
                 {
+                    modded = item.type >= 5546;
+
                     inventoryData.Add(new ItemData
                     {
                         Name = item.Name,
                         Type = item.type,
                         Stack = item.stack,
                         Prefix = item.prefix,
-                        Slot = count
+                        Slot = count,
+                        Modded = modded
                     });
                 }
 
@@ -81,13 +90,16 @@ namespace CTG2.Content.Commands
             {
                 if (item != null)
                 {
+                    modded = item.type >= 5546;
+
                     inventoryData.Add(new ItemData
                     {
                         Name = item.Name,
                         Type = item.type,
                         Stack = item.stack,
                         Prefix = item.prefix,
-                        Slot = count
+                        Slot = count,
+                        Modded = modded
                     });
                 }
 
@@ -119,6 +131,18 @@ namespace CTG2.Content.Commands
         public override string Command => "loadinventory";
         public override string Usage => "/loadinventory";
         public override string Description => "Loads saved inventory from a JSON file";
+
+        private int GetItemIDByName(string itemName)
+        {
+            for (int i = 5546; i < ItemLoader.ItemCount; i++)
+            {
+                ModItem modItem = ItemLoader.GetItem(i);
+                if (modItem != null && modItem.Name.Equals(itemName.Replace(" ", ""), StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+
+            return -1;
+        }
 
         public override void Action(CommandCaller caller, string input, string[] args) {
 
@@ -154,7 +178,10 @@ namespace CTG2.Content.Commands
             {
                 var itemData = allItemData[b];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -165,7 +192,10 @@ namespace CTG2.Content.Commands
             {
                 var itemData = allItemData[player.inventory.Length + c];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -176,7 +206,10 @@ namespace CTG2.Content.Commands
             {
                 var itemData = allItemData[player.inventory.Length + player.armor.Length + d];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -187,7 +220,10 @@ namespace CTG2.Content.Commands
             {
                 var itemData = allItemData[player.inventory.Length + player.armor.Length + player.miscEquips.Length + e];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
