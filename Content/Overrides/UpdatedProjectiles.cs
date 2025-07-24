@@ -4,6 +4,7 @@ using Terraria.ID;
 using Terraria.DataStructures;
 using CTG2.Content.Items;
 using Terraria.Audio;
+using CTG2.Content.ClientSide;
 
 public class ProjectileOverrides : GlobalProjectile
 {
