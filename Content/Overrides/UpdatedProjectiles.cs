@@ -153,5 +153,13 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.ClearBuff(BuffID.CursedInferno);
         }
+        else if (info.DamageSource.SourceProjectileType == 280) //goldenshowerproj
+        {
+            Player.ClearBuff(BuffID.Ichor);
+        }
+        else if (info.DamageSource.SourceProjectileType == 288) //goldenshowerproj
+        {
+            Player.ClearBuff(BuffID.Ichor);
+        }
     }
 }
