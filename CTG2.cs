@@ -315,6 +315,8 @@ namespace CTG2
                     // Populate GameInfo fields
                     GameInfo.matchStage = reader.ReadInt32();
                     GameInfo.matchTime = reader.ReadInt32();
+                    GameInfo.overtime = reader.ReadBoolean();
+                    GameInfo.overtimeTimer = reader.ReadInt32();
                     GameInfo.blueGemX = reader.ReadInt32();
                     GameInfo.redGemX = reader.ReadInt32();
                     GameInfo.blueGemCarrier = reader.ReadString();

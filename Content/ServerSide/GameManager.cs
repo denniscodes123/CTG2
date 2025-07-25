@@ -34,6 +34,9 @@ public class GameManager : ModSystem
     public Queue<MapTypes> mapQueue = new();
 
     public bool pause = false;
+    private bool isOvertime = false;
+    private int overtimeTimer = 0;
+    private const int OVERTIME_DURATION = 60 * 2 * 60; // 2 minutes in ticks (60 ticks/sec)
     
     public GameMap Map { get; private set; }
 
@@ -242,6 +245,9 @@ public class GameManager : ModSystem
 
     public void EndGame()
     {
+        isOvertime = false;
+        GameInfo.overtime = false;
+        overtimeTimer = 0;
         Console.WriteLine("GameManager: Starting EndGame sequence");
 
         IsGameActive = false;
@@ -446,6 +452,9 @@ public class GameManager : ModSystem
             
             packet.Write(matchStage);
             packet.Write((int)MatchTime);
+            packet.Write(isOvertime); 
+            packet.Write(isOvertime ? overtimeTimer : 0); 
+            
             // Blue and red Gem X positions
             var distBetweenGems = Math.Abs(RedGem.Position.X - BlueGem.Position.X);
             if (BlueGem.IsHeld)
@@ -489,12 +498,49 @@ public class GameManager : ModSystem
             EndGame();
         }
 
-        // if Match time exceeds a certain point, end the match
-        if (MatchTime >= 60 * 60 * 15)
+
+        if (!isOvertime && MatchTime >= 60 * 60 * 15)
         {
-            EndGame();
+         
+            if (BlueGem.IsHeld || RedGem.IsHeld)
+            {
+                isOvertime = true;
+                overtimeTimer = OVERTIME_DURATION;
+                GameInfo.overtime = true; 
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[OVERTIME] Overtime has started! Capture the gem or the game will end in 2 minutes."), Microsoft.Xna.Framework.Color.OrangeRed);
+            }
+            else
+            {
+                EndGame();
+                return;
+            }
         }
-        // TODO: 
+
+        if (isOvertime)
+        {
+            overtimeTimer--;
+
+            if (BlueGem.IsCaptured || RedGem.IsCaptured)
+            {
+                EndGame();
+                return;
+            }
+
+            if (!BlueGem.IsHeld && !RedGem.IsHeld)
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[OVERTIME] Overtime ended: No gem is being held."), Microsoft.Xna.Framework.Color.Yellow);
+                EndGame();
+                return;
+            }
+
+            if (overtimeTimer <= 0)
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[OVERTIME] Overtime expired! No capture."), Microsoft.Xna.Framework.Color.Red);
+                EndGame();
+                return;
+            }
+        }
+ 
     }
 
     public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
@@ -694,7 +740,8 @@ public class GameManager : ModSystem
                 packet.Write((byte)MessageType.ServerGameUpdate);
                 packet.Write((int)3); // Waiting for new game phase
                 packet.Write(newGameTimer); // Send remaining time instead of match time
-                
+                packet.Write(isOvertime); 
+                packet.Write(isOvertime ? overtimeTimer : 0); 
                 // Send empty gem data during waiting phase
                 packet.Write((int)0); // Blue gem position
                 packet.Write((int)0); // Red gem position
@@ -750,7 +797,8 @@ public class GameManager : ModSystem
                 packet.Write((byte)MessageType.ServerGameUpdate);
                 packet.Write((int)0); // No game active
                 packet.Write((int)0); // No match time
-                
+                packet.Write(isOvertime); 
+                packet.Write(isOvertime ? overtimeTimer : 0); 
                 // Send empty gem data when no game is active
                 packet.Write((int)0); // Blue gem position
                 packet.Write((int)0); // Red gem position

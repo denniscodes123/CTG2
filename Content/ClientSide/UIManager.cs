@@ -92,7 +92,16 @@ public class UIManager : ModSystem
         int matchTime = GameInfo.matchTime;
         if (matchTime < 1800)
         {
-            timeText = $"Class selection ends in: {30-matchTime/60}s";
+            timeText = $"Class selection ends in: {30 - matchTime / 60}s";
+        }
+        else if (GameInfo.overtime)
+        {
+            int secondsElapsed = GameInfo.overtimeTimer / 60;
+            int secondsLeft = 120 - secondsElapsed;
+            int minutesLeft = secondsLeft / 60;
+            int remainder = secondsLeft % 60;
+            timeText = $"Time left in match: {minutesLeft}:{remainder}";
+            
         }
         else
         {
