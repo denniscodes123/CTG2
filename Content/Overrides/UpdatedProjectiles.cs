@@ -5,10 +5,13 @@ using Terraria.DataStructures;
 using CTG2.Content.Items;
 using Terraria.Audio;
 using CTG2.Content.ClientSide;
+using CTG2.Content.Buffs;
 
 public class ProjectileOverrides : GlobalProjectile
 {
     public override bool InstancePerEntity => true;
+
+    SoundStyle parrySound = new SoundStyle("CTG2/Content/Overrides/Parry");
 
     public override void AI(Projectile projectile)
     {
@@ -119,10 +122,9 @@ public class ProjectileOverrides : GlobalProjectile
             projectile.scale = 0.1f;
         }
     }   
-
-
-
 }
+
+
 public class ModifyHurtModPlayer : ModPlayer
 {
     //should make weps not inflict debuffs?
@@ -134,6 +136,7 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.AddBuff(BuffID.Honey, 180);        
             Player.AddBuff(BuffID.RapidHealing, 180); 
+            Player.AddBuff(ModContent.BuffType<Retaliation>(), 9);
         }
         if (info.DamageSource.SourceProjectileType == ProjectileID.Sunfury)
         {
