@@ -726,8 +726,12 @@ namespace CTG2.Content
             }
         }
 
-
-        //All timer logic below
+        public override void PreUpdate()
+        {
+            if (GameInfo.matchStage == 3)
+                return; 
+        }
+       
         public override void PostUpdate()
         {
             GladiatorPostStatus();

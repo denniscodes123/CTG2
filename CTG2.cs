@@ -13,6 +13,7 @@ using Terraria.ID;
 using System.Collections.Generic;
 using Terraria.Chat;
 using Terraria.Localization;
+using log4net;
 
 
 namespace CTG2
@@ -51,11 +52,12 @@ namespace CTG2
         RequestDie = 28,
         RequestKill = 29,
         RequestWeb = 30,
-        RequestSyncStats=31,
+        RequestSyncStats = 31,
         RequestFullHeal = 32,
 
-                    
-                
+
+
+
     }
 
     public class CTG2 : Mod
@@ -129,7 +131,36 @@ namespace CTG2
                     Console.WriteLine("Server Received Game End Request!");
                     break;
                 case (byte)MessageType.RequestPause:
-                    manager.PauseGame();
+                    
+                    bool paused = reader.ReadBoolean();
+                    GameInfo.matchStage = paused ? 3 : 2;
+
+                    foreach (Player ply2 in Main.player)
+                    {
+                        if (ply2 != null && ply2.active && !ply2.dead)
+                        {
+                            if (paused)
+                            {
+                                // Web for a long time (e.g., 10 minutes)
+                                WebPlayer(ply2.whoAmI, 60 * 60 * 10);
+                                manager.PauseGame();
+                            }
+                            else
+                            {
+                                manager.UnpauseGame();
+                                // Remove webbed debuff
+                                ply2.ClearBuff(BuffID.Webbed);
+                                NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, ply2.whoAmI, 0, 0);
+                            }
+                        }
+                    }
+
+                    
+
+                    string msg = paused ? "The game has been PAUSED by an admin. All actions are frozen." : "The game has been UNPAUSED.";
+                    Color color = paused ? Color.OrangeRed : Color.LimeGreen;
+                    Terraria.Chat.ChatHelper.BroadcastChatMessage(Terraria.Localization.NetworkText.FromLiteral(msg), color);
+                    //GameInfo.matchStage = paused ? 3 : 2;
                     break;
                 case (byte)MessageType.RequestSpawnNpc:
                     var npcX = reader.ReadInt32();
@@ -490,7 +521,7 @@ namespace CTG2
                         break;
                     }
 
-                
+
                     playerToWeb.AddBuff(BuffID.Webbed, webTimeInTicks);
                     NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, webPlayerIndex, BuffID.Webbed, webTimeInTicks);
 
@@ -510,7 +541,7 @@ namespace CTG2
                         break;
                     }
 
-                case(byte)MessageType.RequestFullHeal:
+                case (byte)MessageType.RequestFullHeal:
                     {
                         int plyrindex = reader.ReadInt32();
                         Main.player[plyrindex].Heal(200);
@@ -562,5 +593,7 @@ namespace CTG2
             packet.Write(timeIntTicks);
             packet.Send();
         }
+
     }
+    
 }

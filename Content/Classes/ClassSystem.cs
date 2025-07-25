@@ -362,6 +362,11 @@ namespace ClassesNamespace
                 Player.extraAccessory = true;
             }
         }
+        public override void PreUpdate()
+        {
+            if (GameInfo.matchStage == 3)
+                return; 
+        }
 
         public override void PostUpdate()
         {

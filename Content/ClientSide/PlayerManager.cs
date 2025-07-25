@@ -183,6 +183,7 @@ public class PlayerManager : ModPlayer
     public override void PreUpdate()
     {
         EnforceTeamLock(); // lock team
+        
         // wecan probably delete (state transitions handle all of this)
         if (this.playerState == PlayerState.ClassSelection)
         {
@@ -208,6 +209,8 @@ public class PlayerManager : ModPlayer
 
         if (classSelectionTimer > 0 && !isGameStartClassSelection)
         { //custom 
+            if (GameInfo.matchStage == 3)
+                return; // Don't decrement ability/buff timers
             classSelectionTimer--;
         }
         else if (classSelectionTimer == 0 && !isGameStartClassSelection) // class selection time expired
@@ -223,6 +226,7 @@ public class PlayerManager : ModPlayer
 
             // Reset timer so this doesn't fire again
             classSelectionTimer = -1;
+            
         }
         else
         {
@@ -232,7 +236,8 @@ public class PlayerManager : ModPlayer
 
             }
         }
-
+            if (GameInfo.matchStage == 3)
+                return; // Don't decrement ability/buff timers
 
         if (awaitingRespawn) //was lowkey angry while coding this will clean up later
         {

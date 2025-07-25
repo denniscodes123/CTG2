@@ -230,9 +230,14 @@ public class GameManager : ModSystem
     // Pauses/Unpauses game
     public void PauseGame()
     {
-        MatchTime += 900;
-        BlueTeam.PauseTeam();
-        RedTeam.PauseTeam();
+        pause = true;
+        // MatchTime += 900;
+        // BlueTeam.PauseTeam();
+        // RedTeam.PauseTeam();
+    }
+    public void UnpauseGame()
+    {
+        pause = false;
     }
 
     public void EndGame()
@@ -282,7 +287,7 @@ public class GameManager : ModSystem
 
             // Teleport all players to spectator area
             // web first
-            CTG2.WebPlayer(player.whoAmI,240);
+            CTG2.WebPlayer(player.whoAmI, 240);
 
             ModPacket teleportPacket = mod.GetPacket();
             teleportPacket.Write((byte)MessageType.ServerTeleport);
@@ -320,7 +325,7 @@ public class GameManager : ModSystem
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended! New game starting in 15 seconds..."), Microsoft.Xna.Framework.Color.Yellow);
 
         Console.WriteLine("GameManager: EndGame sequence completed");
-        
+
         // Start the 15-second timer for new game
         isWaitingForNewGame = true;
         newGameTimer = 15 * 60; // 15 seconds * 60 ticks per second
@@ -329,7 +334,10 @@ public class GameManager : ModSystem
     // Runs every frame while game running. Runs all gem checks, draws timer and gem status.
     public void UpdateGame()
     {
-        
+        if (pause)
+        {
+            return;
+        }
         // force set team/pvp
         BlueTeam.EnforceTeam();
         RedTeam.EnforceTeam();
@@ -668,7 +676,11 @@ public class GameManager : ModSystem
     public override void PostUpdateWorld()
     {
         if (!Main.dedServ) return;
-        
+        if (pause)
+        {
+            return;
+        }
+
         // Handle new game timer
         if (isWaitingForNewGame && newGameTimer > 0)
         {
