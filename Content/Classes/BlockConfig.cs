@@ -13,7 +13,7 @@ public class BlockRewardSystem : ModSystem
         blockTimer += 1.0 / 60.0;
         ;
 
-        if (blockTimer < 45.0)
+        if (blockTimer < 25.0)
             return;
 
         blockTimer = 0;
