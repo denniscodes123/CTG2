@@ -17,6 +17,13 @@ namespace CTG2.Content
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
+            var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+            if (!modPlayer.IsAdmin)
+            {
+                caller.Reply("You must be an admin to use this command.", Color.Red);
+                return;
+            }
+
             if (args.Length == 0)
             {
                 caller.Reply("Usage: /nm [mapname]");
@@ -29,6 +36,7 @@ namespace CTG2.Content
             caller.Reply($"Error: '{mapName}' is not a valid map name.");
             return;
         }
+        caller.Reply(mapName + " added to the map queue");
 
         ModPacket myPacket = Mod.GetPacket();
         myPacket.Write((byte)MessageType.RequestNextMap);

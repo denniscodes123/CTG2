@@ -6,8 +6,7 @@ namespace CTG2.Content.Commands
 {
     public class LoginCommand : ModCommand
     {
-        private const string Password = "pwd"; 
-
+        private const string Password = "newctg5"; 
         public override CommandType Type => CommandType.Chat;
         public override string Command => "login";
         public override string Description => "Log in as admin.";
@@ -29,7 +28,7 @@ namespace CTG2.Content.Commands
             }
             else
             {
-                caller.Reply("Incorrect password its pwd", Color.Red);
+                caller.Reply("Incorrect password", Color.Red);
             }
         }
     }

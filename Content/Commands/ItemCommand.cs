@@ -19,11 +19,20 @@ namespace CTG2.Content.Commands
 
 public override void Action(CommandCaller caller, string input, string[] args)
 {
-    if (args.Length == 0)
+    
+    var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+    if (!modPlayer.IsAdmin)
     {
-        caller.Reply("Usage: /item <itemNameOrID> [amount]", Color.Red);
-        return;
+    caller.Reply("You must be an admin to use this command.", Color.Red);
+    return;
     }
+
+    if (args.Length == 0)
+            {
+                caller.Reply("Usage: /item <itemNameOrID> [amount]", Color.Red);
+                return;
+            }
+    
 
     string itemName = "";
     int amount = 1;
