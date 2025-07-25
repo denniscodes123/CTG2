@@ -156,7 +156,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.shoot = 496;
                     item.useAnimation = 18;
                     item.useTime = 18;
-                    item.shootSpeed = 5f;
+                    item.shootSpeed = 4f;
                     item.crit = 0;
                     break;
 
