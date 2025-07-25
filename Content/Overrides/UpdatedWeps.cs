@@ -40,7 +40,7 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint chainKnifeDelay = 55;
         private uint chainKnifeLastUsedCounter = 0;
 
-        private uint cursedFlamesDelay = 50;
+        private uint cursedFlamesDelay = 65;
         private uint cursedFlamesLastUsedCounter = 0;
 
         private uint sickleDelay = 147; //There should only be one ice sickle projectile on the field at once
