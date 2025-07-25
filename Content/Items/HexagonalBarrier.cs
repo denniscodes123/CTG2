@@ -20,7 +20,7 @@ namespace CTG2.Content.Items {
 			Item.CloneDefaults(ItemID.MagicMissile);
 			Item.damage = 0;
 			Item.crit = 0;
-			Item.shootSpeed = 20;
+			Item.shootSpeed = 10;
 			Item.useStyle = 5;
 			Item.noMelee = true;
 			Item.noUseGraphic = true;
@@ -75,7 +75,7 @@ namespace CTG2.Content.Items {
 			Vector2 unitVectorTowardsMouse = mountedCenter.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.UnitX * player.direction);
 			
 			if (firstFrame)
-				Projectile.velocity = unitVectorTowardsMouse * 10 + player.velocity;
+				Projectile.velocity = unitVectorTowardsMouse * Item.shootSpeed + player.velocity;
 			else
 				Projectile.velocity *= 0.8f;
 
