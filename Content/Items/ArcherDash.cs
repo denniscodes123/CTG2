@@ -45,13 +45,16 @@ namespace CTG2.Content.Items
 
 			if (recentlyEnded && DashTimer == 0) {
 				Vector2 newVelocity = Player.velocity;
-				newVelocity.Normalize();
-				newVelocity *= 4f;
-				Player.gravity = 0.4f;
-				Player.velocity = newVelocity;
+				if (newVelocity != Vector2.Zero) {
+					newVelocity.Normalize();
+					newVelocity *= 4f;
+					Player.gravity = 0.4f;
+					Player.velocity = newVelocity;
+				}
 				recentlyEnded = false;
 				DashVelocity = 14f;
 			}
+
 
 			dashKeybindActive = CTG2.ArcherDashKeybind.JustPressed;
 
@@ -97,13 +100,14 @@ namespace CTG2.Content.Items
 
 			if (DashTimer > 0) // If dash is active
 			{
-				if (DashTimer < 10)
-				{
+				if (DashTimer < 10) {
 					DashVelocity -= 1f;
-					Vector2 decVelocity = Player.velocity;
-					decVelocity.Normalize();
-					decVelocity *= DashVelocity;
-					Player.velocity = decVelocity;
+					if (Player.velocity != Vector2.Zero) {
+						Vector2 decVelocity = Player.velocity;
+						decVelocity.Normalize();
+						decVelocity *= DashVelocity;
+						Player.velocity = decVelocity;
+					}
 				}
 
 				// Afterimage effect
