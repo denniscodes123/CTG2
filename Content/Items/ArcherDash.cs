@@ -54,7 +54,7 @@ namespace CTG2.Content.Items
 
 			dashKeybindActive = (Player.controlHook) ? true : false;
 
-			if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.MaxMana);
+			if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.Item35);
 
 			lastDashDelay = DashDelay;
 		}
