@@ -13,9 +13,7 @@ public class ProjectileOverrides : GlobalProjectile
     public override void AI(Projectile projectile)
     {
         if (projectile.type == 167 || projectile.type == 169)
-        {
             projectile.timeLeft = 0;
-        }
         if (projectile.type == 511)
         {
             // Force a new timeLeft value (e.g., 120 ticks = 2 seconds)
@@ -132,7 +130,7 @@ public class ModifyHurtModPlayer : ModPlayer
     {
         var modPlayer = Player.GetModPlayer<PlayerManager>();
     
-        if (modPlayer.currentClass.Name == "Paladin") //Paladin buffs when it's hit
+        if (modPlayer.currentClass.Name == "Paladin" && Player.HeldItem.type == 4760 && Main.mouseRight) //Paladin buffs when it's hit
         {
             Player.AddBuff(BuffID.Honey, 180);        
             Player.AddBuff(BuffID.RapidHealing, 180); 
