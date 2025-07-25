@@ -24,9 +24,9 @@ namespace CTG2.Content.Items
 
 	public class ArcherDashPlayer : ModPlayer {
 		public const int DashCooldown = 150; // Time (frames) between starting dashes. If this is shorter than DashDuration you can start a new dash before an old one has finished
-		public const int DashDuration = 13; // Duration of the dash afterimage effect in frames
+		public const int DashDuration = 18; // Duration of the dash afterimage effect in frames
 
-		public const float DashVelocity = 15f; // The initial velocity.  10 velocity is about 37.5 tiles/second or 50 mph
+		public float DashVelocity = 14f; // The initial velocity.  10 velocity is about 37.5 tiles/second or 50 mph
 
 		public bool dashKeybindActive = false; // Uses the hook keybind as the dash keybind
 
@@ -50,6 +50,7 @@ namespace CTG2.Content.Items
 				Player.gravity = 0.4f;
 				Player.velocity = newVelocity;
 				recentlyEnded = false;
+				DashVelocity = 14f;
 			}
 
 			dashKeybindActive = (Player.controlHook) ? true : false;
@@ -94,8 +95,17 @@ namespace CTG2.Content.Items
 
 			Player.eocDash = DashTimer;
 
-			if (DashTimer > 0) { // If dash is active
-				
+			if (DashTimer > 0) // If dash is active
+			{
+				if (DashTimer < 10)
+				{
+					DashVelocity -= 1f;
+					Vector2 decVelocity = Player.velocity;
+					decVelocity.Normalize();
+					decVelocity *= DashVelocity;
+					Player.velocity = decVelocity;
+				}
+
 				// Afterimage effect
 				Player.armorEffectDrawShadowEOCShield = true;
 				DashTimer--;
