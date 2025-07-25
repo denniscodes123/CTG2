@@ -12,6 +12,10 @@ public class ProjectileOverrides : GlobalProjectile
 
     public override void AI(Projectile projectile)
     {
+        if (projectile.type == 167 || projectile.type == 169)
+        {
+            projectile.timeLeft = 0;
+        }
         if (projectile.type == 511)
         {
             // Force a new timeLeft value (e.g., 120 ticks = 2 seconds)
