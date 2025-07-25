@@ -205,29 +205,29 @@ public class GameManager : ModSystem
     
             startPlayerClassSelection(player.whoAmI, true);
 
-            if (isMapPicked)
-            {
-                ClearHoneyForMap();
-                Map.LoadMap(result);
-                if (result == MapTypes.Kraken || result == MapTypes.Stalactite)
-                {
-                    FillHoneyForMap(result);
-                }
-                FillLavaInDesignatedArea();
-            }
-            else
-            {
-                var randomMap = (MapTypes)CTG2.randomGenerator.Next(0, 7);
-                ClearHoneyForMap();
-                Map.LoadMap(randomMap);
-                FillLavaInDesignatedArea();
-                if (randomMap == MapTypes.Kraken || randomMap == MapTypes.Stalactite)
-                {
-                    FillHoneyForMap(randomMap);
-                }
-            }
         }
 
+        if (isMapPicked)
+        {
+            ClearHoneyForMap();
+            Map.LoadMap(result);
+            if (result == MapTypes.Kraken || result == MapTypes.Stalactite)
+            {
+                FillHoneyForMap(result);
+            }
+            FillLavaInDesignatedArea();
+        }
+        else
+        {
+            var randomMap = (MapTypes)CTG2.randomGenerator.Next(0, 7);
+            ClearHoneyForMap();
+            Map.LoadMap(randomMap);
+            FillLavaInDesignatedArea();
+            if (randomMap == MapTypes.Kraken || randomMap == MapTypes.Stalactite)
+            {
+                FillHoneyForMap(randomMap);
+            }
+        }
     }
 
     // Pauses/Unpauses game
