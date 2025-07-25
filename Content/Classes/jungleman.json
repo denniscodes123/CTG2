@@ -1,6 +1,6 @@
 {
   "HealthPoints": 100,
-  "ManaPoints": 20,
+  "ManaPoints": 6,
   "InventoryItems": [
     {
       "Name": "Shardstone Pickaxe",
