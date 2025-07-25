@@ -13,6 +13,7 @@ namespace CTG2.Content.Items
 			Item.useTime = 7;
 			Item.useAnimation = 14;
 			Item.scale = .75f;
+   			Item.crit = 0f;
 		}
 	}
 }
