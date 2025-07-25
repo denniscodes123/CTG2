@@ -20,9 +20,13 @@ public class ChargedBowProjectile : ModProjectile
 	private Color color = new (0, 0, 0);
 	private SpriteEffects sprite;
 	private bool load = false;
+	private bool recentlyFired = false;
 	private Item item;
 	private bool start;
 	private SlotId sound;
+
+	SoundStyle bowSound = new SoundStyle("CTG2/Content/Items/BowSound");
+	SoundStyle bowSound2 = new SoundStyle("CTG2/Content/Items/BowSound2");
 
 
 	public override void SetDefaults()
@@ -105,7 +109,8 @@ public class ChargedBowProjectile : ModProjectile
 		else
 			framesPulledBack = 0; // reset pullback counter after releasing
 	
-		Main.EntitySpriteDraw(arrowTexture, arrowPos - Main.screenPosition, arrowRectangle, color, Rotation + MathHelper.PiOver2,
+		if (!recentlyFired)
+			Main.EntitySpriteDraw(arrowTexture, arrowPos - Main.screenPosition, arrowRectangle, color, Rotation + MathHelper.PiOver2,
 				origin3, Projectile.scale, SpriteEffects.None); // draw arrow sprite
 
 		return false;
@@ -125,16 +130,15 @@ public class ChargedBowProjectile : ModProjectile
 		Projectile.knockBack = item.knockBack; // knockback stays the same as base item
 
 		Vector2 position = player.Center + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f; // spawns the arrow from aiming direction, not inside player
-		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * (1.2f + (charge / 40) * 1.5f); // calculates the direction and speed of the arrow based on charge: max 160% velocity (3)
+		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * (1.2f + (charge / 40) * 2f); // calculates the direction and speed of the arrow based on charge: 1.2 to 3.2
 
 		if (player.channel & charge < 40f) // if still charging
 		{
-			charge += (float)0.667; // how fast charge grows each frame: max 40
+			charge += (float) 1f; // how fast charge grows each frame: max 40
 
 			if (!start) //plays bow draw sound at the beginning of charging
 			{
-				SoundStyle bowSound = new SoundStyle("CTG2/Content/Items/BowSound");
-				sound = SoundEngine.PlaySound(bowSound.WithVolumeScale(Main.soundVolume * 0.6f));
+				sound = SoundEngine.PlaySound(bowSound.WithVolumeScale(Main.soundVolume * 1.25f), player.Center);
 
 				start = true;
 			}
@@ -147,7 +151,7 @@ public class ChargedBowProjectile : ModProjectile
 				if (c1 == 0) // plays max mana sound after fully charged
 				{
 					c1 = 1;
-					SoundEngine.PlaySound(SoundID.MaxMana, player.Center);
+					SoundEngine.PlaySound(SoundID.MaxMana);
 				}
 				charge = 40f; // caps charge at 40
 			}
@@ -164,17 +168,24 @@ public class ChargedBowProjectile : ModProjectile
 			if (charge >= 40f && Projectile.ai[1] == ProjectileID.WoodenArrowFriendly) special = (int)Projectile.ai[0];
 
 			if (Main.myPlayer == Projectile.owner)
-				{
-			Projectile.NewProjectile(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
-				}
-			SoundEngine.PlaySound(SoundID.Item5, Projectile.position); // sound played when fired
+			{
+				Projectile.NewProjectile(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
+			}
+
+			SoundEngine.PlaySound(bowSound2.WithVolumeScale(Main.soundVolume * 2.5f), Projectile.position); // sound played when fired
+
+			recentlyFired = true;
 		}
 
 		if (t2 == 1)
 		{
 			player.direction = player.oldDirection;
 			t++;
-			if (t >= item.useTime / 2) Projectile.Kill(); // kills bow projectile after half the weapon's usetime has passed
+			if (t >= item.useTime)
+			{
+				Projectile.Kill(); // kills bow projectile after half the weapon's usetime has passed
+				recentlyFired = false;
+			}
 		}
 	}
 }
