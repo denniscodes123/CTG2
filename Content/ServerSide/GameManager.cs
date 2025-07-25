@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Terraria;
 using Terraria.ModLoader;
 using CTG2.Content;
@@ -32,6 +32,8 @@ public class GameManager : ModSystem
     public Gem RedGem { get; private set; }
 
     public Queue<MapTypes> mapQueue = new();
+
+    public bool pause = false;
     
     public GameMap Map { get; private set; }
 
@@ -197,6 +199,7 @@ public class GameManager : ModSystem
             }
 
             // Directly call startPlayerClassSelection instead of sending a packet
+    
             startPlayerClassSelection(player.whoAmI, true);
 
             if (isMapPicked)
@@ -255,6 +258,8 @@ public class GameManager : ModSystem
             Console.WriteLine($"GameManager: Processing player {player.whoAmI} ({player.name}) for game end");
 
             // Reset player state to None
+            PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.None;
+
             ModPacket statePacket = mod.GetPacket();
             statePacket.Write((byte)MessageType.UpdatePlayerState);
             statePacket.Write(player.whoAmI);
@@ -530,6 +535,8 @@ public class GameManager : ModSystem
             packet.Write((int)spectatorSpawnPoint.Y);
             packet.Send(toClient: playerIndex);
 
+            PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.Spectator;
+
             ModPacket statusPacket = mod.GetPacket();
             statusPacket.Write((byte)MessageType.ServerSpectatorUpdate);
             statusPacket.Write(playerIndex);
@@ -584,6 +591,7 @@ public class GameManager : ModSystem
         
         Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
         
+        
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection (non game)"), Color.Beige);
         // Send packet to set class selection time on client
         var mod = ModContent.GetInstance<CTG2>();
@@ -601,18 +609,16 @@ public class GameManager : ModSystem
         }
         
         GameTeam gameTeam = intToTeam[team];
-        
-        var mod2 = ModContent.GetInstance<CTG2>();
-        
+        PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.ClassSelection;
         // Send packet to update client-side player state to ClassSelection
-        ModPacket statePacket = mod2.GetPacket();
+        ModPacket statePacket = mod.GetPacket();
         statePacket.Write((byte)MessageType.UpdatePlayerState);
         statePacket.Write(playerIndex);
         statePacket.Write((byte)PlayerManager.PlayerState.ClassSelection);
         statePacket.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent UpdatePlayerState packet to player {playerIndex} (ClassSelection)");
         CTG2.WebPlayer(player.whoAmI, 240);
-        ModPacket packet = mod2.GetPacket();
+        ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
         packet.Write((int)gameTeam.ClassLocation.X);
@@ -633,7 +639,7 @@ public class GameManager : ModSystem
         
         var mod = ModContent.GetInstance<CTG2>();
         
-
+        PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.Active;
         ModPacket statePacket = mod.GetPacket();
         statePacket.Write((byte)MessageType.UpdatePlayerState);
         statePacket.Write(playerIndex);
