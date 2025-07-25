@@ -370,13 +370,24 @@ namespace ClassesNamespace
 
         public override void PostUpdate()
         {
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            if (playerManager.currentClass?.Name == "Miner" && Main.GameUpdateCount % 1800 == 0) //30 seconds
+            {
+
+                Item bomb = new Item();
+                bomb.SetDefaults(ItemID.StickyBomb);
+                bomb.stack = 1;
+
+                Item overflow = Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+            }
+            
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
             //this is where dyes are set and forced on 
             int redDyeType = 1031;
             int blueDyeType = 1035;
 
-            var playerManager = Player.GetModPlayer<PlayerManager>();
+            
             // Check if player has a class selected and is on a team
             if (playerManager.currentClass != null && !string.IsNullOrEmpty(playerManager.currentClass.Name) && Player.team != 0)
             {
