@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 using CTG2.Content;
@@ -179,6 +179,7 @@ public class GameManager : ModSystem
 
     public void StartGame()
     {
+        isWaitingForNewGame = false;
         IsGameActive = true;
         MatchTime = 0;
         BlueGem.Reset();
@@ -330,7 +331,8 @@ public class GameManager : ModSystem
         endPacket.Send();
 
         // Broadcast game end message
-        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended! New game starting in 15 seconds..."), Microsoft.Xna.Framework.Color.Yellow);
+        //ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended! New game starting in 15 seconds..."), Microsoft.Xna.Framework.Color.Yellow);
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended!"), Microsoft.Xna.Framework.Color.Yellow);
 
         Console.WriteLine("GameManager: EndGame sequence completed");
 
@@ -499,7 +501,6 @@ public class GameManager : ModSystem
             Console.WriteLine("Red gem captured!");
             EndGame();
         }
-
 
         if (!isOvertime && MatchTime >= 60 * 60 * 15)
         {
@@ -751,6 +752,7 @@ public class GameManager : ModSystem
             return;
         }
 
+        /*
         // Handle new game timer
         if (isWaitingForNewGame && newGameTimer > 0)
         {
@@ -810,6 +812,7 @@ public class GameManager : ModSystem
             StartGame();
             return;
         }
+        */
         
         if (!IsGameActive) 
         {
@@ -998,5 +1001,4 @@ public class GameManager : ModSystem
         
         //Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
     }
-
 }
