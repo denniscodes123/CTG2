@@ -6,13 +6,20 @@ namespace YourModName.Players
 {
     public class ChatPlayer : ModPlayer
     {
+        public bool IsMuted = false;
+
         public override void PreUpdate()
         {
-            if (!string.IsNullOrEmpty(Main.chatText))
+            if (IsMuted && !string.IsNullOrEmpty(Main.chatText))
+            {
+                Main.chatText = ""; 
+                Main.NewText("You are muted and cannot chat.", Microsoft.Xna.Framework.Color.Red);
+            }
+            else if (!string.IsNullOrEmpty(Main.chatText))
             {
                 string teamTag = "";
                 string colorTag = "";
-                if (Player.team == 1) 
+                if (Player.team == 1)
                 {
                     teamTag = "[RED]";
                     colorTag = "[c/FF4040:";
@@ -28,7 +35,6 @@ namespace YourModName.Players
                     colorTag = "[c/AAAAAA:";
                 }
 
-               
                 if (!Main.chatText.StartsWith(teamTag))
                 {
                     Main.chatText = $"{colorTag}{teamTag} {Player.name}: {Main.chatText}]";

@@ -531,7 +531,49 @@ namespace CTG2
                         Main.player[plyrindex].Heal(200);
                     }
                     break;
-
+                // ...existing code...
+                case (byte)MessageType.RequestMute:
+                {
+                    int mutedplayer = reader.ReadInt32();
+                    // Send mute packet to the target player
+                    var muteMod = ModContent.GetInstance<CTG2>();
+                    ModPacket packet = muteMod.GetPacket();
+                    packet.Write((byte)MessageType.Mute);
+                    packet.Write(mutedplayer);
+                    packet.Send(toClient: mutedplayer);
+                    break;
+                }
+                case (byte)MessageType.Mute:
+                {
+                    int mutedPlayer = reader.ReadInt32();
+                    if (mutedPlayer == Main.myPlayer)
+                    {
+                        Main.player[mutedPlayer].GetModPlayer<YourModName.Players.ChatPlayer>().IsMuted = true;
+                        Main.NewText("You have been muted.", Microsoft.Xna.Framework.Color.Red);
+                    }
+                    break;
+                }
+                case (byte)MessageType.RequestUnmute:
+                {
+                    int unmuteplayer = reader.ReadInt32();
+                    var unmutemod = ModContent.GetInstance<CTG2>();
+                    ModPacket packet = unmutemod.GetPacket();
+                    packet.Write((byte)MessageType.Unmute);
+                    packet.Write(unmuteplayer);
+                    packet.Send(toClient: unmuteplayer);
+                    break;
+                }
+                case (byte)MessageType.Unmute:
+                {
+                    int unmutePlayer = reader.ReadInt32();
+                    if (unmutePlayer == Main.myPlayer)
+                    {
+                        Main.player[unmutePlayer].GetModPlayer<YourModName.Players.ChatPlayer>().IsMuted = false;
+                        Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
+                    }
+                    break;
+                }
+               
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
