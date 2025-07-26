@@ -64,6 +64,7 @@ namespace ClassesNamespace
     public class ClassSystem : ModPlayer
     {
         public GameClass playerClass = GameClass.None;
+        public bool clearonce= true;
         private string lastPlayerClass = "";
         private string lastUpgrade = "";
         private int bonusHP = 0;
@@ -96,10 +97,15 @@ namespace ClassesNamespace
                 Player.DelBuff(i);
             }
 
-            //Comment this out if you want this to not clear all inventory onenterwolrd
+            //Moved to seperate function
             //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
+            ClearInventory();
+        }
+        
+        public void ClearInventory()
+        {
             for (int i = 0; i < Player.inventory.Length; i++)
-                Player.inventory[i] = new Item();
+            Player.inventory[i] = new Item();
 
             for (int i = 0; i < Player.armor.Length; i++)
                 Player.armor[i] = new Item();
@@ -114,8 +120,6 @@ namespace ClassesNamespace
                 Player.miscDyes[i] = new Item();
 
             Player.trashItem = new Item();
-
-            NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI); //sync state 
         }
 
         private void SetInventory(CtgClass classData)
@@ -370,6 +374,18 @@ namespace ClassesNamespace
 
         public override void PostUpdate()
         {
+            //clear inventory logic for matchend
+            if (GameInfo.matchStage == 0 && clearonce== true)
+            {
+                ClearInventory();
+                clearonce = false;
+            }
+            if (GameInfo.matchStage != 0 && clearonce == false)
+            {
+                clearonce = true;
+            }
+
+            //Miner bombs over time logic (port dirt config to here later)
             var playerManager = Player.GetModPlayer<PlayerManager>();
             if (playerManager.currentClass?.Name == "Miner" && Main.GameUpdateCount % 1800 == 0) //30 seconds
             {
