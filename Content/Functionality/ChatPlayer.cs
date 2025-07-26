@@ -1,18 +1,29 @@
 using Terraria;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using Terraria.ModLoader;
+using Terraria.GameInput;
+using Microsoft.Xna.Framework.Input;
+using Terraria.Chat;
+using Terraria.Localization;
+
+
+
+
 
 namespace YourModName.Players
 {
-    public class ChatPlayer : ModPlayer
-    {
+      public class ChatPlayer : ModPlayer
+        {
         public bool IsMuted = false;
 
-        public override void PreUpdate()
+
+            public override void PreUpdate()
         {
+
             if (IsMuted && !string.IsNullOrEmpty(Main.chatText))
             {
-                Main.chatText = ""; 
+                Main.chatText = "";
                 Main.NewText("You are muted and cannot chat.", Microsoft.Xna.Framework.Color.Red);
             }
             else if (!string.IsNullOrEmpty(Main.chatText))
@@ -21,25 +32,35 @@ namespace YourModName.Players
                 string colorTag = "";
                 if (Player.team == 1)
                 {
-                    teamTag = "[RED]";
+                    teamTag = "RED]";
                     colorTag = "[c/FF4040:";
                 }
                 else if (Player.team == 3) // Blue
                 {
-                    teamTag = "[BLUE]";
+                    teamTag = "BLUE]";
                     colorTag = "[c/40A0FF:";
                 }
                 else
                 {
-                    teamTag = "[NO TEAM]";
+                    teamTag = "NO TEAM]";
                     colorTag = "[c/AAAAAA:";
                 }
 
-                if (!Main.chatText.StartsWith(teamTag))
+                if (Main.chatText.StartsWith("/"))
                 {
-                    Main.chatText = $"{colorTag}{teamTag} {Player.name}: {Main.chatText}]";
+                    
                 }
+
+                else if (!Main.chatText.StartsWith(colorTag + teamTag))
+                {
+
+                    Main.chatText = $"{colorTag}{teamTag}: {Main.chatText}";
+                }
+
             }
         }
-    }
+        }
+    
+
+
 }
