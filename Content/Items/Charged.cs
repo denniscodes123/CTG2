@@ -12,6 +12,9 @@ using CTG2.Content.Items;
 public class Charged : GlobalItem
 {
     public bool Affected;
+    private uint useDelay = 42; // Time between shots
+    private uint postShotDelay = 30;
+    private uint lastUsedCounter = 0;
 
 
     public override void SetDefaults(Item item)
@@ -39,7 +42,19 @@ public class Charged : GlobalItem
 
     public override bool CanUseItem(Item item, Player player)
     {
-        if (item.useAmmo == AmmoID.Arrow && Affected) return !(player.ownedProjectileCounts[ModContent.ProjectileType<ChargedBowProjectile>()] >= 1);
+        if (item.useAmmo == AmmoID.Arrow && Affected && player.ownedProjectileCounts[ModContent.ProjectileType<ChargedBowProjectile>()] == 0)
+        {
+            if (Main.GameUpdateCount - lastUsedCounter >= useDelay)
+			{
+				lastUsedCounter = Main.GameUpdateCount;
+	
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+        }
         else return base.CanUseItem(item, player);
     }
 
@@ -53,6 +68,9 @@ public class Charged : GlobalItem
                 Projectile.NewProjectile(Entity.GetSource_NaturalSpawn(), position.X, position.Y, velocity.X, velocity.Y, ModContent.ProjectileType<ChargedBowProjectile>(),
                     0, knockback, player.whoAmI, item.type, type);
             }
+            // if (Main.GameUpdateCount - lastUsedCounter > useDelay - postShotDelay)
+            //     lastUsedCounter = Main.GameUpdateCount - useDelay + postShotDelay;
+
             return false;
         }
         else return base.Shoot(item, player, source, position, velocity, type, damage, knockback);
@@ -63,4 +81,10 @@ public class Charged : GlobalItem
 
 
     public override bool AppliesToEntity(Item entity, bool lateInstantiation) { return true; }
+
+
+    public void PostShotUpdate() {
+        if (Main.GameUpdateCount - lastUsedCounter > useDelay - postShotDelay)
+            lastUsedCounter = Main.GameUpdateCount - useDelay + postShotDelay;
+    }
 }
