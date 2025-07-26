@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 using CTG2.Content;
@@ -234,9 +234,6 @@ public class GameManager : ModSystem
     public void PauseGame()
     {
         pause = true;
-        // MatchTime += 900;
-        // BlueTeam.PauseTeam();
-        // RedTeam.PauseTeam();
     }
     public void UnpauseGame()
     {
