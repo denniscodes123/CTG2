@@ -51,9 +51,14 @@ namespace CTG2
         RequestDie = 28,
         RequestKill = 29,
         RequestWeb = 30,
-        RequestSyncStats=31,
+        RequestSyncStats = 31,
         RequestFullHeal = 32,
-        RequestUnpause = 33
+        RequestUnpause = 33,
+
+        RequestMute = 34,
+        Mute = 35,
+        RequestUnmute = 36,
+        Unmute = 37,
                     
                 
     }

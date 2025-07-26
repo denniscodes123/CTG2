@@ -133,7 +133,7 @@ public class PlayerManager : ModPlayer
         int redBaseY = CTG2.config.RedBase[1] / 16;
         int lobbyX = CTG2.config.Lobby[0] / 16;
         int lobbyY = CTG2.config.Lobby[0] / 16;
-        
+
         int spectatorSpawnX = (13332 + 19316) / 32;
         int spectatorSpawnY = 11000 / 32;
         if (Player.ghost)
@@ -160,19 +160,19 @@ public class PlayerManager : ModPlayer
                 else
                 {
                     Player.SpawnX = lobbyX;
-                    Player.SpawnY = lobbyY;                    
+                    Player.SpawnY = lobbyY;
                 }
                 break;
             case PlayerState.ClassSelection:
                 if (Player.team == 3)
                 {
-                    Player.SpawnX = (int) gameManager.BlueTeam.ClassLocation.X / 16;
-                    Player.SpawnY = (int) gameManager.BlueTeam.ClassLocation.Y / 16;
+                    Player.SpawnX = (int)gameManager.BlueTeam.ClassLocation.X / 16;
+                    Player.SpawnY = (int)gameManager.BlueTeam.ClassLocation.Y / 16;
                 }
                 else if (Player.team == 1)
                 {
-                    Player.SpawnX = (int) gameManager.RedTeam.ClassLocation.X / 16;
-                    Player.SpawnY = (int) gameManager.RedTeam.ClassLocation.Y / 16;
+                    Player.SpawnX = (int)gameManager.RedTeam.ClassLocation.X / 16;
+                    Player.SpawnY = (int)gameManager.RedTeam.ClassLocation.Y / 16;
                 }
                 break;
 
@@ -182,8 +182,9 @@ public class PlayerManager : ModPlayer
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
     {
+
         EnforceTeamLock(); // lock team
-        
+
         // wecan probably delete (state transitions handle all of this)
         if (this.playerState == PlayerState.ClassSelection)
         {
@@ -226,7 +227,7 @@ public class PlayerManager : ModPlayer
 
             // Reset timer so this doesn't fire again
             classSelectionTimer = -1;
-            
+
         }
         else
         {
@@ -236,8 +237,8 @@ public class PlayerManager : ModPlayer
 
             }
         }
-            if (GameInfo.matchStage == 3)
-                return; // Don't decrement ability/buff timers
+        if (GameInfo.matchStage == 3)
+            return; // Don't decrement ability/buff timers
 
         if (awaitingRespawn) //was lowkey angry while coding this will clean up later
         {
@@ -315,7 +316,7 @@ public class PlayerManager : ModPlayer
     }
     public void LockTeam()
     {
-        
+
 
         if (gameManager != null && gameManager.IsGameActive)
         {
@@ -347,29 +348,30 @@ public class PlayerManager : ModPlayer
         }
     }
 
-        public override void Initialize()
+    public override void Initialize()
+    {
+        // We only need to create the layer for the client, not the server.
+        if (!Main.dedServ)
         {
-            // We only need to create the layer for the client, not the server.
-            if (!Main.dedServ)
-            {
-                gemLayer = new GemDrawLayer();
-            }
+            gemLayer = new GemDrawLayer();
         }
+    }
 
-        public override void ModifyDrawLayerOrdering(IDictionary<PlayerDrawLayer, PlayerDrawLayer.Position> positions)
+    public override void ModifyDrawLayerOrdering(IDictionary<PlayerDrawLayer, PlayerDrawLayer.Position> positions)
+    {
+        if (gemLayer == null)
         {
-            if (gemLayer == null)
-            {
-                return;
-            }
-            if (gemLayer != null)
-            {
-                positions[gemLayer] = gemLayer.GetDefaultPosition();
-            }
+            return;
         }
+        if (gemLayer != null)
+        {
+            positions[gemLayer] = gemLayer.GetDefaultPosition();
+        }
+    }
 
     private void EnforceTeamLock()
     {
         LockTeam();
     }
+    
 }
