@@ -142,12 +142,14 @@ namespace CTG2.Content
                         if (!attacker.HasBuff(206) && attacker.team != Player.team)
                         {
                             attacker.GetModPlayer<Abilities>().class7HitCounter++;
-
+                            
+                            if(attacker.whoAmI == Main.myPlayer){
                             if (attacker.GetModPlayer<Abilities>().class7HitCounter < 10)
                                 Main.NewText($"{attacker.GetModPlayer<Abilities>().class7HitCounter}/10 hits");
                             else
                             {
                                 Main.NewText("10/10 hits");
+                            }
                             }
                         }
                         break;
