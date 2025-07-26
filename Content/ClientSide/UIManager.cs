@@ -96,12 +96,10 @@ public class UIManager : ModSystem
         }
         else if (GameInfo.overtime)
         {
-            int secondsElapsed = GameInfo.overtimeTimer / 60;
-            int secondsLeft = 120 - secondsElapsed;
+            int secondsLeft = GameInfo.overtimeTimer / 60;
             int minutesLeft = secondsLeft / 60;
             int remainder = secondsLeft % 60;
             timeText = $"Time left in match: {minutesLeft}:{remainder.ToString("D2")}";
-            
         }
         else
         {
