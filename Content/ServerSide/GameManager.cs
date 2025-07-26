@@ -292,11 +292,12 @@ public class GameManager : ModSystem
             // web first
             CTG2.WebPlayer(player.whoAmI, 240);
 
+            //can write out bool for player winner in the future to only tp losers to top
             ModPacket teleportPacket = mod.GetPacket();
             teleportPacket.Write((byte)MessageType.ServerTeleport);
             teleportPacket.Write(player.whoAmI);
-            teleportPacket.Write((int)spectatorSpawnPoint.X);
-            teleportPacket.Write((int)spectatorSpawnPoint.Y);
+            teleportPacket.Write((int)13317);
+            teleportPacket.Write((int)10855);
             teleportPacket.Send(toClient: player.whoAmI);
 
             // Clear inventory and reset player stats
