@@ -130,7 +130,7 @@ public class ChargedBowProjectile : ModProjectile
 		Projectile.knockBack = item.knockBack; // knockback stays the same as base item
 
 		Vector2 position = player.Center + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f; // spawns the arrow from aiming direction, not inside player
-		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * (1.2f + (charge / 40) * 2f); // calculates the direction and speed of the arrow based on charge: 1.2 to 3.2
+		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * (1.6f + (charge / 40) * 1.6f); // calculates the direction and speed of the arrow based on charge: 1.2 to 3.2
 
 		if (player.channel & charge < 40f) // if still charging
 		{
@@ -170,6 +170,7 @@ public class ChargedBowProjectile : ModProjectile
 			if (Main.myPlayer == Projectile.owner)
 			{
 				Projectile.NewProjectile(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
+				item.GetGlobalItem<Charged>().PostShotUpdate();
 			}
 
 			SoundEngine.PlaySound(bowSound2.WithVolumeScale(Main.soundVolume * 2.5f), Projectile.position); // sound played when fired
