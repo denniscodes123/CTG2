@@ -112,14 +112,14 @@ public class GameTeam
         
     }
 
-    public void PauseTeam()
-    {
-        foreach (Player ply in Players)
-        {
-            int buffTicks = 15 * 60;
-            ply.AddBuff(BuffID.Webbed, buffTicks);
-            NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, ply.whoAmI, BuffID.Webbed, buffTicks);
-        }
-    }
+    // public void PauseTeam()
+    // {
+    //     foreach (Player ply in Players)
+    //     {
+    //         int buffTicks = 15 * 60;
+    //         ply.AddBuff(BuffID.Webbed, buffTicks);
+    //         NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, ply.whoAmI, BuffID.Webbed, buffTicks);
+    //     }
+    // }
     
 }
