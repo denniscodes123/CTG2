@@ -53,7 +53,7 @@ namespace CTG2
         RequestWeb = 30,
         RequestSyncStats=31,
         RequestFullHeal = 32,
-
+        RequestUnpause = 33
                     
                 
     }
@@ -135,6 +135,9 @@ namespace CTG2
                     break;
                 case (byte)MessageType.RequestPause:
                     manager.PauseGame();
+                    break;
+                case (byte)MessageType.RequestUnpause:
+                    manager.UnpauseGame();
                     break;
                 case (byte)MessageType.RequestSpawnNpc:
                     var npcX = reader.ReadInt32();
