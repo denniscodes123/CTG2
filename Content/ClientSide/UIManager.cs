@@ -100,7 +100,7 @@ public class UIManager : ModSystem
             int secondsLeft = 120 - secondsElapsed;
             int minutesLeft = secondsLeft / 60;
             int remainder = secondsLeft % 60;
-            timeText = $"Time left in match: {minutesLeft}:{remainder}";
+            timeText = $"Time left in match: {minutesLeft}:{remainder.ToString("D2")}";
             
         }
         else
@@ -109,7 +109,7 @@ public class UIManager : ModSystem
             int secondsLeft = 900 - secondsElapsed;
             int minutesLeft = secondsLeft / 60;
             int remainder = secondsLeft % 60;
-            timeText = $"Time left in match: {minutesLeft}:{remainder}";
+            timeText = $"Time left in match: {minutesLeft}:{remainder.ToString("D2")}";
         }
         var blueGemStatus = GameInfo.blueGemCarrier;
         var redGemStatus = GameInfo.redGemCarrier;
