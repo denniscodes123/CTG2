@@ -34,6 +34,7 @@ public class GameManager : ModSystem
     public Queue<MapTypes> mapQueue = new();
 
     public bool pause = false;
+    public bool killonce = true;
     private bool isOvertime = false;
     private int overtimeTimer = 0;
     private const int OVERTIME_DURATION = 60 * 2 * 60; // 2 minutes in ticks (60 ticks/sec)
@@ -536,7 +537,29 @@ public class GameManager : ModSystem
                 return;
             }
         }
- 
+         // Kill all mobs during class selection
+        if (GameInfo.matchStage == 1 && killonce == true)
+        {
+
+            if (killonce)
+            {
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+
+                    if (!npc.active)
+                        continue;
+
+                    npc.active = false;
+
+                }
+                killonce = false;
+            }
+        }
+        if (GameInfo.matchStage == 2 && killonce == false)
+        {
+            killonce = true;
+        }
     }
 
     public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
