@@ -6,10 +6,6 @@ namespace CTG2.Content.Items
 {
 	public class Rancor : ModItem // Archer bow
 	{
-
-	   	private uint useDelay = 40; // Time between shots
-     		private uint lastUsedCounter = 0;
-	    
 		public override void SetDefaults()
 		{
 	  		Item.CloneDefaults(ItemID.TendonBow);
@@ -18,7 +14,7 @@ namespace CTG2.Content.Items
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 18;
 			Item.height = 40;
-			Item.useTime = 16;
+			Item.useTime = 18;
 			Item.useAnimation = 35;
 			Item.knockBack = 5;
 			Item.value = Item.buyPrice(silver: 1);
@@ -26,19 +22,5 @@ namespace CTG2.Content.Items
 			Item.autoReuse = false;
    			Item.mana = 0;
 		}
-		
-  		public override bool CanUseItem(Player player)
-	    	{
-		      	if (Main.GameUpdateCount - lastUsedCounter >= useDelay)
-		      	{
-		        	lastUsedCounter = Main.GameUpdateCount;
-		
-		        	return true;
-		      	}
-		      	else
-		      	{
-		        	return false;
-		      	}
-	 	}
 	}
 }
