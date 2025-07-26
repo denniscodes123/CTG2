@@ -372,6 +372,43 @@ namespace ClassesNamespace
                 return; 
         }
 
+        public override void OnEquipmentLoadoutSwitched(int oldLoadoutIndex, int loadoutIndex)
+        {
+          
+                var savedLoadout = Player.Loadouts[0]; // Loadout 0
+                ApplyLoadout(0);
+                Player.CurrentLoadoutIndex = oldLoadoutIndex;
+
+                if (Main.myPlayer == Player.whoAmI)
+                {
+                    Main.NewText("You cannot switch loadouts in this game.", Color.Red);
+                }
+            
+        }
+        public void ApplyLoadout(int index)
+        {
+            var loadout = Player.Loadouts[index];
+
+
+
+                    for (int i = 0; i < Player.armor.Length; i++)
+                    {
+                        Player.armor[i] = loadout.Armor[i].Clone();
+                    }
+
+
+                    for (int i = 0; i < Player.dye.Length; i++)
+                    {
+                        Player.dye[i] = loadout.Dye[i].Clone();
+                    }
+
+
+            if (Main.netMode == NetmodeID.Server)
+            {
+                NetMessage.SendData(MessageID.SyncEquipment, -1, -1, null, Player.whoAmI);
+            }
+        }
+
         public override void PostUpdate()
         {
             //clear inventory logic for matchend
