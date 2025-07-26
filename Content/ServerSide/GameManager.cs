@@ -88,10 +88,12 @@ public class GameManager : ModSystem
             {
                 case MapTypes.Kraken:
                     honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+                    honeyZones.Add(new Rectangle(1022, 685, 2, 1)); 
                     break;
 
                 case MapTypes.Stalactite:
-                    
+                    honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+                    honeyZones.Add(new Rectangle(1022, 685, 2, 1)); 
                     break;
 
                 default:
@@ -117,13 +119,15 @@ public class GameManager : ModSystem
                 }
             }
 
+            
+
             Liquid.UpdateLiquid();
         }
         public static void ClearHoneyForMap()
         {
             List<Rectangle> honeyZones = new();
 
-            honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+            honeyZones.Add(new Rectangle(1022, 685, 10, 10));
 
             foreach (var zone in honeyZones)
             {
