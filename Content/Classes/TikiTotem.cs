@@ -23,6 +23,7 @@ namespace CTG2.Content.Classes
         private float healFrameGap = 30;
         private float frameCount = 0;
         private int totemTeam = 0;
+        private int maxHP = 200;
 
         public override void SetStaticDefaults()
         {
@@ -37,7 +38,7 @@ namespace CTG2.Content.Classes
             NPC.height = 48;
             NPC.damage = 0; 
             NPC.defense = 0;
-            NPC.lifeMax = 200;
+            NPC.lifeMax = maxHP;
             NPC.knockBackResist = 0; //make this higher for more knockback
 
             NPC.aiStyle = -1; 
@@ -61,7 +62,8 @@ namespace CTG2.Content.Classes
 
         public override void AI()
         {
-            
+            if (frameCount % 6 == 0) NPC.life--;
+
             float friction = 0f; //update this to change friction
 
             if (NPC.velocity.X > 0f)
