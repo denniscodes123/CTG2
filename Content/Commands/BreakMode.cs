@@ -11,6 +11,12 @@ namespace CTG2.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
+                 var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+            if (!modPlayer.IsAdmin)
+            {
+                caller.Reply("You must be an admin to use this command.", Color.Red);
+                return;
+            }
             UnbreakableTiles.AllowBreaking = !UnbreakableTiles.AllowBreaking;
 
             string status = UnbreakableTiles.AllowBreaking ? "enabled" : "disabled";
