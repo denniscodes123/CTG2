@@ -7,6 +7,7 @@ namespace CTG2.Content
 {
     public class UnbreakableTiles : GlobalTile
     {
+        public static bool AllowBreaking = false;
         public override bool CanPlace(int i, int j, int type)
         {
             Tile existing = Main.tile[i, j];
@@ -20,6 +21,11 @@ namespace CTG2.Content
 
         public override bool CanKillTile(int i, int j, int type, ref bool blockDamaged)
         {
+            if (AllowBreaking)
+            {
+                return base.CanKillTile(i, j, type, ref blockDamaged);
+            }
+
             if (type == TileID.LihzahrdBrick)
                 return false;
 
