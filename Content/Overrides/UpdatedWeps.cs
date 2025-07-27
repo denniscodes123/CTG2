@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Microsoft.Xna.Framework.Audio;
 using ReLogic.Utilities;
 using System;
+using CTG2.Content.ClientSide;
 
 namespace CTG2.Content.Items.ModifiedWeps
 {
@@ -47,10 +48,6 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint sickleLastUsedCounter = 0;
 
         public override bool InstancePerEntity => true;
-
-
-
-
 
 
         public override void SetDefaults(Item item)
@@ -231,10 +228,9 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.shootSpeed = 48f;
                     item.crit = 0;
                     break;
-
-
             }
         }
+
 
         public override bool Shoot(Item item, Player player, Terraria.DataStructures.EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
@@ -246,6 +242,8 @@ namespace CTG2.Content.Items.ModifiedWeps
             }
             return base.Shoot(item, player, source, position, velocity, type, damage, knockback);
         }
+
+
         public override bool CanUseItem(Item item, Player player)
         {
             if (item.type == ItemID.Bananarang)
@@ -373,6 +371,8 @@ namespace CTG2.Content.Items.ModifiedWeps
             else
                 return true;
         }
+
+
         public override void UpdateEquip(Item item, Player player)
         {
             switch (item.type)
