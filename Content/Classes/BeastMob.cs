@@ -5,17 +5,24 @@ using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
-
+using Microsoft.Xna.Framework.Audio;
+using Terraria.Audio;
+using CTG2.Content.Items;
 
 
 namespace CTG2.Content.Classes
 {
     public class StationaryBeast : ModNPC
     {
+        
+        private int lavaSoundCooldown = 0;
+
+
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 1;
         }
+
 
         public override void SetDefaults()
         {
@@ -32,10 +39,25 @@ namespace CTG2.Content.Classes
             NPC.friendly = false;
 
         }
+
+
+        public override void HitEffect (NPC.HitInfo hit)
+        {
+            SoundEngine.PlaySound(SoundID.NPCHit1, NPC.Center);
+
+            if (NPC.life <= 0)
+            {
+                SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
+            }
+        }
+
+
         public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers) //might have to change values later
         {
-            NPC.immune[player.whoAmI] = 40;
+            if (item.type != ModContent.ItemType<ShardstonePickaxe>())
+                NPC.immune[player.whoAmI] = 40;
         }
+
 
         public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers)
         {
@@ -44,6 +66,7 @@ namespace CTG2.Content.Classes
                 NPC.immune[projectile.owner] = 40;
             }
         }
+
 
         public override void AI()
         {
@@ -96,7 +119,25 @@ namespace CTG2.Content.Classes
 
                 }
             }
+
+            if (lavaSoundCooldown > 0)
+            {
+                lavaSoundCooldown--;
+            }
+
+            if (NPC.lavaWet && NPC.lifeRegen < 0 && lavaSoundCooldown == 0)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit1, NPC.position);
+
+                if (NPC.life <= 0)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
+                }
+
+                lavaSoundCooldown = 40;
+            }
         }
+
 
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
@@ -123,7 +164,5 @@ namespace CTG2.Content.Classes
                 0f
             );
         }
-        
-        
     }
 }
