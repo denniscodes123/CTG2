@@ -11,18 +11,32 @@ using CTG2.Content.Items;
 
 namespace CTG2.Content.Classes
 {
-
     public class AllNpcs : GlobalNPC
     {
         public int team = 3;
+        private int previousLife = 0;
+
+        SoundStyle totemCrumble = new SoundStyle("CTG2/Content/Classes/TotemCrumble");
 
         public override bool InstancePerEntity => true;
+
+        public override void AI(NPC npc)
+        {
+            if (npc.life <= 0 && previousLife > 0) //use this for future sounds to play ondeath for all npcs that decay (no death reason)
+            {
+                if (npc.type == ModContent.NPCType<TikiTotem>())
+                    SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 3f), npc.Center);
+                else if (npc.type == ModContent.NPCType<StationaryBeast>())
+                    SoundEngine.PlaySound(SoundID.NPCDeath1, npc.Center);
+            }
+
+            previousLife = npc.life;
+        }
     }
 
 
     public class TikiTotem : ModNPC
     {
-        private int lavaSoundCooldown = 0;
         private float healFrameGap = 30;
         private int hitCounter = 0;
         private float frameCount = 0;
@@ -30,6 +44,7 @@ namespace CTG2.Content.Classes
         private int maxHP = 200;
 
         SoundStyle totemCrumble = new SoundStyle("CTG2/Content/Classes/TotemCrumble");
+
 
         public override void SetStaticDefaults()
         {
@@ -70,7 +85,23 @@ namespace CTG2.Content.Classes
         }
 
 
-        public override void HitEffect (NPC.HitInfo hit)
+        public override bool? CanBeHitByProjectile(Projectile projectile)
+        {
+            int tikiTeam = (int)NPC.ai[0];
+
+            if (projectile.owner >= 0 && projectile.owner < Main.maxPlayers)
+            {
+                Player player = Main.player[projectile.owner];
+
+                if (tikiTeam == player.team)
+                    return false;
+            }
+
+            return true;
+        }
+
+
+        public override void HitEffect(NPC.HitInfo hit)
         {
             int tikiTeam = (int)NPC.ai[0];
 
@@ -82,8 +113,8 @@ namespace CTG2.Content.Classes
                 else if (tikiTeam == 1)
                     for (int i = 0; i < 5; i++)
                         Dust.NewDust(NPC.position, NPC.width, NPC.height, 88);
-
-                SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 1f), NPC.Center);
+                
+                SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 3f), NPC.Center);
             }
             else
             {
@@ -139,42 +170,6 @@ namespace CTG2.Content.Classes
                 {   
                     player.Heal(1);
                 }
-            }
-
-            if (lavaSoundCooldown > 0)
-            {
-                lavaSoundCooldown--;
-            }
-
-            if (NPC.lavaWet && NPC.lifeRegen < 0 && lavaSoundCooldown == 0)
-            {
-                int tikiTeam = (int)NPC.ai[0];
-
-                if (NPC.life <= 0)
-                {
-                    if (tikiTeam == 1)
-                        for (int i = 0; i < 5; i++)
-                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 90);
-                    else if (tikiTeam == 1)
-                        for (int i = 0; i < 5; i++)
-                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 88);
-
-                    SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 1f), NPC.Center);
-                }
-                else
-                {
-                    if (tikiTeam == 1)
-                        for (int i = 0; i < 5; i++)
-                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 60);
-                    else if (tikiTeam == 1)
-                        for (int i = 0; i < 5; i++)
-                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 59);
-                }
-
-                SoundEngine.PlaySound(SoundID.NPCHit16, NPC.Center);
-
-                hitCounter = 1;
-                lavaSoundCooldown = 40;
             }
 
             frameCount++;
