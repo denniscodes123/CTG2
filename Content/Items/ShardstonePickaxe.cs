@@ -14,6 +14,7 @@ namespace CTG2.Content.Items
 			Item.useAnimation = 14;
 			Item.scale = .75f;
    			Item.crit = 0;
+			Item.knockBack = 0.7f;
 		}
 	}
 }
