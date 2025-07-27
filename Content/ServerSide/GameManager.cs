@@ -52,6 +52,21 @@ public class GameManager : ModSystem
     private int blueGemFireworkTimer = 0;
     private int redGemFireworkTimer = 0;
     private const int FIREWORK_INTERVAL = 120;
+/* might be cooked rn 
+    public bool IsPubsModeActive { get; set; }
+
+    public void EnablePubsMode()
+    {
+        IsPubsModeActive = true;
+        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[GAMEMODE] Pubs mode enabled."), Color.Aqua);
+
+        ModPacket packet = Mod.GetPacket();
+        packet.Write((byte)MessageType.SyncPubsMode);
+        packet.Write(true);
+        packet.Send();
+
+    }
+    
         public static void FillLavaInDesignatedArea()
         {
             //hard coded coords for the right.wld if you are on the wrong wld it will spawn lava in wrong spot!!!
@@ -186,6 +201,33 @@ public class GameManager : ModSystem
         RedGem.Reset();
         bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
 
+                /*
+        if (IsPubsModeActive)
+        {
+            List<Player> unassigned = new List<Player>();
+            foreach (Player p in Main.player)
+            {
+                if (p != null && p.active)
+                    unassigned.Add(p);
+            }
+
+            unassigned.Shuffle(CTG2.randomGenerator);
+
+            for (int i = 0; i < unassigned.Count; i++)
+            {
+                Player plyrr = unassigned[i];
+                int team = (i % 2 == 0) ? 1 : 3; // Alternate Red (1) and Blue (3)
+
+                plyrr.team = team;
+                var mod1 = ModContent.GetInstance<CTG2>();
+                ModPacket SetTeamPacket = mod1.GetPacket();
+                SetTeamPacket.Write((byte)MessageType.UpdatePlayerTeam);
+                SetTeamPacket.Write(plyrr.whoAmI);
+                SetTeamPacket.Write(team);
+                SetTeamPacket.Send();
+            }
+        }
+        */
 
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
