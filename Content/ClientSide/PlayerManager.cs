@@ -398,6 +398,7 @@ public class PlayerManager : ModPlayer
             InventoryCounts[itemType] = 0;
         InventoryCounts[itemType] += addAmount - left;
     }
+    
     public override bool OnPickup(Item item)
     {
         if (item != null && item.type > ItemID.None && item.stack > 0)

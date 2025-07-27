@@ -16,6 +16,8 @@ using Terraria.Chat;
 using Terraria.Localization;
 
 using MonoMod.Cil;
+using Humanizer;
+using System.Reflection;
 
 
 namespace CTG2
