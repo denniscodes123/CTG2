@@ -282,6 +282,18 @@ public class PlayerManager : ModPlayer
             info.DamageSource = default;
         }
     }
+    public override void OnEnterWorld()
+    {
+        if (GameInfo.matchStage != 1 && !GameInfo.overtime)
+        {
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.LateJoin);
+            packet.Write(Player.whoAmI);
+            packet.Send();
+        }
+        base.OnEnterWorld();
+    }
 
     // When a player disconnects, this hook can clean up their data.
     public override void PlayerDisconnect()

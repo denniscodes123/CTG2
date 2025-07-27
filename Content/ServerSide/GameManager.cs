@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Terraria;
 using Terraria.ModLoader;
 using CTG2.Content;
@@ -35,123 +35,126 @@ public class GameManager : ModSystem
 
     public bool pause = false;
     public bool killonce = true;
+
+    public bool pubsConfig = false; // this is used at the start of every game
+
     private bool isOvertime = false;
     private int overtimeTimer = 0;
     private const int OVERTIME_DURATION = 60 * 2 * 60; // 2 minutes in ticks (60 ticks/sec)
-    
+
     public GameMap Map { get; private set; }
 
     // Spectator tracking
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
     private Vector2 spectatorSpawnPoint = new Vector2((13332 + 19316) / 2, 11000); // Center area for spectators
-    
+
     // New game delay tracking
     private bool isWaitingForNewGame = false;
     private int newGameTimer = 0;
     private int blueGemFireworkTimer = 0;
     private int redGemFireworkTimer = 0;
     private const int FIREWORK_INTERVAL = 120;
-        public static void FillLavaInDesignatedArea()
+    public static void FillLavaInDesignatedArea()
+    {
+        //hard coded coords for the right.wld if you are on the wrong wld it will spawn lava in wrong spot!!!
+        int xMin = 13702 / 16;
+        int yMin = 11719 / 16;
+        int xMax = 19030 / 16;
+        int yMax = 11814 / 16;
+
+        for (int x = xMin; x <= xMax; x++)
         {
-            //hard coded coords for the right.wld if you are on the wrong wld it will spawn lava in wrong spot!!!
-            int xMin = 13702 /16; 
-            int yMin = 11719 /16;
-            int xMax = 19030 /16;
-            int yMax = 11814 /16;
-    
-            for (int x = xMin; x <= xMax; x++)
+            for (int y = yMin; y <= yMax; y++)
             {
-                for (int y = yMin; y <= yMax; y++)
+                Tile tile = Framing.GetTileSafely(x, y);
+
+
+                if (!tile.HasTile)
+                {
+                    tile.LiquidAmount = 255;
+                    tile.LiquidType = LiquidID.Lava;
+                    Liquid.AddWater(x, y); // Schedule a liquid update at this position
+                    WorldGen.SquareTileFrame(x, y, true);
+                }
+            }
+        }
+
+        Liquid.UpdateLiquid();
+    }
+    public static void FillHoneyForMap(MapTypes map)
+    {
+        // Define honey zones for specific maps
+        List<Rectangle> honeyZones = new();
+
+        switch (map)
+        {
+            case MapTypes.Kraken:
+                honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+                honeyZones.Add(new Rectangle(1022, 685, 2, 1));
+                break;
+
+            case MapTypes.Stalactite:
+                honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
+                honeyZones.Add(new Rectangle(1022, 685, 2, 1));
+                break;
+
+            default:
+                return;
+        }
+
+        foreach (var zone in honeyZones)
+        {
+            for (int x = zone.Left; x < zone.Right; x++)
+            {
+                for (int y = zone.Top; y < zone.Bottom; y++)
                 {
                     Tile tile = Framing.GetTileSafely(x, y);
-    
-    
+
                     if (!tile.HasTile)
                     {
                         tile.LiquidAmount = 255;
-                        tile.LiquidType = LiquidID.Lava;
-                        Liquid.AddWater(x, y); // Schedule a liquid update at this position
+                        tile.LiquidType = LiquidID.Honey;
+                        Liquid.AddWater(x, y);
                         WorldGen.SquareTileFrame(x, y, true);
                     }
                 }
             }
-    
-            Liquid.UpdateLiquid();
         }
-        public static void FillHoneyForMap(MapTypes map)
+
+
+
+        Liquid.UpdateLiquid();
+    }
+    public static void ClearHoneyForMap()
+    {
+        List<Rectangle> honeyZones = new();
+
+        honeyZones.Add(new Rectangle(1022, 685, 10, 10));
+
+        foreach (var zone in honeyZones)
         {
-            // Define honey zones for specific maps
-            List<Rectangle> honeyZones = new();
-
-            switch (map)
+            for (int x = zone.Left; x < zone.Right; x++)
             {
-                case MapTypes.Kraken:
-                    honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
-                    honeyZones.Add(new Rectangle(1022, 685, 2, 1)); 
-                    break;
-
-                case MapTypes.Stalactite:
-                    honeyZones.Add(new Rectangle(16357 / 16, 10965 / 16, (16376 - 16357 + 1) / 16, 1));
-                    honeyZones.Add(new Rectangle(1022, 685, 2, 1)); 
-                    break;
-
-                default:
-                    return;
-            }
-
-            foreach (var zone in honeyZones)
-            {
-                for (int x = zone.Left; x < zone.Right; x++)
+                for (int yPos = zone.Top; yPos < zone.Bottom; yPos++)
                 {
-                    for (int y = zone.Top; y < zone.Bottom; y++)
-                    {
-                        Tile tile = Framing.GetTileSafely(x, y);
+                    Tile tile = Framing.GetTileSafely(x, yPos);
 
-                        if (!tile.HasTile)
-                        {
-                            tile.LiquidAmount = 255;
-                            tile.LiquidType = LiquidID.Honey;
-                            Liquid.AddWater(x, y);
-                            WorldGen.SquareTileFrame(x, y, true);
-                        }
+                    if (tile.LiquidAmount > 0 && tile.LiquidType == LiquidID.Honey)
+                    {
+                        tile.LiquidAmount = 0;
+                        tile.LiquidType = 0;
+                        Liquid.AddWater(x, yPos);
+                        WorldGen.SquareTileFrame(x, yPos, true);
                     }
                 }
             }
-
-            
-
-            Liquid.UpdateLiquid();
-        }
-        public static void ClearHoneyForMap()
-        {
-            List<Rectangle> honeyZones = new();
-
-            honeyZones.Add(new Rectangle(1022, 685, 10, 10));
-
-            foreach (var zone in honeyZones)
-            {
-                for (int x = zone.Left; x < zone.Right; x++)
-                {
-                    for (int yPos = zone.Top; yPos < zone.Bottom; yPos++)
-                    {
-                        Tile tile = Framing.GetTileSafely(x, yPos);
-
-                        if (tile.LiquidAmount > 0 && tile.LiquidType == LiquidID.Honey)
-                        {
-                            tile.LiquidAmount = 0;
-                            tile.LiquidType = 0;
-                            Liquid.AddWater(x, yPos);
-                            WorldGen.SquareTileFrame(x, yPos, true);
-                        }
-                    }
-                }
-            }
-
-            Liquid.UpdateLiquid();
         }
 
-    
+        Liquid.UpdateLiquid();
+    }
+
+
     public override void OnWorldLoad()
     {
         // TODO: Re-Paste the Arena on world load (in case it gets destroyed by an admin).
@@ -182,6 +185,11 @@ public class GameManager : ModSystem
         isWaitingForNewGame = false;
         IsGameActive = true;
         MatchTime = 0;
+        if (pubsConfig)
+        {
+            PubsConfig();
+        }
+
         BlueGem.Reset();
         RedGem.Reset();
         bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
@@ -207,7 +215,7 @@ public class GameManager : ModSystem
             }
 
             // Directly call startPlayerClassSelection instead of sending a packet
-    
+
             startPlayerClassSelection(player.whoAmI, true);
 
         }
@@ -351,15 +359,15 @@ public class GameManager : ModSystem
         // force set team/pvp
         BlueTeam.EnforceTeam();
         RedTeam.EnforceTeam();
-        
+
         // Additional PvP enforcement
         EnsureAllPlayersHavePvP();
-        
+
         if (MatchTime == 1800)
         {
             // this code will handle class selection and stuff
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"class selection is ending"), Microsoft.Xna.Framework.Color.Olive);
-                
+
             BlueTeam.SendToBase();
             RedTeam.SendToBase();
         }
@@ -373,7 +381,7 @@ public class GameManager : ModSystem
             RedGem.Update(BlueGem, BlueTeam.Players);
 
             // fire works test?
-    
+
             if (BlueGem.IsHeld)
             {
                 blueGemFireworkTimer++;
@@ -402,7 +410,7 @@ public class GameManager : ModSystem
             {
                 blueGemFireworkTimer = 0;
             }
-            
+
             if (RedGem.IsHeld)
             {
                 redGemFireworkTimer++;
@@ -412,15 +420,15 @@ public class GameManager : ModSystem
                     var holder = Main.player[RedGem.HeldBy];
 
                     int projectileIndex = Projectile.NewProjectile(
-                        Entity.GetSource_NaturalSpawn(), 
+                        Entity.GetSource_NaturalSpawn(),
                         holder.Center,
-                        new Vector2(0f, -8f), 
+                        new Vector2(0f, -8f),
                         ProjectileID.RocketFireworkRed,
-                        0, 
-                        0f, 
-                        Main.myPlayer 
+                        0,
+                        0f,
+                        Main.myPlayer
                     );
-                    
+
                     if (projectileIndex >= 0 && projectileIndex < Main.maxProjectiles)
                     {
                         NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, projectileIndex);
@@ -438,9 +446,10 @@ public class GameManager : ModSystem
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerGameUpdate);
-            
-            foreach (Player p in Main.player) {
-                    ForcePlayerStatSync(p.whoAmI);
+
+            foreach (Player p in Main.player)
+            {
+                ForcePlayerStatSync(p.whoAmI);
             }
 
             // Determine match stage based on game state
@@ -453,12 +462,12 @@ public class GameManager : ModSystem
             {
                 matchStage = 2; // Active Gameplay phase
             }
-            
+
             packet.Write(matchStage);
             packet.Write((int)MatchTime);
-            packet.Write(isOvertime); 
-            packet.Write(isOvertime ? overtimeTimer : 0); 
-            
+            packet.Write(isOvertime);
+            packet.Write(isOvertime ? overtimeTimer : 0);
+
             // Blue and red Gem X positions
             var distBetweenGems = Math.Abs(RedGem.Position.X - BlueGem.Position.X);
             if (BlueGem.IsHeld)
@@ -504,12 +513,12 @@ public class GameManager : ModSystem
 
         if (!isOvertime && MatchTime >= 60 * 60 * 15)
         {
-         
+
             if (BlueGem.IsHeld || RedGem.IsHeld)
             {
                 isOvertime = true;
                 overtimeTimer = OVERTIME_DURATION;
-                GameInfo.overtime = true; 
+                GameInfo.overtime = true;
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[OVERTIME] Overtime has started! Capture the gem or the game will end in 2 minutes."), Microsoft.Xna.Framework.Color.OrangeRed);
             }
             else
@@ -543,7 +552,7 @@ public class GameManager : ModSystem
                 return;
             }
         }
-         // Kill all mobs during class selection
+        // Kill all mobs during class selection
         if (GameInfo.matchStage == 1 && killonce == true)
         {
 
@@ -568,7 +577,8 @@ public class GameManager : ModSystem
         }
     }
 
-    public void queueMap(MapTypes mapType) { // idk what to do here i have a Queue<MapType> here
+    public void queueMap(MapTypes mapType)
+    { // idk what to do here i have a Queue<MapType> here
         mapQueue.Enqueue(mapType);
     }
 
@@ -576,11 +586,11 @@ public class GameManager : ModSystem
     {
         return playerSpectatorStatus.GetValueOrDefault(playerIndex, false);
     }
-    
+
     public void SetPlayerSpectator(int playerIndex, bool isSpectator)
     {
         if (!Main.player[playerIndex].active) return;
-        
+
         var player = Main.player[playerIndex];
         if (isSpectator)
         {
@@ -604,7 +614,7 @@ public class GameManager : ModSystem
             playerSpectatorStatus[playerIndex] = true;
 
             // Send teleport packet to client
-            CTG2.WebPlayer(player.whoAmI,120); //not sure if webbing is needed here
+            CTG2.WebPlayer(player.whoAmI, 120); //not sure if webbing is needed here
 
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
@@ -667,10 +677,10 @@ public class GameManager : ModSystem
         // Instead, get the team from the vanilla Player.team
         Player player = Main.player[playerIndex];
         int team = player.team;
-        
+
         Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
-        
-        
+
+
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection (non game)"), Color.Beige);
         // Send packet to set class selection time on client
         var mod = ModContent.GetInstance<CTG2>();
@@ -680,13 +690,13 @@ public class GameManager : ModSystem
         timePacket.Write(1800.0); // class selection time
         timePacket.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent SetClassSelectionTime packet to player {playerIndex}");
-        
+
         if (!intToTeam.ContainsKey(team))
         {
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[ERROR] Invalid team {team} for player {playerIndex}"), Color.Red);
             return;
         }
-        
+
         GameTeam gameTeam = intToTeam[team];
         PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.ClassSelection;
         // Send packet to update client-side player state to ClassSelection
@@ -710,28 +720,28 @@ public class GameManager : ModSystem
         // Use vanilla Player.team instead of PlayerManager on server
         Player player = Main.player[playerIndex];
         int team = player.team;
-        
+
         if (!intToTeam.ContainsKey(team))
             return;
-        
+
         GameTeam gameTeam = intToTeam[team];
-        
+
         var mod = ModContent.GetInstance<CTG2>();
-        
+
         PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.Active;
         ModPacket statePacket = mod.GetPacket();
         statePacket.Write((byte)MessageType.UpdatePlayerState);
         statePacket.Write(playerIndex);
         statePacket.Write((byte)PlayerManager.PlayerState.Active);
         statePacket.Send(toClient: playerIndex);
-      
+
         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
-        
+
         // Force sync player stats to ensure HP displays correctly to other players
         //ForcePlayerStatSync(playerIndex);
 
         // Send teleport packet to client
-        CTG2.WebPlayer(player.whoAmI,240); //could be overkill
+        CTG2.WebPlayer(player.whoAmI, 240); //could be overkill
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.ServerTeleport);
         packet.Write(playerIndex);
@@ -740,7 +750,7 @@ public class GameManager : ModSystem
         packet.Send(toClient: playerIndex);
 
         ModPacket healpacket = mod.GetPacket(); //do heal server side
-        healpacket.Write((byte)MessageType.RequestFullHeal); 
+        healpacket.Write((byte)MessageType.RequestFullHeal);
         healpacket.Write(playerIndex);
         healpacket.Send(toClient: playerIndex);
     }
@@ -813,8 +823,8 @@ public class GameManager : ModSystem
             return;
         }
         */
-        
-        if (!IsGameActive) 
+
+        if (!IsGameActive)
         {
             // Send game info updates when game is not active every 6 ticks
             if (Main.GameUpdateCount % 6 == 0)
@@ -824,8 +834,8 @@ public class GameManager : ModSystem
                 packet.Write((byte)MessageType.ServerGameUpdate);
                 packet.Write((int)0); // No game active
                 packet.Write((int)0); // No match time
-                packet.Write(isOvertime); 
-                packet.Write(isOvertime ? overtimeTimer : 0); 
+                packet.Write(isOvertime);
+                packet.Write(isOvertime ? overtimeTimer : 0);
                 // Send empty gem data when no game is active
                 packet.Write((int)0); // Blue gem position
                 packet.Write((int)0); // Red gem position
@@ -840,7 +850,7 @@ public class GameManager : ModSystem
 
         base.PostUpdateWorld();
     }
-    
+
     private void ClearPlayerInventory(Player player)
     {
         // Clear main inventory
@@ -848,46 +858,46 @@ public class GameManager : ModSystem
         {
             player.inventory[i].TurnToAir();
         }
-        
+
         // Clear armor and accessories
         for (int i = 0; i < player.armor.Length; i++)
         {
             player.armor[i].TurnToAir();
         }
-        
+
         // Clear dye slots
         for (int i = 0; i < player.dye.Length; i++)
         {
             player.dye[i].TurnToAir();
         }
-        
+
         // Clear miscellaneous equipment
         for (int i = 0; i < player.miscEquips.Length; i++)
         {
             player.miscEquips[i].TurnToAir();
         }
-        
+
         // Clear misc dyes
         for (int i = 0; i < player.miscDyes.Length; i++)
         {
             player.miscDyes[i].TurnToAir();
         }
-        
+
         // Sync inventory changes to all clients
         NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, player.whoAmI);
-        
+
         Console.WriteLine($"GameManager: Cleared inventory for player {player.whoAmI} ({player.name})");
     }
 
     public void HandlePlayerTeamChange(int playerIndex, int newTeam)
     {
         if (!Main.player[playerIndex].active) return;
-        
+
         Player player = Main.player[playerIndex];
         int oldTeam = player.team;
-        
+
         Console.WriteLine($"GameManager: HandlePlayerTeamChange called for player {playerIndex} from team {oldTeam} to team {newTeam}");
-        
+
         // Check if too late to change teams during active game (similar to spectator logic)
         if (IsGameActive && MatchTime >= 60 * 60 * 15 - 45 * 60)
         {
@@ -895,26 +905,26 @@ public class GameManager : ModSystem
             Console.WriteLine($"Player {player.name} cannot change teams - game ending soon");
             return;
         }
-        
+
         // Set the new team
         player.team = newTeam;
-        
+
         // Update PlayerManager team
         var playerManager = player.GetModPlayer<PlayerManager>();
         playerManager.SetTeam(newTeam);
-        
+
         // Send team update to all clients
         NetMessage.SendData(MessageID.PlayerTeam, -1, -1, null, playerIndex, newTeam);
-        
+
         var mod = ModContent.GetInstance<CTG2>();
-        
+
         // Send packet to update PlayerManager.team on client side
         ModPacket updatePacket = mod.GetPacket();
         updatePacket.Write((byte)MessageType.UpdatePlayerTeam);
         updatePacket.Write(playerIndex);
         updatePacket.Write(newTeam);
         updatePacket.Send(toClient: playerIndex);
-        
+
         // Handle gem dropping if player was carrying one
         if (BlueGem.IsHeld && BlueGem.HeldBy == playerIndex)
         {
@@ -922,18 +932,18 @@ public class GameManager : ModSystem
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Blue Gem when changing teams"), Microsoft.Xna.Framework.Color.Blue);
             Console.WriteLine($"Player {player.name} dropped Blue Gem when changing teams");
         }
-        
+
         if (RedGem.IsHeld && RedGem.HeldBy == playerIndex)
         {
             RedGem.Reset();
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} dropped the Red Gem when changing teams"), Microsoft.Xna.Framework.Color.Red);
             Console.WriteLine($"Player {player.name} dropped Red Gem when changing teams");
         }
-        
+
         // Update team rosters
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
-        
+
         // Handle different scenarios based on new team and game state
         if (newTeam == 0)
         {
@@ -945,9 +955,9 @@ public class GameManager : ModSystem
         else if (IsGameActive)
         {
             // Game is active - handle based on game phase
-            
 
-            
+
+
             // Remove from spectator if they were spectating
             if (playerSpectatorStatus.GetValueOrDefault(playerIndex, false))
             {
@@ -958,13 +968,13 @@ public class GameManager : ModSystem
                 spectatorPacket.Write(false);
                 spectatorPacket.Send(toClient: playerIndex);
             }
-            
+
             // Start class selection for the player
             startPlayerClassSelection(playerIndex, MatchTime < 1800); // true if during initial game start phase
-            
+
             // Force sync stats after team change
             //ForcePlayerStatSync(playerIndex);
-            
+
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} has been moved to team {newTeam} and entered class selection"), Microsoft.Xna.Framework.Color.Green);
             Console.WriteLine($"Player {player.name} moved to team {newTeam} and started class selection");
         }
@@ -989,16 +999,52 @@ public class GameManager : ModSystem
         }
     }
 
+    public void PubsConfig()
+    {
+        
+        List<Player> activePlayers = new();
+        foreach (Player player in Main.player)
+        {
+            if (player != null && player.active && !player.dead)
+            {
+                activePlayers.Add(player);
+            }
+        }
+
+        Random rng = new Random();
+        int n = activePlayers.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            (activePlayers[n], activePlayers[k]) = (activePlayers[k], activePlayers[n]);
+        }
+
+        int half = activePlayers.Count / 2;
+        for (int i = 0; i < activePlayers.Count; i++)
+        {
+            int teamID = (i < half) ? 1 : 3; 
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestTeamChange);
+            packet.Write(activePlayers[i].whoAmI);
+            packet.Write(teamID);
+            packet.Send();
+        }
+    }
+    
     public static void ForcePlayerStatSync(int playerIndex)
     {
         if (playerIndex < 0 || playerIndex >= Main.player.Length) return;
-        
+
         Player player = Main.player[playerIndex];
         if (!player.active) return;
-        
+
         var classSystem = player.GetModPlayer<ClassSystem>();
         classSystem.SyncPlayerStats();
-        
+
         //Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
     }
+    
+    
 }

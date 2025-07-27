@@ -54,11 +54,11 @@ namespace CTG2
         RequestSyncStats = 31,
         RequestFullHeal = 32,
         RequestUnpause = 33,
-
         RequestMute = 34,
         Mute = 35,
         RequestUnmute = 36,
         Unmute = 37,
+        LateJoin = 38,
                     
                 
     }
@@ -570,6 +570,40 @@ namespace CTG2
                     {
                         Main.player[unmutePlayer].GetModPlayer<YourModName.Players.ChatPlayer>().IsMuted = false;
                         Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
+                    }
+                    break;
+                }
+                case (byte)MessageType.LateJoin:
+                {
+                    int joiningPlayer = reader.ReadInt32();
+                        if (manager.pubsConfig)
+                        {
+                            int redCount = 0, blueCount = 0;
+                            foreach (Player p in Main.player)
+                            {
+                                if (p.active && !p.dead)
+                                {
+                                    if (p.team == 1) redCount++;
+                                    else if (p.team == 3) blueCount++;
+                                }
+                            }
+
+                            int teamno;
+                            if (redCount < blueCount)
+                                teamno = 1;
+                            else if (blueCount < redCount)
+                                teamno = 3;
+                            else
+                                teamno = Main.rand.NextBool() ? 1 : 3;
+
+                            var teammod = ModContent.GetInstance<CTG2>();
+                            ModPacket packet = teammod.GetPacket();
+                            packet.Write((byte)MessageType.RequestTeamChange);
+                            packet.Write(joiningPlayer);
+                            packet.Write(teamno);
+                            packet.Send();
+                            
+                            manager.startPlayerClassSelection(joiningPlayer, true);
                     }
                     break;
                 }
