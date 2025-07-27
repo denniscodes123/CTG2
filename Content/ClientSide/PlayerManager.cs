@@ -194,6 +194,7 @@ public class PlayerManager : ModPlayer
             if (!Player.hostile) //this is client side only btw should be fine but might need to be synced later
             {
                 Player.hostile = true;
+                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, Player.whoAmI);
             }
         }
         else if (this.playerState == PlayerState.Active)
@@ -202,6 +203,7 @@ public class PlayerManager : ModPlayer
             if (!Player.hostile)
             {
                 Player.hostile = true;
+                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, Player.whoAmI);
             }
         }
         else
