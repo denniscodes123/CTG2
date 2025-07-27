@@ -39,19 +39,19 @@ namespace CTG2.Content.Items {
 
 
 		public override bool CanUseItem(Player player)
-        {
-            if (player.altFunctionUse == 2) //right click
-            {
+        	{
+	            	if (player.altFunctionUse == 2) //right click
+	            	{
 				Item.shootSpeed = 18;
-                Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile2>();
-            }
-            else //left click
-            {
+	                	Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile2>();
+	            	}
+	            	else //left click
+	            	{
 				Item.shootSpeed = 20;
-                Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile1>();
-            }
-            return base.CanUseItem(player);
-        }
+	                	Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile1>();
+	            	}
+	            	return base.CanUseItem(player);
+        	}
 	}
 
 
