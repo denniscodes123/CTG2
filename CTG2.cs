@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using Terraria.Chat;
 using Terraria.Localization;
 
+using MonoMod.Cil;
+
 
 namespace CTG2
 {
@@ -60,8 +62,8 @@ namespace CTG2
         RequestUnmute = 36,
         Unmute = 37,
         LateJoin = 38,
-                    
-                
+
+
     }
 
     public class CTG2 : Mod
@@ -506,7 +508,7 @@ namespace CTG2
                         break;
                     }
 
-                
+
                     playerToWeb.AddBuff(BuffID.Webbed, webTimeInTicks);
                     NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, webPlayerIndex, BuffID.Webbed, webTimeInTicks);
 
@@ -526,7 +528,7 @@ namespace CTG2
                         break;
                     }
 
-                case(byte)MessageType.RequestFullHeal:
+                case (byte)MessageType.RequestFullHeal:
                     {
                         int plyrindex = reader.ReadInt32();
                         Main.player[plyrindex].Heal(200);
@@ -534,49 +536,49 @@ namespace CTG2
                     break;
                 // ...existing code...
                 case (byte)MessageType.RequestMute:
-                {
-                    int mutedplayer = reader.ReadInt32();
-                    // Send mute packet to the target player
-                    var muteMod = ModContent.GetInstance<CTG2>();
-                    ModPacket packet = muteMod.GetPacket();
-                    packet.Write((byte)MessageType.Mute);
-                    packet.Write(mutedplayer);
-                    packet.Send(toClient: mutedplayer);
-                    break;
-                }
+                    {
+                        int mutedplayer = reader.ReadInt32();
+                        // Send mute packet to the target player
+                        var muteMod = ModContent.GetInstance<CTG2>();
+                        ModPacket packet = muteMod.GetPacket();
+                        packet.Write((byte)MessageType.Mute);
+                        packet.Write(mutedplayer);
+                        packet.Send(toClient: mutedplayer);
+                        break;
+                    }
                 case (byte)MessageType.Mute:
-                {
-                    int mutedPlayer = reader.ReadInt32();
-                    if (mutedPlayer == Main.myPlayer)
                     {
-                        Main.player[mutedPlayer].GetModPlayer<ChatPlayer>().IsMuted = true;
-                        Main.NewText("You have been muted.", Microsoft.Xna.Framework.Color.Red);
+                        int mutedPlayer = reader.ReadInt32();
+                        if (mutedPlayer == Main.myPlayer)
+                        {
+                            Main.player[mutedPlayer].GetModPlayer<ChatPlayer>().IsMuted = true;
+                            Main.NewText("You have been muted.", Microsoft.Xna.Framework.Color.Red);
+                        }
+                        break;
                     }
-                    break;
-                }
                 case (byte)MessageType.RequestUnmute:
-                {
-                    int unmuteplayer = reader.ReadInt32();
-                    var unmutemod = ModContent.GetInstance<CTG2>();
-                    ModPacket packet = unmutemod.GetPacket();
-                    packet.Write((byte)MessageType.Unmute);
-                    packet.Write(unmuteplayer);
-                    packet.Send(toClient: unmuteplayer);
-                    break;
-                }
-                case (byte)MessageType.Unmute:
-                {
-                    int unmutePlayer = reader.ReadInt32();
-                    if (unmutePlayer == Main.myPlayer)
                     {
-                        Main.player[unmutePlayer].GetModPlayer<ChatPlayer>().IsMuted = false;
-                        Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
+                        int unmuteplayer = reader.ReadInt32();
+                        var unmutemod = ModContent.GetInstance<CTG2>();
+                        ModPacket packet = unmutemod.GetPacket();
+                        packet.Write((byte)MessageType.Unmute);
+                        packet.Write(unmuteplayer);
+                        packet.Send(toClient: unmuteplayer);
+                        break;
                     }
-                    break;
-                }
+                case (byte)MessageType.Unmute:
+                    {
+                        int unmutePlayer = reader.ReadInt32();
+                        if (unmutePlayer == Main.myPlayer)
+                        {
+                            Main.player[unmutePlayer].GetModPlayer<ChatPlayer>().IsMuted = false;
+                            Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
+                        }
+                        break;
+                    }
                 case (byte)MessageType.LateJoin:
-                {
-                    int joiningPlayer = reader.ReadInt32();
+                    {
+                        int joiningPlayer = reader.ReadInt32();
                         if (manager.pubsConfig)
                         {
                             int redCount = 0, blueCount = 0;
@@ -603,12 +605,12 @@ namespace CTG2
                             packet.Write(joiningPlayer);
                             packet.Write(teamno);
                             packet.Send();
-                            
+
                             manager.startPlayerClassSelection(joiningPlayer, true);
+                        }
+                        break;
                     }
-                    break;
-                }
-               
+
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;

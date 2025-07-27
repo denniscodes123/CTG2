@@ -8,7 +8,7 @@ using Terraria.Chat;
 using Terraria.Localization;
 
 
-namespace CTG2.Content.Commands
+namespace CTG2.Content
 {
     public class ChatPlayer : ModPlayer
     {
