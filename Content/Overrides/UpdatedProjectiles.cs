@@ -12,8 +12,6 @@ public class ProjectileOverrides : GlobalProjectile
 {
     public override bool InstancePerEntity => true;
 
-    SoundStyle parrySound = new SoundStyle("CTG2/Content/Overrides/Parry");
-
 
     public override void AI(Projectile projectile)
     {
@@ -103,7 +101,6 @@ public class ProjectileOverrides : GlobalProjectile
             projectile.damage = 0;
             projectile.scale = 0;
         } //If nebula code doesnt work we have to kill the projectiles onspawn
-
     }
 
 
@@ -130,15 +127,6 @@ public class ProjectileOverrides : GlobalProjectile
 
 public class ModifyHurtModPlayer : ModPlayer
 {
-    public override void OnHitAnything(float x, float y, Entity victim)
-    {
-        var tikimodPlayer = Player.GetModPlayer<PlayerManager>();
-
-        if (tikimodPlayer.currentClass?.Name == "Tiki Priest" && victim is Player player)
-            Player.Heal(4);
-    }
-
-
     public override bool CanHitPvp(Item item, Player target)
     {
         if (target.ghost)
@@ -160,6 +148,7 @@ public class ModifyHurtModPlayer : ModPlayer
     public override void OnHurt(Player.HurtInfo info)
     {
         var modPlayer = Player.GetModPlayer<PlayerManager>();
+        int attackerIndex = info.DamageSource.SourcePlayerIndex;
     
         if (modPlayer.currentClass.Name == "Paladin" && Player.HeldItem.type == 4760 && Main.mouseRight) //Paladin buffs when it's hit
         {
@@ -170,6 +159,13 @@ public class ModifyHurtModPlayer : ModPlayer
         if (info.DamageSource.SourceProjectileType == ProjectileID.Sunfury)
         {
             Player.ClearBuff(BuffID.OnFire);
+        }
+        else if (info.DamageSource.SourceProjectileType == ProjectileID.Seed && attackerIndex >= 0 && attackerIndex < Main.maxPlayers)
+        {
+            Player attacker = Main.player[attackerIndex];
+            var attackerPlayer = attacker.GetModPlayer<PlayerManager>();
+            if (attackerPlayer.currentClass.Name == "Tiki Priest")
+                attacker.Heal(4);
         }
         else if (info.DamageSource.SourceProjectileType == ProjectileID.ThornChakram)
         {
