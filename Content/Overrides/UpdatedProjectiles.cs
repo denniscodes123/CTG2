@@ -7,11 +7,13 @@ using Terraria.Audio;
 using CTG2.Content.ClientSide;
 using CTG2.Content.Buffs;
 
+
 public class ProjectileOverrides : GlobalProjectile
 {
     public override bool InstancePerEntity => true;
 
     SoundStyle parrySound = new SoundStyle("CTG2/Content/Overrides/Parry");
+
 
     public override void AI(Projectile projectile)
     {
@@ -104,6 +106,7 @@ public class ProjectileOverrides : GlobalProjectile
 
     }
 
+
     public override void OnSpawn(Projectile projectile, IEntitySource source)
     {
 
@@ -127,31 +130,15 @@ public class ProjectileOverrides : GlobalProjectile
 
 public class ModifyHurtModPlayer : ModPlayer
 {
-    //should make weps not inflict debuffs?
-        public override void OnHitAnything(float x, float y, Entity victim)
+    public override void OnHitAnything(float x, float y, Entity victim)
     {
         var tikimodPlayer = Player.GetModPlayer<PlayerManager>();
 
-        if (tikimodPlayer.currentClass?.Name == "Tiki Priest")
-        {
+        if (tikimodPlayer.currentClass?.Name == "Tiki Priest" && victim is Player player)
             Player.Heal(4);
-
-/*
-            foreach (Player other in Main.player)
-            {
-                if (other == Player) { continue; }
-                if (Vector2.Distance(Player.Center, other.Center) <= 18 * 16) // e.g. 18 tile radius
-                {
-                    ModPacket heal4packet = Mod.GetPacket(); //do heal server side
-                    heal4packet.Write((byte)MessageType.Request4hpHeal);
-                    heal4packet.Write(other.whoAmI);
-                    heal4packet.Send();
-
-                }
-            } Couldn't get this to work for some reason
-            */
-        }
     }
+
+
     public override bool CanHitPvp(Item item, Player target)
     {
         if (target.ghost)
@@ -159,6 +146,7 @@ public class ModifyHurtModPlayer : ModPlayer
 
         return base.CanHitPvp(item, target);
     }
+
 
     public override bool CanHitPvpWithProj(Projectile proj, Player target)
     {
@@ -168,6 +156,7 @@ public class ModifyHurtModPlayer : ModPlayer
         return base.CanHitPvpWithProj(proj, target);
     }
     
+
     public override void OnHurt(Player.HurtInfo info)
     {
         var modPlayer = Player.GetModPlayer<PlayerManager>();
