@@ -8,6 +8,7 @@ using CTG2.Content;
 using CTG2.Content.Classes;
 using CTG2.Content.ClientSide;
 using CTG2.Content.ServerSide;
+using CTG2.Content.Commands;
 using Microsoft.Xna.Framework;
 using Terraria.ID;
 using System.Collections.Generic;
@@ -548,7 +549,7 @@ namespace CTG2
                     int mutedPlayer = reader.ReadInt32();
                     if (mutedPlayer == Main.myPlayer)
                     {
-                        Main.player[mutedPlayer].GetModPlayer<YourModName.Players.ChatPlayer>().IsMuted = true;
+                        Main.player[mutedPlayer].GetModPlayer<ChatPlayer>().IsMuted = true;
                         Main.NewText("You have been muted.", Microsoft.Xna.Framework.Color.Red);
                     }
                     break;
@@ -568,7 +569,7 @@ namespace CTG2
                     int unmutePlayer = reader.ReadInt32();
                     if (unmutePlayer == Main.myPlayer)
                     {
-                        Main.player[unmutePlayer].GetModPlayer<YourModName.Players.ChatPlayer>().IsMuted = false;
+                        Main.player[unmutePlayer].GetModPlayer<ChatPlayer>().IsMuted = false;
                         Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
                     }
                     break;
