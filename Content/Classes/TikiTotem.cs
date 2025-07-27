@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Microsoft.Xna.Framework.Audio;
 using Terraria.Audio;
+using CTG2.Content.Items;
 
 namespace CTG2.Content.Classes
 {
@@ -21,7 +22,7 @@ namespace CTG2.Content.Classes
 
     public class TikiTotem : ModNPC
     {
-
+        private int lavaSoundCooldown = 0;
         private float healFrameGap = 30;
         private int hitCounter = 0;
         private float frameCount = 0;
@@ -51,10 +52,14 @@ namespace CTG2.Content.Classes
             NPC.noTileCollide = false;
             NPC.friendly = false;
         }
-            public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers)
+        
+        
+        public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers)
         {
-            NPC.immune[player.whoAmI] = 40;
+            if (item.type != ModContent.ItemType<ShardstonePickaxe>())
+                NPC.immune[player.whoAmI] = 40;
         }
+
 
         public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers)
         {
@@ -62,6 +67,37 @@ namespace CTG2.Content.Classes
             {
                 NPC.immune[projectile.owner] = 40;
             }
+        }
+
+
+        public override void HitEffect (NPC.HitInfo hit)
+        {
+            int tikiTeam = (int)NPC.ai[0];
+
+            if (NPC.life <= 0)
+            {
+                if (tikiTeam == 1)
+                    for (int i = 0; i < 5; i++)
+                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 90);
+                else if (tikiTeam == 1)
+                    for (int i = 0; i < 5; i++)
+                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 88);
+
+                SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 1f), NPC.Center);
+            }
+            else
+            {
+                if (tikiTeam == 1)
+                    for (int i = 0; i < 5; i++)
+                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 60);
+                else if (tikiTeam == 1)
+                    for (int i = 0; i < 5; i++)
+                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 59);
+            }
+
+            SoundEngine.PlaySound(SoundID.NPCHit16, NPC.Center);
+
+            hitCounter = 1;
         }
 
 
@@ -104,71 +140,44 @@ namespace CTG2.Content.Classes
                     player.Heal(1);
                 }
             }
+
+            if (lavaSoundCooldown > 0)
+            {
+                lavaSoundCooldown--;
+            }
+
+            if (NPC.lavaWet && NPC.lifeRegen < 0 && lavaSoundCooldown == 0)
+            {
+                int tikiTeam = (int)NPC.ai[0];
+
+                if (NPC.life <= 0)
+                {
+                    if (tikiTeam == 1)
+                        for (int i = 0; i < 5; i++)
+                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 90);
+                    else if (tikiTeam == 1)
+                        for (int i = 0; i < 5; i++)
+                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 88);
+
+                    SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 1f), NPC.Center);
+                }
+                else
+                {
+                    if (tikiTeam == 1)
+                        for (int i = 0; i < 5; i++)
+                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 60);
+                    else if (tikiTeam == 1)
+                        for (int i = 0; i < 5; i++)
+                            Dust.NewDust(NPC.position, NPC.width, NPC.height, 59);
+                }
+
+                SoundEngine.PlaySound(SoundID.NPCHit16, NPC.Center);
+
+                hitCounter = 1;
+                lavaSoundCooldown = 40;
+            }
+
             frameCount++;
-
-            // Main.NewText(NPC.GetGlobalNPC<AllNpcs>().team);
-        }
-
-
-        public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone)
-        {
-            int tikiTeam = (int)NPC.ai[0];
-
-            if (NPC.life <= 0)
-            {
-                if (tikiTeam == 1)
-                    for (int i = 0; i < 5; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 90);
-                else if (tikiTeam == 1)
-                    for (int i = 0; i < 5; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 88);
-
-                SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 1f), NPC.Center);
-            }
-            else
-            {
-                if (tikiTeam == 1)
-                    for (int i = 0; i < 5; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 60);
-                else if (tikiTeam == 1)
-                    for (int i = 0; i < 5; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 59);
-            }
-
-            SoundEngine.PlaySound(SoundID.NPCHit15, NPC.Center);
-
-            hitCounter = 1;
-        }
-
-
-        public override void OnHitByProjectile (Projectile projectile, NPC.HitInfo hit, int damageDone)
-        {
-            int tikiTeam = (int)NPC.ai[0];
-
-            if (NPC.life <= 0)
-            {
-                if (tikiTeam == 1)
-                    for (int i = 0; i < 5; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 90);
-                else if (tikiTeam == 1)
-                    for (int i = 0; i < 5; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 88);
-
-                SoundEngine.PlaySound(totemCrumble.WithVolumeScale(Main.soundVolume * 6f), NPC.Center);
-            }
-            else
-            {
-                if (tikiTeam == 1)
-                    for (int i = 0; i < 10; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 60);
-                else if (tikiTeam == 1)
-                    for (int i = 0; i < 10; i++)
-                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 59);
-            }
-
-            SoundEngine.PlaySound(SoundID.NPCHit16, NPC.Center);
-
-            hitCounter = 1;
         }
 
 
@@ -217,7 +226,7 @@ namespace CTG2.Content.Classes
             );
 
             if (hitCounter > 0 && hitCounter < 100) hitCounter++;
-            else if (hitCounter >= 50) hitCounter = 0;
+            else if (hitCounter >= 100) hitCounter = 0;
         }
     }
 }
