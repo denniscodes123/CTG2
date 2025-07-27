@@ -8,19 +8,15 @@ using Terraria.Chat;
 using Terraria.Localization;
 
 
-
-
-
-namespace YourModName.Players
+namespace CTG2.Content.Commands
 {
-      public class ChatPlayer : ModPlayer
-        {
+    public class ChatPlayer : ModPlayer
+    {
         public bool IsMuted = false;
 
 
-            public override void PreUpdate()
+        public override void PreUpdate()
         {
-
             if (IsMuted && !string.IsNullOrEmpty(Main.chatText))
             {
                 Main.chatText = "";
@@ -59,8 +55,5 @@ namespace YourModName.Players
 
             }
         }
-        }
-    
-
-
+    }
 }
