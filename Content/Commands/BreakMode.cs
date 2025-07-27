@@ -1,5 +1,8 @@
 using Terraria.ModLoader;
 using CTG2.Content;
+using Terraria;
+using Terraria.ID;
+using Microsoft.Xna.Framework;
 
 namespace CTG2.Commands
 {
@@ -11,7 +14,7 @@ namespace CTG2.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-                 var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+            var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
             if (!modPlayer.IsAdmin)
             {
                 caller.Reply("You must be an admin to use this command.", Color.Red);
