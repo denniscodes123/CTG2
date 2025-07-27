@@ -59,6 +59,7 @@ namespace CTG2
         Mute = 35,
         RequestUnmute = 36,
         Unmute = 37,
+        SyncPubsMode= 38,
                     
                 
     }
@@ -571,6 +572,13 @@ namespace CTG2
                         Main.player[unmutePlayer].GetModPlayer<YourModName.Players.ChatPlayer>().IsMuted = false;
                         Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
                     }
+                    break;
+                }
+
+                case (byte)MessageType.SyncPubsMode:
+                {
+                    bool enabled = reader.ReadBoolean();
+                    ModContent.GetInstance<GameManager>().IsPubsModeActive = enabled;
                     break;
                 }
                
