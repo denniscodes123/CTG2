@@ -37,6 +37,7 @@ public class PlayerManager : ModPlayer
     public bool isGameStartClassSelection = false; // Track if this is game start vs mid-game class selection
     public int team = 0; // TODO: THIS NEEDS TO BE UPDATED IN TEAMSET 
     GemDrawLayer gemLayer = null;
+    public Dictionary<int, int> InventoryCounts = new();
 
     public static PlayerManager GetPlayerManager(int playerIndex)
     {
@@ -181,6 +182,7 @@ public class PlayerManager : ModPlayer
 
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
+
     {
 
         EnforceTeamLock(); // lock team
@@ -325,7 +327,88 @@ public class PlayerManager : ModPlayer
         classSelectionTimer = -1;
         isGameStartClassSelection = false;
         Main.NewText($"PlayerManager: Exited class selection", Microsoft.Xna.Framework.Color.Green);
+
+        InventoryCounts.Clear();
+        foreach (var item in Player.inventory)
+        {
+            if (item != null && item.type > ItemID.None && item.stack > 0)
+            {
+                if (!InventoryCounts.ContainsKey(item.type))
+                    InventoryCounts[item.type] = 0;
+                InventoryCounts[item.type] += item.stack;
+            }
+        }
     }
+    public void SetItemCount(int itemType, int newCount)
+    {
+        for (int i = 0; i < Player.inventory.Length; i++)
+        {
+            if (Player.inventory[i].type == itemType)
+            {
+                Player.inventory[i].TurnToAir();
+            }
+        }
+
+        int maxStack = ContentSamples.ItemsByType[itemType].maxStack;
+        int left = newCount;
+        for (int i = 0; i < Player.inventory.Length && left > 0; i++)
+        {
+            if (Player.inventory[i].type == ItemID.None)
+            {
+                int give = Math.Min(left, maxStack);
+                Player.inventory[i].SetDefaults(itemType);
+                Player.inventory[i].stack = give;
+                left -= give;
+            }
+        }
+        InventoryCounts[itemType] = newCount;
+    }
+    public void AddItemCount(int itemType, int addAmount)
+    {
+        if (addAmount <= 0) return;
+
+        int maxStack = ContentSamples.ItemsByType[itemType].maxStack;
+        int left = addAmount;
+
+        for (int i = 0; i < Player.inventory.Length && left > 0; i++)
+        {
+            var item = Player.inventory[i];
+            if (item.type == itemType && item.stack < maxStack)
+            {
+                int space = maxStack - item.stack;
+                int toAdd = Math.Min(space, left);
+                item.stack += toAdd;
+                left -= toAdd;
+            }
+        }
+
+        for (int i = 0; i < Player.inventory.Length && left > 0; i++)
+        {
+            var item = Player.inventory[i];
+            if (item.type == ItemID.None)
+            {
+                int toAdd = Math.Min(left, maxStack);
+                item.SetDefaults(itemType);
+                item.stack = toAdd;
+                left -= toAdd;
+            }
+        }
+
+        if (!InventoryCounts.ContainsKey(itemType))
+            InventoryCounts[itemType] = 0;
+        InventoryCounts[itemType] += addAmount - left;
+    }
+    public override bool OnPickup(Item item)
+    {
+        if (item != null && item.type > ItemID.None && item.stack > 0)
+        {
+            if (!InventoryCounts.ContainsKey(item.type))
+                InventoryCounts[item.type] = 0;
+            InventoryCounts[item.type] += item.stack;
+        }
+        return base.OnPickup(item);
+    }
+
     public void LockTeam()
     {
 
