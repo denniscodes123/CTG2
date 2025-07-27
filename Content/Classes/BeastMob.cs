@@ -14,10 +14,6 @@ namespace CTG2.Content.Classes
 {
     public class StationaryBeast : ModNPC
     {
-        
-        private int lavaSoundCooldown = 0;
-
-
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 1;
@@ -46,9 +42,7 @@ namespace CTG2.Content.Classes
             SoundEngine.PlaySound(SoundID.NPCHit1, NPC.Center);
 
             if (NPC.life <= 0)
-            {
                 SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
-            }
         }
 
 
@@ -118,23 +112,6 @@ namespace CTG2.Content.Classes
                     player.immuneTime = 30; // Iframes after hit
 
                 }
-            }
-
-            if (lavaSoundCooldown > 0)
-            {
-                lavaSoundCooldown--;
-            }
-
-            if (NPC.lavaWet && NPC.lifeRegen < 0 && lavaSoundCooldown == 0)
-            {
-                SoundEngine.PlaySound(SoundID.NPCHit1, NPC.position);
-
-                if (NPC.life <= 0)
-                {
-                    SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
-                }
-
-                lavaSoundCooldown = 40;
             }
         }
 
