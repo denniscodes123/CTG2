@@ -50,6 +50,21 @@ Items: {
 		DisplayName: Amalgamated Hand1_4
 		Tooltip: ""
 	}
+
+	AmalgamatedHand: {
+		Tooltip: ""
+		DisplayName: Amalgamated Hand
+	}
+
+	StaffOfWinter: {
+		Tooltip: ""
+		DisplayName: Staff Of Winter
+	}
+
+	HexagonalBarrier: {
+		Tooltip: ""
+		DisplayName: Hexagonal Barrier
+	}
 }
 
 NPCs: {
@@ -65,4 +80,16 @@ Projectiles: {
 	ChargedBowProjectile.DisplayName: Charged Bow Projectile
 	AmalgamatedHandProjectile1_3.DisplayName: Amalgamated Hand Projectile1_3
 	AmalgamatedHandProjectile1_4.DisplayName: Amalgamated Hand Projectile1_4
+	AmalgamatedHandProjectile1.DisplayName: Amalgamated Hand Projectile1
+	HexagonalBarrierProjectile.DisplayName: Hexagonal Barrier Projectile
+	AmalgamatedHandProjectile2.DisplayName: Amalgamated Hand Projectile2
 }
+
+Buffs: {
+	Retaliation: {
+		Description: Mods.CTG2.Buffs.Retaliation.Description
+		DisplayName: Retaliation
+	}
+}
+
+"Keybinds.Archer Dash.DisplayName": Archer  Dash

@@ -357,11 +357,11 @@ public class GameManager : ModSystem
             return;
         }
         // force set team/pvp
-        BlueTeam.EnforceTeam();
-        RedTeam.EnforceTeam();
+        //BlueTeam.EnforceTeam();
+        //RedTeam.EnforceTeam();
 
         // Additional PvP enforcement
-        EnsureAllPlayersHavePvP();
+        //EnsureAllPlayersHavePvP();
 
         if (MatchTime == 1800)
         {
