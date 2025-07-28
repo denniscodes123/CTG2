@@ -569,7 +569,7 @@ namespace CTG2
                         int mutedPlayer = reader.ReadInt32();
                         if (mutedPlayer == Main.myPlayer)
                         {
-                            Main.player[mutedPlayer].GetModPlayer<ChatPlayer>().IsMuted = true;
+                            //Main.player[mutedPlayer].GetModPlayer<ChatPlayer>().IsMuted = true;
                             Main.NewText("You have been muted.", Microsoft.Xna.Framework.Color.Red);
                         }
                         break;
@@ -589,7 +589,7 @@ namespace CTG2
                         int unmutePlayer = reader.ReadInt32();
                         if (unmutePlayer == Main.myPlayer)
                         {
-                            Main.player[unmutePlayer].GetModPlayer<ChatPlayer>().IsMuted = false;
+                            //Main.player[unmutePlayer].GetModPlayer<ChatPlayer>().IsMuted = false;
                             Main.NewText("You have been unmuted.", Microsoft.Xna.Framework.Color.Green);
                         }
                         break;
