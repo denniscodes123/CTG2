@@ -1,3 +1,4 @@
+/*
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -38,3 +39,4 @@ public class BlockRewardSystem : ModSystem
     }
     
 }
+*/
