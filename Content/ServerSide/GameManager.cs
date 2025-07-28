@@ -1002,6 +1002,7 @@ public class GameManager : ModSystem
     public void PubsConfig()
     {
         
+        var manager = ModContent.GetInstance<GameManager>();
         List<Player> activePlayers = new();
         foreach (Player player in Main.player)
         {
@@ -1024,12 +1025,9 @@ public class GameManager : ModSystem
         for (int i = 0; i < activePlayers.Count; i++)
         {
             int teamID = (i < half) ? 1 : 3; 
-            var mod = ModContent.GetInstance<CTG2>();
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)MessageType.RequestTeamChange);
-            packet.Write(activePlayers[i].whoAmI);
-            packet.Write(teamID);
-            packet.Send();
+            int whoAmI = activePlayers[i].whoAmI;
+
+            manager.HandlePlayerTeamChange(whoAmI, teamID);
         }
     }
     
