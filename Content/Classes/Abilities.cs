@@ -50,7 +50,7 @@ namespace CTG2.Content
 
             List<ItemData> classItems = classData.InventoryItems;
 
-            for (int b = 0; b < Player.inventory.Length; b++)
+            for (int b = 10; b < Player.inventory.Length; b++)
             {
                 var itemData = classItems[b];
                 Item newItem = new Item();
