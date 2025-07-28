@@ -73,7 +73,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.useAnimation = 18;
                     item.shootSpeed = 13f;
                     item.autoReuse = false;
-                    item.damage = 32;
+                    item.damage = 26;
                     item.crit = 0;
                     break;
                 case ItemID.Bananarang: // Tree
