@@ -288,15 +288,15 @@ public class PlayerManager : ModPlayer
     }
     public override void OnEnterWorld()
     {
-        if (GameInfo.matchStage != 1 && !GameInfo.overtime)
+        if (ModContent.GetInstance<GameManager>().pubsConfig && GameInfo.matchStage != 1 && !GameInfo.overtime && GameInfo.matchStage != 0)
         {
-            var mod = ModContent.GetInstance<CTG2>();
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)MessageType.LateJoin);
-            packet.Write(Player.whoAmI);
+            
+            ModPacket packet = ModContent.GetInstance<CTG2>().GetPacket();
+            packet.Write((byte)MessageType.RequestTeamChange);
+            packet.Write(Main.myPlayer);
+            packet.Write(-1); 
             packet.Send();
         }
-        base.OnEnterWorld();
     }
 
     // When a player disconnects, this hook can clean up their data.
