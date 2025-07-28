@@ -343,6 +343,7 @@ public class GameManager : ModSystem
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended!"), Microsoft.Xna.Framework.Color.Yellow);
 
         Console.WriteLine("GameManager: EndGame sequence completed");
+        ClearFloatingItems();
 
         // Start the 15-second timer for new game
         isWaitingForNewGame = true;
@@ -1044,6 +1045,19 @@ public class GameManager : ModSystem
 
         //Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
     }
+    public static void ClearFloatingItems()
+    {
+    if (Main.netMode == NetmodeID.MultiplayerClient) return;
+
+    for (int i = 0; i < Main.maxItems; i++)
+    {
+        if (Main.item[i].active)
+        {
+            Main.item[i].TurnToAir();
+            NetMessage.SendData(MessageID.SyncItem, -1, -1, null, i);
+        }
+    }
+}
     
     
 }
