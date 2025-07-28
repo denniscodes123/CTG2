@@ -234,9 +234,24 @@ namespace CTG2
                     break;
                 case (byte)MessageType.RequestTeamChange:
                     int target = reader.ReadInt32();
-                    int teamID = reader.ReadInt32();
-                    manager.HandlePlayerTeamChange(target, teamID);
-                    break;
+                    int requestedTeam = reader.ReadInt32();
+
+                        if (requestedTeam == -1) //If call is for pubsconfig (gives random team)
+                        {
+                        int red = 0, blue = 0;
+                            foreach (Player p in Main.player)
+                            {
+                            if (p.active && !p.dead && p.whoAmI != target)
+                                {
+                                    if (p.team == 1) red++;
+                                    else if (p.team == 3) blue++;
+                                }
+                                }
+                                requestedTeam = red < blue ? 1 : (blue < red ? 3 : (Main.rand.NextBool() ? 1 : 3));
+                            } 
+
+                        ModContent.GetInstance<GameManager>().HandlePlayerTeamChange(target, requestedTeam);
+                        break;
 
                 case (byte)MessageType.RequestEnterSpectator:
                     int spectatorPlayerIndex = reader.ReadInt32();
