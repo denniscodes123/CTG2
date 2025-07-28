@@ -25,6 +25,7 @@ public class ProjectileOverrides : GlobalProjectile
                 projectile.timeLeft = 120;
             }
         }
+
         if (projectile.type == ProjectileID.ThornChakram)
         {
             projectile.width = 30; //easier one blocking
@@ -143,7 +144,7 @@ public class ModifyHurtModPlayer : ModPlayer
 
         return base.CanHitPvpWithProj(proj, target);
     }
-    
+
 
     public override void OnHurt(Player.HurtInfo info)
     {
@@ -158,11 +159,12 @@ public class ModifyHurtModPlayer : ModPlayer
                 proj.Kill();
             }
         }
-    
+
+
         if (modPlayer.currentClass.Name == "Paladin" && Player.HeldItem.type == 4760 && Main.mouseRight) //Paladin buffs when it's hit
         {
-            Player.AddBuff(BuffID.Honey, 180);        
-            Player.AddBuff(BuffID.RapidHealing, 180); 
+            Player.AddBuff(BuffID.Honey, 180);
+            Player.AddBuff(BuffID.RapidHealing, 180);
             Player.AddBuff(ModContent.BuffType<Retaliation>(), 9);
         }
         if (info.DamageSource.SourceProjectileType == ProjectileID.Sunfury)
@@ -207,6 +209,10 @@ public class ModifyHurtModPlayer : ModPlayer
         else if (info.DamageSource.SourceProjectileType == 288) //goldenshowerproj
         {
             Player.ClearBuff(BuffID.Ichor);
+        }
+        else if (info.DamageSource.SourceProjectileType == 267) //Poison dart
+        {
+            Player.ClearBuff(BuffID.Poisoned);
         }
     }
 }
