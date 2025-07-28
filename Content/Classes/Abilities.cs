@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using ClassesNamespace;
 using CTG2.Content.ClientSide;
 using CTG2.Content.Classes;
+using CTG2.Content.Items;
 
 
 namespace CTG2.Content
@@ -41,24 +42,70 @@ namespace CTG2.Content
         private int mutantState = 1;
 
 
+        private int GetItemIDByName(string itemName)
+        {
+            for (int i = 5546; i < ItemLoader.ItemCount; i++)
+            {
+                ModItem modItem = ItemLoader.GetItem(i);
+                if (modItem != null && modItem.Name.Equals(itemName.Replace(" ", ""), StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
 
+            return -1;
+        }
 
-        private void SetInventory(CtgClass classData)
+        private void SetInventory(CtgClass classData, bool rmoot)
         {
             Player.statLifeMax2 = classData.HealthPoints;
             Player.statManaMax2 = classData.ManaPoints;
 
             List<ItemData> classItems = classData.InventoryItems;
 
-            for (int b = 10; b < Player.inventory.Length; b++)
-            {
-                var itemData = classItems[b];
-                Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
-                newItem.stack = itemData.Stack;
-                newItem.Prefix(itemData.Prefix);
+            bool placedMushrooms = false;
+            bool placedWeapon = false;
 
-                Player.inventory[b] = newItem;
+            for (int b = 0; b < Player.inventory.Length; b++)
+            {
+                if (Player.inventory[b].type == ModContent.ItemType<AmalgamatedHand>() && rmoot)
+                {
+                    Item newItem = new Item();
+                    newItem.SetDefaults(ItemID.WaterBolt);
+                    newItem.stack = 1;
+                    Player.inventory[b] = newItem;
+                    placedWeapon = true;
+                }
+                else if (Player.inventory[b].type == ItemID.WaterBolt && !rmoot)
+                {
+                    Item newItem = new Item();
+                    newItem.SetDefaults(GetItemIDByName("Amalgamated Hand"));
+                    newItem.stack = 1;
+                    Player.inventory[b] = newItem;
+                    placedWeapon = true;
+                }
+                else if (Player.inventory[b].type == ItemID.None && b >= 29 && !rmoot && !placedMushrooms)
+                {
+                    Item newItem = new Item();
+                    newItem.SetDefaults(ItemID.Mushroom);
+                    newItem.stack = 9999;
+                    Player.inventory[b] = newItem;
+                    placedMushrooms = true;
+                }
+                else if (Player.inventory[b].type == ItemID.Mushroom && rmoot)
+                {
+                    Item newItem = new Item();
+                    newItem.TurnToAir();
+                    Player.inventory[b] = newItem;
+                }
+                else if (Player.inventory[b].type == ItemID.PalladiumHeadgear || Player.inventory[b].type == ItemID.PalladiumBreastplate || Player.inventory[b].type == ItemID.PalladiumLeggings ||
+                         Player.inventory[b].type == ItemID.CharmofMyths || Player.inventory[b].type == ItemID.WormScarf || Player.inventory[b].type == ItemID.FireGauntlet || Player.inventory[b].type == ItemID.FrozenTurtleShell ||
+                         Player.inventory[b].type == ItemID.BlizzardinaBottle || Player.inventory[b].type == ItemID.EoCShield || Player.inventory[b].type == ItemID.Magiluminescence || Player.inventory[b].type == ItemID.DestroyerEmblem ||
+                         Player.inventory[b].type == ItemID.DevilHorns || Player.inventory[b].type == ItemID.FlowerBoyShirt || Player.inventory[b].type == ItemID.FlowerBoyPants || Player.inventory[b].type == ItemID.LizardTail ||
+                         Player.inventory[b].type == ItemID.ApprenticeScarf || Player.inventory[b].type == ItemID.Yoraiz0rDarkness)
+                {
+                    Item newItem = new Item();
+                    newItem.TurnToAir();
+                    Player.inventory[b] = newItem;
+                }
             }
 
             for (int c = 0; c < Player.armor.Length; c++)
@@ -589,13 +636,13 @@ namespace CTG2.Content
             switch (mutantState)
             {
                 case 1:
-                    SetInventory(class16RegenData);
+                    SetInventory(class16RegenData, false);
                     mutantState = 2;
 
                     break;
 
                 case 2:
-                    SetInventory(class16RushData);
+                    SetInventory(class16RushData, true);
                     mutantState = 1;
 
                     break;
