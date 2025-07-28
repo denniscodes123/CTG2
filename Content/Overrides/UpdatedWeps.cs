@@ -206,7 +206,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     break;
 
                 case 3836: //ghastly glaive
-                    item.damage = 36;
+                    item.damage = 34;
                     break;
 
                 case 220:
@@ -222,7 +222,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                 case 165:
                     item.shoot = 699;
                     item.scale = 0;
-                    item.damage = 36;
+                    item.damage = 34;
                     item.useTime = 20;
                     item.useAnimation = 20;
                     item.shootSpeed = 48f;
