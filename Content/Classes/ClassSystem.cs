@@ -98,7 +98,7 @@ namespace ClassesNamespace
             }
 
             //Moved to seperate function
-            //Maybe makes this check if the player is in the current game before doing this in case of disconnects 
+            //Maybe makes this check if the Player is in the current game before doing this in case of disconnects 
             ClearInventory();
         }
         
@@ -121,6 +121,18 @@ namespace ClassesNamespace
 
             Player.trashItem = new Item();
             Main.mouseItem = new Item();
+        }
+
+        private int GetItemIDByName(string itemName)
+        {
+            for (int i = 5546; i < ItemLoader.ItemCount; i++)
+            {
+                ModItem modItem = ItemLoader.GetItem(i);
+                if (modItem != null && modItem.Name.Equals(itemName.Replace(" ", ""), StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+
+            return -1;
         }
 
         private void SetInventory(CtgClass classData)
@@ -147,11 +159,15 @@ namespace ClassesNamespace
             Console.WriteLine($" {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax2}");
             List<ItemData> classItems = classData.InventoryItems;
 
+
             for (int b = 0; b < Player.inventory.Length; b++)
             {
                 var itemData = classItems[b];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -162,7 +178,10 @@ namespace ClassesNamespace
             {
                 var itemData = classItems[Player.inventory.Length + c];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -173,7 +192,10 @@ namespace ClassesNamespace
             {
                 var itemData = classItems[Player.inventory.Length + Player.armor.Length + d];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -184,7 +206,10 @@ namespace ClassesNamespace
             {
                 var itemData = classItems[Player.inventory.Length + Player.armor.Length + Player.miscEquips.Length + e];
                 Item newItem = new Item();
-                newItem.SetDefaults(itemData.Type);
+                if (itemData.Modded)
+                    newItem.SetDefaults(GetItemIDByName(itemData.Name));
+                else
+                    newItem.SetDefaults(itemData.Type);
                 newItem.stack = itemData.Stack;
                 newItem.Prefix(itemData.Prefix);
 
@@ -340,7 +365,7 @@ namespace ClassesNamespace
             // currentHP = Player.statLifeMax2;
             // currentMana = Player.statManaMax2;
 
-            // Add player buffs here instead (delete switch once config is populated with the required buffs)
+            // Add Player buffs here instead (delete switch once config is populated with the required buffs)
            /* try
             {
                 var playerManager = Player.GetModPlayer<PlayerManager>();
@@ -450,7 +475,7 @@ namespace ClassesNamespace
             int blueDyeType = 1035;
 
             
-            // Check if player has a class selected and is on a team
+            // Check if Player has a class selected and is on a team
             if (playerManager.currentClass != null && !string.IsNullOrEmpty(playerManager.currentClass.Name) && Player.team != 0)
             {
                 int dyeID = Player.team switch
@@ -471,7 +496,7 @@ namespace ClassesNamespace
 
         public void SyncPlayerStats()
         {
-            // First ensure the player's max stats are updated
+            // First ensure the Player's max stats are updated
             // Player.statLifeMax = currentHP;
             // Player.statLifeMax2 = currentHP;
 
