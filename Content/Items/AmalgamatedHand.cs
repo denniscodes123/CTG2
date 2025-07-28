@@ -39,19 +39,20 @@ namespace CTG2.Content.Items {
 
 
 		public override bool CanUseItem(Player player)
-        	{
-	            	if (player.altFunctionUse == 2) //right click
-	            	{
+		{
+			if (player.altFunctionUse == 2) //right click
+			{
 				Item.shootSpeed = 18;
-	                	Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile2>();
-	            	}
-	            	else //left click
-	            	{
+				Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile2>();
+			}
+			else //left click
+			{
 				Item.shootSpeed = 20;
-	                	Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile1>();
-	            	}
-	            	return base.CanUseItem(player);
-        	}
+				Item.shoot = ModContent.ProjectileType<AmalgamatedHandProjectile1>();
+			}
+			
+			return base.CanUseItem(player);
+		}
 	}
 
 
@@ -96,8 +97,8 @@ namespace CTG2.Content.Items {
 
 		public override void SetDefaults() {
 			Projectile.netImportant = true; // This ensures that the projectile is synced when other players join the world.
-			Projectile.width = 38; // The width of your projectile
-			Projectile.height = 38; // The height of your projectile
+			Projectile.width = 20; // The width of your projectile
+			Projectile.height = 20; // The height of your projectile
 			Projectile.friendly = true; // Deals damage to enemies
 			Projectile.penetrate = -1; // Infinite pierce
 			Projectile.DamageType = DamageClass.Melee; // Deals melee damage
@@ -186,7 +187,7 @@ namespace CTG2.Content.Items {
 						doFastThrowDust = true;
 						bool shouldSwitchToRetracting = StateTimer++ >= launchTimeLimit;
 						shouldSwitchToRetracting |= Projectile.Distance(mountedCenter) >= maxLaunchLength;
-						if (player.controlUseItem && StateTimer > 5) // If the player clicks, transition to the Dropping state
+						if (player.controlUseItem) // If the player clicks, transition to the Dropping state
 						{
 							CurrentAIState = AIState.Dropping;
 							StateTimer = 0f;
@@ -546,8 +547,8 @@ namespace CTG2.Content.Items {
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 22;
-			Projectile.height = 22;
+			Projectile.width = 20;
+			Projectile.height = 20;
 			Projectile.friendly = true;
 			Projectile.penetrate = -1;
 			Projectile.DamageType = DamageClass.Melee;
@@ -605,7 +606,7 @@ namespace CTG2.Content.Items {
 				// When ai[0] == 1f, the Projectile has either hit a tile or has reached maxChainLength, so now we retract the Projectile
 				float elasticFactorA = 25f / player.GetAttackSpeed(DamageClass.Melee);
 				float elasticFactorB = 1.4f / player.GetAttackSpeed(DamageClass.Melee);
-				float maxStretchLength = 400f; // This is the furthest the flail can stretch before being forced to retract. Make sure that this is a bit less than maxChainLength so you don't accidentally reach maxStretchLength on the initial throw.
+				float maxStretchLength = 460f; // This is the furthest the flail can stretch before being forced to retract. Make sure that this is a bit less than maxChainLength so you don't accidentally reach maxStretchLength on the initial throw.
 
 				if (Projectile.ai[1] == 1f)
 					Projectile.tileCollide = false;
@@ -648,6 +649,8 @@ namespace CTG2.Content.Items {
 
 			// Here we set the rotation based off of the direction to the player tweaked by the velocity, giving it a little spin as the flail turns around each swing 
 			Projectile.rotation = vectorToPlayer.ToRotation() - Projectile.velocity.X * 0.1f;
+			Projectile.timeLeft = 2; // Makes sure the flail doesn't die (good when the flail is resting on the ground)
+			player.SetDummyItemTime(2); // Add a delay so the player can't button mash the flail
 
 			// Here is where a flail like Flower Pow could spawn additional Projectiles or other custom behaviors
 		}
