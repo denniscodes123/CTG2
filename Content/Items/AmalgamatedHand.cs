@@ -19,7 +19,7 @@ namespace CTG2.Content.Items {
 	{
 		public override void SetDefaults() {
 	  		Item.CloneDefaults(ItemID.Sunfury);
-			Item.damage = 36;
+			Item.damage = 35;
 			Item.crit = 0;
 			Item.shootSpeed = 20;
 			Item.rare = ItemRarityID.Red;
