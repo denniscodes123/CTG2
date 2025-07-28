@@ -1,8 +1,11 @@
 using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
+using Terraria.Chat;
+using Terraria.Localization;
+using CTG2.Content.ServerSide;
 
-/*
+
 
 namespace CTG2.Content.Commands
 {
@@ -30,8 +33,18 @@ namespace CTG2.Content.Commands
 
             if (args[0].ToLower() == "pubs")
             {
-                ModContent.GetInstance<ServerSide.GameManager>().EnablePubsMode();
-                caller.Reply("Pubs mode has been enabled.", Color.Green);
+                ModPacket packet = ModContent.GetInstance<CTG2>().GetPacket();
+                packet.Write((byte)MessageType.RequestGamemodeChange);
+                packet.Write("pubs");
+                packet.Send();
+
+            }
+            if (args[0].ToLower() == "scrims")
+            {
+                ModPacket packet = ModContent.GetInstance<CTG2>().GetPacket();
+                packet.Write((byte)MessageType.RequestGamemodeChange);
+                packet.Write("scrims");
+                packet.Send();
             }
             else
             {
@@ -40,4 +53,4 @@ namespace CTG2.Content.Commands
         }
     }
 }
-*/
+
