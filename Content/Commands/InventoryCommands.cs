@@ -230,6 +230,9 @@ namespace CTG2.Content.Commands
                 player.miscDyes[e] = newItem;
             }
 
+            Player.trashItem = new Item();
+            Main.mouseItem = new Item();
+
             Main.NewText("Inventory loaded successfully.", Microsoft.Xna.Framework.Color.LightGreen);
         }
     }
