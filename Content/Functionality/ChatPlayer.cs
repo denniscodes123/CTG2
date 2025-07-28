@@ -1,3 +1,4 @@
+/* Not working rn
 using Terraria;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
@@ -56,4 +57,4 @@ namespace CTG2.Content
             }
         }
     }
-}
+} */

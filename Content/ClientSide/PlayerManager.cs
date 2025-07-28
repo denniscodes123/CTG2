@@ -80,13 +80,13 @@ public class PlayerManager : ModPlayer
             isGameStartClassSelection = false;
         }
 
-        Main.NewText($"PlayerManager: Changed state to {playerState}", Microsoft.Xna.Framework.Color.Purple);
+        //Main.NewText($"PlayerManager: Changed state to {playerState}", Microsoft.Xna.Framework.Color.Purple);
     }
     public static void setPlayerClassSelectionTime(int playerIndex, double val)
     {
         PlayerManager player = PlayerManager.GetPlayerManager(playerIndex);
         player.classSelectionTimer = val;
-        Main.NewText($"PlayerManager: Server set class selection timer to {val} for player {playerIndex}", Microsoft.Xna.Framework.Color.LightBlue);
+        //Main.NewText($"PlayerManager: Server set class selection timer to {val} for player {playerIndex}", Microsoft.Xna.Framework.Color.LightBlue);
     }
     // =========================== OVERRIDE METHODS ====================================
     // Set Custom Respawn Times
@@ -227,7 +227,7 @@ public class PlayerManager : ModPlayer
             statusPacket.Write(Player.whoAmI);  // Use Player.whoAmI instead of player
             statusPacket.Send();
 
-            Main.NewText($"PlayerManager: Sent ExitClassSelection packet for player {Player.whoAmI}", Microsoft.Xna.Framework.Color.Purple);
+            //Main.NewText($"PlayerManager: Sent ExitClassSelection packet for player {Player.whoAmI}", Microsoft.Xna.Framework.Color.Purple);
 
             // Reset timer so this doesn't fire again
             classSelectionTimer = -1;
@@ -314,12 +314,12 @@ public class PlayerManager : ModPlayer
         if (!gameStarted)
         {
             classSelectionTimer = 1800;
-            Main.NewText($"PlayerManager: Started client-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Green);
+            //Main.NewText($"PlayerManager: Started client-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Green);
         }
         else
         {
             classSelectionTimer = 1800;
-            Main.NewText($"PlayerManager: Started server-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Orange);
+            //Main.NewText($"PlayerManager: Started server-controlled class selection timer (1800)", Microsoft.Xna.Framework.Color.Orange);
         }
     }
 
@@ -328,7 +328,7 @@ public class PlayerManager : ModPlayer
         changePlayerState(PlayerState.Active);
         classSelectionTimer = -1;
         isGameStartClassSelection = false;
-        Main.NewText($"PlayerManager: Exited class selection", Microsoft.Xna.Framework.Color.Green);
+        //Main.NewText($"PlayerManager: Exited class selection", Microsoft.Xna.Framework.Color.Green);
 
         InventoryCounts.Clear();
         foreach (var item in Player.inventory)
