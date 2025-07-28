@@ -149,6 +149,15 @@ public class ModifyHurtModPlayer : ModPlayer
     {
         var modPlayer = Player.GetModPlayer<PlayerManager>();
         int attackerIndex = info.DamageSource.SourcePlayerIndex;
+        int projIndex = info.DamageSource.SourceProjectileLocalIndex;
+        if (projIndex >= 0 && projIndex < Main.maxProjectiles)
+        {
+            Projectile proj = Main.projectile[projIndex];
+            if (proj.active && (proj.type == 263 || proj.type == 513))
+            {
+                proj.Kill();
+            }
+        }
     
         if (modPlayer.currentClass.Name == "Paladin" && Player.HeldItem.type == 4760 && Main.mouseRight) //Paladin buffs when it's hit
         {
