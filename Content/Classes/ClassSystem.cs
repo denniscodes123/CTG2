@@ -215,6 +215,9 @@ namespace ClassesNamespace
 
                 Player.miscDyes[e] = newItem;
             }
+
+            Player.trashItem = new Item();
+            Main.mouseItem = new Item();
             /*this may not work lol
             */
             
