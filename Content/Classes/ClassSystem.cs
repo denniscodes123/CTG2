@@ -120,6 +120,7 @@ namespace ClassesNamespace
                 Player.miscDyes[i] = new Item();
 
             Player.trashItem = new Item();
+            Main.mouseItem = new Item();
         }
 
         private void SetInventory(CtgClass classData)
