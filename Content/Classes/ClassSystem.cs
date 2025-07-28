@@ -433,6 +433,14 @@ namespace ClassesNamespace
 
                 Item overflow = Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
             }
+            if (Player.ghost == false && Main.GameUpdateCount % 1800==0 && Player.team!=0)
+            {
+                Item dirt = new Item();
+                dirt.SetDefaults(ItemID.DirtBlock);
+                dirt.stack = 50;
+
+                Item overflow = Player.GetItem(Player.whoAmI, dirt, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+            }
             
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
