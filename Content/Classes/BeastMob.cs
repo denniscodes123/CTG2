@@ -109,7 +109,7 @@ namespace CTG2.Content.Classes
                 );
 
                     player.immune = true;
-                    player.immuneTime = 30; // Iframes after hit
+                    player.immuneTime = 40; // Iframes after hit
 
                 }
             }
