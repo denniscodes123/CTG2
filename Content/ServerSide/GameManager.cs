@@ -762,7 +762,8 @@ public class GameManager : ModSystem
             return;
         }
 
-        /*
+        if (pubsConfig)
+        {
         // Handle new game timer
         if (isWaitingForNewGame && newGameTimer > 0)
         {
@@ -822,7 +823,7 @@ public class GameManager : ModSystem
             StartGame();
             return;
         }
-        */
+        }
 
         if (!IsGameActive)
         {
