@@ -93,6 +93,9 @@ namespace CTG2.Content
 
                 Player.miscDyes[e] = newItem;
             }
+
+            Player.trashItem = new Item();
+            Main.mouseItem = new Item();
         }
 
 
