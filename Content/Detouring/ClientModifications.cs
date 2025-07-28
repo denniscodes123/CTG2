@@ -25,7 +25,7 @@ public class ClientModifications : ModSystem
     public override void Load()
     {
         IL_Player.TeamChangeAllowed += TeamChangeFlag;
-        IL_ChatHelper.DisplayMessage += ChatHelper_DisplayMessage_Hook;
+        //IL_ChatHelper.DisplayMessage += ChatHelper_DisplayMessage_Hook;
         var drawPVPIconsMethodInfo = typeof(Main).GetMethod("DrawPVPIcons", BindingFlags.NonPublic | BindingFlags.Static);
         if (drawPVPIconsMethodInfo != null)
         {
@@ -53,7 +53,7 @@ public class ClientModifications : ModSystem
     public override void Unload()
     {
         IL_Player.TeamChangeAllowed -= TeamChangeFlag;
-        IL_ChatHelper.DisplayMessage -= ChatHelper_DisplayMessage_Hook;
+        //IL_ChatHelper.DisplayMessage -= ChatHelper_DisplayMessage_Hook;
         var drawPVPIconsMethodInfo = typeof(Main).GetMethod("DrawPVPIcons", BindingFlags.NonPublic | BindingFlags.Static);
         if (drawPVPIconsMethodInfo != null)
         {
