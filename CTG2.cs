@@ -292,13 +292,13 @@ namespace CTG2
                     var id = reader.ReadInt32();
                     int tpX = reader.ReadInt32();
                     int tpY = reader.ReadInt32();
-                    Main.NewText($"CLIENT: Received ServerTeleport packet for player {id} to ({tpX}, {tpY}), myPlayer: {Main.myPlayer}", Color.Yellow);
+                    //Main.NewText($"CLIENT: Received ServerTeleport packet for player {id} to ({tpX}, {tpY}), myPlayer: {Main.myPlayer}", Color.Yellow);
                     if (id == Main.myPlayer)
                     {
                         Vector2 oldPos = Main.player[id].position;
                         Main.player[id].Teleport(new Vector2(tpX, tpY));
                         Vector2 newPos = Main.player[id].position;
-                        Main.NewText($"CLIENT: Teleported from {oldPos} to {newPos}!", Color.Green);
+                        //Main.NewText($"CLIENT: Teleported from {oldPos} to {newPos}!", Color.Green);
                     }
                     else
                     {
@@ -369,7 +369,7 @@ namespace CTG2
                 case (byte)MessageType.UpdatePlayerState:
                     int statePlayerIdx = reader.ReadInt32();
                     byte newState = reader.ReadByte();
-                    Main.NewText($"CLIENT: Received UpdatePlayerState packet for player {statePlayerIdx}, state: {(PlayerManager.PlayerState)newState}, myPlayer: {Main.myPlayer}", Color.Yellow);
+                    //Main.NewText($"CLIENT: Received UpdatePlayerState packet for player {statePlayerIdx}, state: {(PlayerManager.PlayerState)newState}, myPlayer: {Main.myPlayer}", Color.Yellow);
                     if (statePlayerIdx == Main.myPlayer)
                     {
                         var playerManager = Main.player[statePlayerIdx].GetModPlayer<PlayerManager>();
@@ -380,7 +380,7 @@ namespace CTG2
                         {
                             bool isGameStart = (GameInfo.matchStage == 1); // Stage 1 = Class Selection during game start
                             playerManager.HandleEnterClassSelection(isGameStart);
-                            Main.NewText($"CLIENT: Entering class selection, isGameStart: {isGameStart}, matchStage: {GameInfo.matchStage}", Color.Cyan);
+                            //Main.NewText($"CLIENT: Entering class selection, isGameStart: {isGameStart}, matchStage: {GameInfo.matchStage}", Color.Cyan);
                         }
                         else if (targetState == PlayerManager.PlayerState.Active)
                         {
@@ -391,11 +391,11 @@ namespace CTG2
                             playerManager.changePlayerState(targetState);
                         }
 
-                        Main.NewText($"CLIENT: Updated player state to {targetState}", Color.Green);
+                        //Main.NewText($"CLIENT: Updated player state to {targetState}", Color.Green);
                     }
                     else
                     {
-                        Main.NewText($"CLIENT: Ignoring state update packet - not for local player", Color.Orange);
+                        //Main.NewText($"CLIENT: Ignoring state update packet - not for local player", Color.Orange);
                     }
                     break;
                 case (byte)MessageType.RequestViewMap:
