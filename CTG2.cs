@@ -64,6 +64,7 @@ namespace CTG2
         RequestUnmute = 36,
         Unmute = 37,
         LateJoin = 38,
+        RequestGamemodeChange = 39,
 
 
     }
@@ -627,6 +628,20 @@ namespace CTG2
                         }
                         break;
                     }
+                    
+                case (byte)MessageType.RequestGamemodeChange:
+                {
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        string mode = reader.ReadString();
+                        //can add other gamemodes here later
+                            if (mode == "pubs") manager.pubsConfig = true;
+                            else {manager.pubsConfig = false; }
+
+                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Gamemode set to {mode}."), Color.Orange);
+                    }
+                    break;
+                }
 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
