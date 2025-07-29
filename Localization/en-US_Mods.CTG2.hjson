@@ -95,4 +95,16 @@ Buffs: {
 Keybinds: {
 	"Archer Dash.DisplayName": Archer  Dash
 	"Aimbot Toggle.DisplayName": Aimbot  Toggle
+	Toggle.DisplayName: Toggle
+}
+
+Configs: {
+	CTG2Config: {
+		ClashRoyaleOTMusic: {
+			Label: Enable clash royale OT music
+			Tooltip: ""
+		}
+
+		DisplayName: C T G2 Config
+	}
 }

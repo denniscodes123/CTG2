@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using CTG2.Content.Items;
+using CTG2.Content.ClientSide;
 
 
 public class Charged : GlobalItem
@@ -65,6 +66,14 @@ public class Charged : GlobalItem
         {
             if (player.ownedProjectileCounts[ModContent.ProjectileType<ChargedBowProjectile>()] == 0)
             {
+                if (player.GetModPlayer<TestPlayer>().playerAttribute)
+                {
+                    bool x = player.GetModPlayer<TestPlayer>().TryGetAimedVelocity(player, position, velocity, out Vector2 outvelocity);
+                    if (x)
+                    {
+                        velocity = outvelocity;
+                    }
+                }
                 Projectile.NewProjectile(Entity.GetSource_NaturalSpawn(), position.X, position.Y, velocity.X, velocity.Y, ModContent.ProjectileType<ChargedBowProjectile>(),
                     0, knockback, player.whoAmI, item.type, type);
             }
