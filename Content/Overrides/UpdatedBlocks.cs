@@ -25,98 +25,100 @@ namespace CTG2.Content
             {
                 return base.CanKillTile(i, j, type, ref blockDamaged);
             }
+            else
+            {
+                if (type == TileID.LihzahrdBrick)
+                    return false;
 
-            if (type == TileID.LihzahrdBrick)
-                return false;
+                if (type == TileID.Platforms)
+                    return false;
 
-            if (type == TileID.Platforms)
-                return false;
+                if (type == TileID.EchoBlock)
+                    return false;
 
-            if (type == TileID.EchoBlock)
-                return false;
+                if (type == TileID.CrystalBlock)
+                    return false;
 
-            if (type == TileID.CrystalBlock)
-                return false;
+                if (type == TileID.PalladiumColumn)
+                    return false;
 
-            if (type == TileID.PalladiumColumn)
-                return false;
+                if (type == TileID.Grate)
+                    return false;
 
-            if (type == TileID.Grate)
-                return false;
+                if (type == TileID.ConveyorBeltLeft)
+                    return false;
 
-            if (type == TileID.ConveyorBeltLeft)
-                return false;
+                if (type == TileID.ConveyorBeltRight)
+                    return false;
 
-            if (type == TileID.ConveyorBeltRight)
-                return false;
+                if (type == TileID.IridescentBrick)
+                    return false;
 
-            if (type == TileID.IridescentBrick)
-                return false;
+                if (type == TileID.HangingLanterns)
+                    return false;
 
-            if (type == TileID.HangingLanterns)
-                return false;
+                if (type == TileID.Banners)
+                    return false;
 
-            if (type == TileID.Banners)
-                return false;
+                if (type == TileID.AncientPinkBrick)
+                    return false;
 
-            if (type == TileID.AncientPinkBrick)
-                return false;
+                if (type == TileID.PaintedArrowSign)
+                    return false;
 
-            if (type == TileID.PaintedArrowSign)
-                return false;
+                if (type == TileID.MusicBoxes)
+                    return false;
 
-            if (type == TileID.MusicBoxes)
-                return false;
+                if (type == TileID.AncientGreenBrick)
+                    return false;
 
-            if (type == TileID.AncientGreenBrick)
-                return false;
+                if (type == TileID.MarbleColumn)
+                    return false;
 
-            if (type == TileID.MarbleColumn)
-                return false;
+                if (type == TileID.AlphabetStatues)
+                    return false;
 
-            if (type == TileID.AlphabetStatues)
-                return false;
+                if (type == TileID.Statues)
+                    return false;
 
-            if (type == TileID.Statues)
-                return false;
+                if (type == 128)
+                    return false;
 
-            if (type == 128)
-                return false;
+                if (type == TileID.ItemFrame)
+                    return false;
 
-            if (type == TileID.ItemFrame)
-                return false;
+                if (type == TileID.Signs)
+                    return false;
 
-            if (type == TileID.Signs)
-                return false;
+                if (type == TileID.RubyGemspark)
+                    return false;
 
-            if (type == TileID.RubyGemspark)
-                return false;
+                if (type == TileID.WaterFountain)
+                    return false;
 
-            if (type == TileID.WaterFountain)
-                return false;
+                if (type == TileID.Benches)
+                    return false;
 
-            if (type == TileID.Benches)
-                return false;
+                if (type == TileID.SapphireGemspark)
+                    return false;
 
-            if (type == TileID.SapphireGemspark)
-                return false;
+                if (type == TileID.DynastyWood)
+                    return false;
 
-            if (type == TileID.DynastyWood)
-                return false;
+                if (type == TileID.PinkDungeonBrick)
+                    return false;
 
-            if (type == TileID.PinkDungeonBrick)
-                return false;
+                if (type == TileID.GreenDungeonBrick)
+                    return false;
 
-            if (type == TileID.GreenDungeonBrick)
-                return false;
+                if (type == TileID.Candles)
+                    return false;
 
-            if (type == TileID.Candles)
-                return false;
+                if (type == TileID.Asphalt)
+                    return false;
 
-            if (type == TileID.Asphalt)
-                return false;
-
-            return base.CanKillTile(i, j, type, ref blockDamaged);
+                return base.CanKillTile(i, j, type, ref blockDamaged);
+            }
         }
 
         public override bool CanExplode(int i, int j, int type)
