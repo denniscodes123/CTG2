@@ -14,7 +14,9 @@ using Terraria.ID;
 using System.Collections.Generic;
 using Terraria.Chat;
 using Terraria.Localization;
-
+using Terraria.Audio;
+using Terraria.GameContent;
+using Microsoft.Xna.Framework.Audio;
 using MonoMod.Cil;
 using Humanizer;
 using System.Reflection;
@@ -66,6 +68,7 @@ namespace CTG2
         LateJoin = 38,
         RequestGamemodeChange = 39,
         RequestClassSelection = 40,
+        RequestAudio = 41,
 
     }
 
@@ -460,28 +463,10 @@ namespace CTG2
 
                     Console.WriteLine($"Server: Sent team chat from {senderPlayer.name} to {messagesSent} players on {teamName} team");
                     break;
-                case (byte)MessageType.RequestClassSelection:
-                    int playerSelecting = reader.ReadInt32();
-                    string classSelected = reader.ReadString();
-
-                    // Get the player who sent the message
-                    var selectingPlayer = Main.player[playerSelecting];
-                    if (!selectingPlayer.active)
-                    {
-                        Console.WriteLine($"Invalid player {playerSelecting} tried to pick a class");
-                        break;
-                    }
-
-                    int team = selectingPlayer.team;
-
-                    string formattedMsg = $"{selectingPlayer.name} picked {classSelected}";
-
-                    foreach (Player team_player in Main.player)
-                    {
-                        if (team_player.active && team_player.team == team)
-                            ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(formattedMsg), Color.Yellow, team_player.whoAmI);
-                    }
-
+                case (byte)MessageType.RequestAudio:
+                    string filepath = reader.ReadString();
+                    SoundStyle sound = new SoundStyle(filepath);
+                    SoundEngine.PlaySound(sound);
                     break;
                 case (byte)MessageType.RequestDie:
                     int playerWhoDies = reader.ReadInt32();
