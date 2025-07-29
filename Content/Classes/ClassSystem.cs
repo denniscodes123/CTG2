@@ -470,7 +470,7 @@ namespace ClassesNamespace
 
                 Item overflow = Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
             }
-            if (Player.ghost == false && Main.GameUpdateCount % 1800==0 && Player.team!=0)
+            if (Player.ghost == false && Main.GameUpdateCount % 1800==0 && Player.team!=0 && GameInfo.matchStage ==2)
             {
                 Item dirt = new Item();
                 dirt.SetDefaults(ItemID.DirtBlock);
