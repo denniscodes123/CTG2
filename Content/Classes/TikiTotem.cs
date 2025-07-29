@@ -101,6 +101,17 @@ namespace CTG2.Content.Classes
         }
 
 
+        public override bool? CanBeHitByItem (Player player, Item item)
+        {
+            int tikiTeam = (int)NPC.ai[0];
+
+            if (player.whoAmI >= 0 && player.whoAmI < Main.maxPlayers && tikiTeam == player.team)
+                return false;
+
+            return true;
+        }
+
+
         public override void HitEffect(NPC.HitInfo hit)
         {
             int tikiTeam = (int)NPC.ai[0];
