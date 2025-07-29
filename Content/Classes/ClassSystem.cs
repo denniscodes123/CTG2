@@ -334,6 +334,14 @@ namespace ClassesNamespace
 
                 SetInventory(classInfo);
 
+                string name = playerManager.currentClass.Inventory;
+
+                ModPacket packet = Mod.GetPacket();
+                packet.Write((byte)MessageType.RequestClassSelection);
+                packet.Write(Player.whoAmI);
+                packet.Write(name);
+                packet.Send();
+
                 // Apply First upgrade by default when new class selected
                 //ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
             }
