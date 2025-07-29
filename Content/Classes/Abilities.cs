@@ -410,13 +410,26 @@ namespace CTG2.Content
 
                 if (Vector2.Distance(Player.Center, other.Center) <= 25 * 16 && Player.team == other.team) // 25 block radius
                 {
-                    other.AddBuff(103, 480);
-                    other.AddBuff(26, 480);
-                    other.AddBuff(2, 480);
+                    ModPacket packet1 = mod.GetPacket();
+                    packet1.Write((byte)MessageType.RequestAddBuff);
+                    packet1.Write(class12ClosestPlayer.whoAmI);
+                    packet1.Write(103);
+                    packet1.Write(480);
+                    packet1.Send();
 
-                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 2, 480);
-                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 26, 480);
-                    NetMessage.SendData(MessageID.AddPlayerBuff, other.whoAmI, -1, null, other.whoAmI, 103, 480);
+                    ModPacket packet2 = mod.GetPacket();
+                    packet2.Write((byte)MessageType.RequestAddBuff);
+                    packet2.Write(class12ClosestPlayer.whoAmI);
+                    packet2.Write(26);
+                    packet2.Write(480);
+                    packet2.Send();
+
+                    ModPacket packet3 = mod.GetPacket();
+                    packet3.Write((byte)MessageType.RequestAddBuff);
+                    packet3.Write(class12ClosestPlayer.whoAmI);
+                    packet3.Write(2);
+                    packet3.Write(480);
+                    packet3.Send();
                 }
             }
         }
