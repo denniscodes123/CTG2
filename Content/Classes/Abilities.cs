@@ -66,18 +66,18 @@ namespace CTG2.Content
 
             for (int b = 0; b < Player.inventory.Length; b++)
             {
-                if (Player.inventory[b].type == ModContent.ItemType<AmalgamatedHand>() && rmoot)
+                if (Player.inventory[b].type == ItemID.WaterBolt && rmoot)
                 {
                     Item newItem = new Item();
-                    newItem.SetDefaults(ItemID.WaterBolt);
+                    newItem.SetDefaults(GetItemIDByName("Amalgamated Hand"));
                     newItem.stack = 1;
                     Player.inventory[b] = newItem;
                     placedWeapon = true;
                 }
-                else if (Player.inventory[b].type == ItemID.WaterBolt && !rmoot)
+                else if (Player.inventory[b].type == ModContent.ItemType<AmalgamatedHand>() && !rmoot)
                 {
                     Item newItem = new Item();
-                    newItem.SetDefaults(GetItemIDByName("Amalgamated Hand"));
+                    newItem.SetDefaults(ItemID.WaterBolt);
                     newItem.stack = 1;
                     Player.inventory[b] = newItem;
                     placedWeapon = true;
