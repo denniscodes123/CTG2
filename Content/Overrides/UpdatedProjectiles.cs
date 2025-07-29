@@ -171,7 +171,7 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.ClearBuff(BuffID.OnFire);
         }
-        else if (info.DamageSource.SourceProjectileType == ProjectileID.Seed && attackerIndex >= 0 && attackerIndex < Main.maxPlayers)
+        else if (info.DamageSource.SourceProjectileType == ProjectileID.PoisonDart && attackerIndex >= 0 && attackerIndex < Main.maxPlayers)
         {
             Player attacker = Main.player[attackerIndex];
             var attackerPlayer = attacker.GetModPlayer<PlayerManager>();
