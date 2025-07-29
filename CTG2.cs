@@ -484,6 +484,7 @@ namespace CTG2
                         if (team_player.active && team_player.team == team)
                             ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(formattedMsg), Color.Yellow, team_player.whoAmI);
                     }
+                    break;
                 case (byte)MessageType.RequestAudio:
                     string filepath = reader.ReadString();
                     SoundStyle sound = new SoundStyle(filepath);
