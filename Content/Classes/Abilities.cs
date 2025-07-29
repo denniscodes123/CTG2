@@ -390,6 +390,7 @@ namespace CTG2.Content
                 if (Player.statLife <= 0)
                 {
                     Player.KillMe(PlayerDeathReason.ByCustomReason(Terraria.Localization.NetworkText.FromLiteral($"{Player.name} finished ")), 9999, 0);
+                    psychicActive = false;
                 }
                 NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI); // Sync HP
             }

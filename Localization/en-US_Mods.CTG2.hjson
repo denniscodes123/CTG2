@@ -92,4 +92,7 @@ Buffs: {
 	}
 }
 
-"Keybinds.Archer Dash.DisplayName": Archer  Dash
+Keybinds: {
+	"Archer Dash.DisplayName": Archer  Dash
+	"Aimbot Toggle.DisplayName": Aimbot  Toggle
+}
