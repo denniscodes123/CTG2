@@ -14,6 +14,7 @@ using CTG2;
 using CTG2.Content.ClientSide;
 using Terraria.Localization;
 using Terraria.Chat;
+using CTG2.Content;
 
 
 namespace ClassesNamespace
@@ -394,6 +395,7 @@ namespace ClassesNamespace
         {
             ApplyPermBuffs();
             Player.Heal(600);
+            Player.GetModPlayer<Abilities>().psychicActive = false;
         }
 
         public override void UpdateEquips()
