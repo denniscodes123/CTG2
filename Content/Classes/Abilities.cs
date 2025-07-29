@@ -66,7 +66,7 @@ namespace CTG2.Content
 
             for (int b = 0; b < Player.inventory.Length; b++)
             {
-                if (Player.inventory[b].type == ItemID.WaterBolt && rmoot)
+                if (Player.inventory[b].type == ItemID.TheRottedFork && rmoot)
                 {
                     Item newItem = new Item();
                     newItem.SetDefaults(GetItemIDByName("Amalgamated Hand"));
@@ -77,7 +77,7 @@ namespace CTG2.Content
                 else if (Player.inventory[b].type == ModContent.ItemType<AmalgamatedHand>() && !rmoot)
                 {
                     Item newItem = new Item();
-                    newItem.SetDefaults(ItemID.WaterBolt);
+                    newItem.SetDefaults(ItemID.TheRottedFork);
                     newItem.stack = 1;
                     Player.inventory[b] = newItem;
                     placedWeapon = true;
