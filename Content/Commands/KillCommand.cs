@@ -20,14 +20,16 @@ namespace CTG2.Content.Commands
                 caller.Reply("You must be an admin to use this command.", Color.Red);
                 return;
             }
-            if (args.Length == 0)
+
+            var match = System.Text.RegularExpressions.Regex.Match(input, @"^/kill\s+""(.+?)""$");
+            if (!match.Success)
             {
-                caller.Reply("Usage: /kill <player_name>", Color.Red);
+                caller.Reply("Usage: /kill \"<player_name>\"", Color.Red);
                 return;
             }
 
-            string targetPlayerName = string.Join(" ", args);
-            
+            string targetPlayerName = match.Groups[1].Value;
+
             if (string.IsNullOrWhiteSpace(targetPlayerName))
             {
                 caller.Reply("Player name cannot be empty!", Color.Red);
@@ -40,8 +42,10 @@ namespace CTG2.Content.Commands
             packet.Write(caller.Player.whoAmI);
             packet.Write(targetPlayerName);
             packet.Send();
-            
+
             caller.Reply($"Requesting to kill player '{targetPlayerName}'...", Color.Yellow);
+
         }
+
     }
 }

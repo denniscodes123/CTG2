@@ -27,16 +27,16 @@ namespace CTG2.Content.Commands
                 caller.Reply("You must be an admin to use this command.", Color.Red);
                 return;
             }
-            
-            if (args.Length < 2)
+
+            var match = System.Text.RegularExpressions.Regex.Match(input, @"^/teamset\s+""(.+?)""\s+(\w+)$");
+            if (!match.Success)
             {
-                caller.Reply("Usage: /teamset <playerName> <teamColor>", Color.Red);
+                caller.Reply("Usage: /teamset \"<playerName>\" <teamColor>", Color.Red);
                 return;
             }
 
-            string targetName = args[0].ToLower();
-            string teamColor = args[1].ToLower();
-
+            string targetName = match.Groups[1].Value.ToLower();
+            string teamColor = match.Groups[2].Value.ToLower();
 
             Player target = Main.player.FirstOrDefault(p => p.active && p.name.ToLower() == targetName);
 
@@ -45,7 +45,6 @@ namespace CTG2.Content.Commands
                 caller.Reply($"Player '{targetName}' not found.", Color.Red);
                 return;
             }
-
 
             int teamID = teamColor switch
             {
@@ -63,15 +62,14 @@ namespace CTG2.Content.Commands
                 caller.Reply($"Invalid team color '{teamColor}'. Valid: red, green, blue, yellow, pink, none.", Color.Red);
                 return;
             }
-            //target.GetModPlayer<CTGPlayer>().LockTeam(teamID); //Modplayer instace for CTGPlayer (where noteamswap.cs is)
-            
+
             var mod1 = ModContent.GetInstance<CTG2>();
             ModPacket packet1 = mod1.GetPacket();
             packet1.Write((byte)MessageType.RequestTeamChange);
             packet1.Write(target.whoAmI);
             packet1.Write(teamID);
             packet1.Send();
-            
+
             caller.Reply($"Set player '{target.name}' to the {teamColor} team.", Color.Green);
         }
     }
