@@ -167,7 +167,7 @@ public class ModifyHurtModPlayer : ModPlayer
             Player.AddBuff(BuffID.RapidHealing, 180);
             Player.AddBuff(ModContent.BuffType<Retaliation>(), 9);
         }
-        if (info.DamageSource.SourceProjectileType == ProjectileID.Sunfury)
+        else if (info.DamageSource.SourceProjectileType == ModContent.ProjectileType<AmalgamatedHandProjectile1>() || info.DamageSource.SourceProjectileType == ModContent.ProjectileType<AmalgamatedHandProjectile2>())
         {
             Player.ClearBuff(BuffID.OnFire);
         }
@@ -203,10 +203,6 @@ public class ModifyHurtModPlayer : ModPlayer
             Player.ClearBuff(BuffID.CursedInferno);
         }
         else if (info.DamageSource.SourceProjectileType == 280) //goldenshowerproj
-        {
-            Player.ClearBuff(BuffID.Ichor);
-        }
-        else if (info.DamageSource.SourceProjectileType == 288) //goldenshowerproj
         {
             Player.ClearBuff(BuffID.Ichor);
         }
