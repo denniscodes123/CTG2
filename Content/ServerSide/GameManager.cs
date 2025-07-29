@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 using CTG2.Content;
@@ -569,6 +569,17 @@ public class GameManager : ModSystem
                     npc.active = false;
 
                 }
+
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    Projectile proj = Main.projectile[i];
+
+                    if (!proj.active)
+                        continue;
+
+                    proj.active = false;
+                }
+
                 killonce = false;
             }
         }
