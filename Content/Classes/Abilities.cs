@@ -410,6 +410,8 @@ namespace CTG2.Content
 
                 if (Vector2.Distance(Player.Center, other.Center) <= 25 * 16 && Player.team == other.team) // 25 block radius
                 {
+                    var mod = ModContent.GetInstance<CTG2>();
+                    
                     ModPacket packet1 = mod.GetPacket();
                     packet1.Write((byte)MessageType.RequestAddBuff);
                     packet1.Write(class12ClosestPlayer.whoAmI);
