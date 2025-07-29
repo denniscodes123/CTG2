@@ -82,6 +82,7 @@ namespace CTG2.Content.Items {
 		public ref float StateTimer => ref Projectile.ai[1];
 		public ref float CollisionCounter => ref Projectile.localAI[0];
 		public ref float SpinningStateTimer => ref Projectile.localAI[1];
+		public float LifeTimer = 0;
 
 		public override void Load() {
 			chainTexture = ModContent.Request<Texture2D>(ChainTexturePath);
@@ -348,6 +349,9 @@ namespace CTG2.Content.Items {
 				player.itemRotation += (float)Math.PI;
 			}
 			player.itemRotation = MathHelper.WrapAngle(player.itemRotation);
+
+			if (CurrentAIState != AIState.Spinning)
+				LifeTimer++;
 		}
 
 		public override bool OnTileCollide(Vector2 oldVelocity) {
@@ -368,7 +372,10 @@ namespace CTG2.Content.Items {
 					impactIntensity = 1;
 				}
 
-				Projectile.velocity.X = (0f - oldVelocity.X) * bounceFactor;
+				if (Vector2.Distance(Main.player[Projectile.owner].MountedCenter, Projectile.Center) > 0.1 || LifeTimer > 10)
+					Projectile.velocity.X = (0f - oldVelocity.X) * bounceFactor;
+				else
+					Projectile.velocity.X = 0;
 				CollisionCounter += 1f;
 			}
 
@@ -377,7 +384,7 @@ namespace CTG2.Content.Items {
 					impactIntensity = 1;
 				}
 
-				Projectile.velocity.Y = (0f - oldVelocity.Y) * bounceFactor;
+					Projectile.velocity.Y = (0f - oldVelocity.Y) * bounceFactor;
 				CollisionCounter += 1f;
 			}
 
