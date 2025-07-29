@@ -65,7 +65,7 @@ namespace CTG2
         Unmute = 37,
         LateJoin = 38,
         RequestGamemodeChange = 39,
-
+        RequestClassSelection = 40,
 
     }
 
@@ -459,6 +459,29 @@ namespace CTG2
                     }
 
                     Console.WriteLine($"Server: Sent team chat from {senderPlayer.name} to {messagesSent} players on {teamName} team");
+                    break;
+                case (byte)MessageType.RequestClassSelection:
+                    int playerSelecting = reader.ReadInt32();
+                    string classSelected = reader.ReadString();
+
+                    // Get the player who sent the message
+                    var selectingPlayer = Main.player[playerSelecting];
+                    if (!selectingPlayer.active)
+                    {
+                        Console.WriteLine($"Invalid player {playerSelecting} tried to pick a class");
+                        break;
+                    }
+
+                    int team = selectingPlayer.team;
+
+                    string formattedMsg = $"{selectingPlayer.name} picked {classSelected}";
+
+                    foreach (Player team_player in Main.player)
+                    {
+                        if (team_player.active && team_player.team == team)
+                            ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(formattedMsg), Color.Yellow, team_player.whoAmI);
+                    }
+
                     break;
                 case (byte)MessageType.RequestDie:
                     int playerWhoDies = reader.ReadInt32();
