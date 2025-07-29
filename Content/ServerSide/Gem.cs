@@ -1,10 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Terraria;
 using System.Collections.Generic;
 using Terraria.Chat;
 using Terraria.ID;
 using Terraria.Localization;
 using CTG2.Content.ClientSide;
+using Terraria.Audio;
+using Terraria.GameContent;
+using Microsoft.Xna.Framework.Audio;
+using Terraria.ModLoader;
 
 namespace CTG2.Content.ServerSide;
 
@@ -72,6 +76,11 @@ public class Gem
                 HeldBy = ply.whoAmI;
                 NetworkText pickUpText = NetworkText.FromLiteral($"{ply.name} has picked up the gem!");
                 // Broadcast to everyone
+                var mod = ModContent.GetInstance<CTG2>();
+                ModPacket packet = mod.GetPacket();
+                packet.Write((byte)MessageType.RequestAudio);
+                packet.Write("CTG2/Content/ServerSide/GemPickup");
+                packet.Send();
                 ChatHelper.BroadcastChatMessage(pickUpText, Color.Aqua);
                 break;
             }
@@ -104,6 +113,11 @@ public class Gem
             IsHeld = false;
             NetworkText dropText = NetworkText.FromLiteral($"{gemHolder.name} has dropped the gem!");
             // Broadcast to everyone
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestAudio);
+            packet.Write("CTG2/Content/ServerSide/GemDrop");
+            packet.Send();
             ChatHelper.BroadcastChatMessage(dropText, Color.Aqua);
         }
         if (gemHolder.ghost == true)
@@ -114,5 +128,4 @@ public class Gem
             ChatHelper.BroadcastChatMessage(dropText, Color.Aqua);
         }
     }
-    
 }
