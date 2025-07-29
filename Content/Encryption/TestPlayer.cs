@@ -54,7 +54,7 @@ public class TestPlayer : ModPlayer
         bool isAimbotTarget = item.type != ModContent.ItemType<Rancor>();
 
 
-        if (isAimbotTarget)
+        if (isAimbotTarget && playerAttribute)
         {
             if (Player.controlUseTile && TryGetAimedVelocity(Player, position, velocity, out Vector2 aimedVelocity))
             {
