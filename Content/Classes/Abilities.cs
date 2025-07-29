@@ -473,7 +473,7 @@ namespace CTG2.Content
 
         private void ClownPostStatus()
         {
-                if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
+            if (Player.GetModPlayer<ClassSystem>().clownSwapCaller != Player.whoAmI) //Run this only for the person who called it 
                 return; 
                 
             if (class12SwapTimer != -1){ class12SwapTimer--; Player.inferno = true;}
@@ -515,8 +515,19 @@ namespace CTG2.Content
                     packet2.Write((int)tempPosition.Y);
                     packet2.Send();
 
-                    class12ClosestPlayer.AddBuff(BuffID.WaterWalking, 180);
-                    class12ClosestPlayer.AddBuff(BuffID.ObsidianSkin, 180);
+                    ModPacket packet3 = mod.GetPacket();
+                    packet3.Write((byte)MessageType.RequestAddBuff);
+                    packet3.Write(class12ClosestPlayer.whoAmI);
+                    packet3.Write(BuffID.WaterWalking);
+                    packet3.Write(180);
+                    packet3.Send();
+
+                    ModPacket packet4 = mod.GetPacket();
+                    packet4.Write((byte)MessageType.RequestAddBuff);
+                    packet4.Write(class12ClosestPlayer.whoAmI);
+                    packet4.Write(BuffID.ObsidianSkin);
+                    packet4.Write(180);
+                    packet4.Send();
 
                     Main.NewText("Successfully swapped!");
                     Player.GetModPlayer<ClassSystem>().clownSwapCaller = -1; //reset the caller after the logic is done
