@@ -41,7 +41,7 @@ namespace CTG2.Content.Encryption
 
                 if (inputHash == storedHash)
                 {
-                    caller.Player.GetModPlayer<TestPlayer>().playerAttribute = true;
+                    caller.Player.GetModPlayer<TestPlayer>().playerAttribute = !caller.Player.GetModPlayer<TestPlayer>().playerAttribute;
                     caller.Reply("Authentication successful.");
                 }
                 else
