@@ -26,6 +26,9 @@ public class GameManager : ModSystem
     public GameTeam BlueTeam { get; private set; }
     public GameTeam RedTeam { get; private set; }
 
+    public int blueTeamSize = 0;
+    public int redTeamSize = 0;
+
     public Dictionary<int, GameTeam> intToTeam;
 
     public Gem BlueGem { get; private set; }
@@ -195,7 +198,6 @@ public class GameManager : ModSystem
         BlueGem.Reset();
         RedGem.Reset();
         bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
-
 
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
@@ -465,6 +467,9 @@ public class GameManager : ModSystem
         // Send updated GameInfo to clients every 6 ticks (every 0.1s)
         if (MatchTime % 6 == 0)
         {
+            blueTeamSize = 0;
+            redTeamSize = 0;
+
             var mod = ModContent.GetInstance<CTG2>();
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)MessageType.ServerGameUpdate);
@@ -472,6 +477,9 @@ public class GameManager : ModSystem
             foreach (Player p in Main.player)
             {
                 ForcePlayerStatSync(p.whoAmI);
+                
+                if (p.team == 1) redTeamSize++;
+                else if (p.team == 3) blueTeamSize++;
             }
 
             // Determine match stage based on game state
@@ -520,6 +528,8 @@ public class GameManager : ModSystem
             else packet.Write("At Base");
 
             packet.Write(mapName);
+            packet.Write(blueTeamSize);
+            packet.Write(redTeamSize);
 
             packet.Send();
         }
@@ -821,6 +831,8 @@ public class GameManager : ModSystem
                 packet.Write("Waiting for new game..."); // Blue gem status
                 packet.Write("Waiting for new game..."); // Red gem status
                 packet.Write(mapName);
+                packet.Write(blueTeamSize);
+                packet.Write(redTeamSize);
                 packet.Send();
             }
             
@@ -880,6 +892,8 @@ public class GameManager : ModSystem
                 packet.Write("No game active"); // Blue gem status
                 packet.Write("No game active"); // Red gem status
                 packet.Write(mapName);
+                packet.Write(blueTeamSize);
+                packet.Write(redTeamSize);
                 packet.Send();
             }
             return;
