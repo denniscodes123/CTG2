@@ -53,6 +53,8 @@ public class GameManager : ModSystem
 
     private string mapName = "";
 
+    private int pauseTimer = 0;
+
     // Spectator tracking
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
@@ -844,6 +846,25 @@ public class GameManager : ModSystem
         if (!Main.dedServ) return;
         if (pause)
         {
+            if (pauseTimer % 6 == 0)
+            {
+                foreach (Player p in Main.player)
+                {
+                    if (p.active)
+                    {
+                        var mod = ModContent.GetInstance<CTG2>();
+
+                        ModPacket packet = mod.GetPacket();
+                        packet.Write((byte)MessageType.RequestAddBuff);
+                        packet.Write(p.whoAmI);
+                        packet.Write(BuffID.Webbed);
+                        packet.Write(12);
+                        packet.Send();
+                    }
+                }
+            }
+
+            pauseTimer++;
             return;
         }
 
