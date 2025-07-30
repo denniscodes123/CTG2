@@ -195,6 +195,7 @@ public class GameManager : ModSystem
         IsGameActive = true;
         hasStartedEarly = false;
         MatchTime = 0;
+        matchStartTime = 1800;
         if (pubsConfig)
         {
             PubsConfig();
@@ -245,7 +246,7 @@ public class GameManager : ModSystem
             var randomMap = (MapTypes)CTG2.randomGenerator.Next(0, 7);
             ClearHoneyForMap();
             Map.LoadMap(randomMap);
-            mapName = result.ToString();
+            mapName = randomMap.ToString();
             FillLavaInDesignatedArea();
             if (randomMap == MapTypes.Kraken || randomMap == MapTypes.Stalactite)
             {
