@@ -291,6 +291,21 @@ public class GameManager : ModSystem
             player.ghost = false;
             player.respawnTimer = 0;
 
+            // Reset ability attributes
+            player.GetModPlayer<Abilities>().class7HitCounter = 0;
+            player.GetModPlayer<Abilities>().cooldown = 0;
+            player.GetModPlayer<Abilities>().class4BuffTimer = 0;
+            player.GetModPlayer<Abilities>().class4PendingBuffs = false;
+            player.GetModPlayer<Abilities>().class6ReleaseTimer = -1;
+            player.GetModPlayer<Abilities>().class7HitCounter = 0;
+            player.GetModPlayer<Abilities>().class8HP = 0;
+            player.GetModPlayer<Abilities>().psychicActive = false;
+            player.GetModPlayer<Abilities>().class12SwapTimer = -1;
+            player.GetModPlayer<Abilities>().class12ClosestDist = 99999;
+            player.GetModPlayer<Abilities>().class12ClosestPlayer = null;
+            player.GetModPlayer<Abilities>().class15AbilityTimer = -1;
+            player.GetModPlayer<Abilities>().mutantState = 1;
+
             // Remove from spectator tracking if they were spectating
             if (playerSpectatorStatus.GetValueOrDefault(player.whoAmI, false))
             {
