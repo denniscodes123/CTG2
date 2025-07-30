@@ -13,4 +13,6 @@ public static class GameInfo
     public static bool overtime = false;
     public static int overtimeTimer = 0;
     public static string mapName = "";
+    public static int blueTeamSize = 0;
+    public static int redTeamSize = 0;
 }
