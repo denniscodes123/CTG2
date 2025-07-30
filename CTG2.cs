@@ -328,6 +328,8 @@ namespace CTG2
                     GameInfo.blueGemCarrier = reader.ReadString();
                     GameInfo.redGemCarrier = reader.ReadString();
                     GameInfo.mapName = reader.ReadString();
+                    GameInfo.blueTeamSize = reader.ReadInt32();
+                    GameInfo.redTeamSize = reader.ReadInt32();
                     break;
 
                 case (byte)MessageType.ServerSpectatorUpdate:
