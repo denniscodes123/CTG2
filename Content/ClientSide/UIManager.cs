@@ -11,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using Terraria.Chat;
 
 
 namespace CTG2.Content.ClientSide;
@@ -207,5 +208,12 @@ public class UIManager : ModSystem
         {
             Utils.DrawBorderString(Main.spriteBatch, abilText, abilPos, abilCol);
         }
+
+        //draw map name
+        string mapText = $"Map: {GameInfo.mapName}";
+        Vector2 mapPos = new Vector2(Main.screenWidth - 320, 350);
+        Color mapCol = Color.Pink;
+
+        Utils.DrawBorderString(Main.spriteBatch, mapText, mapPos, mapCol);
     }
 }
