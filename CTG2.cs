@@ -311,7 +311,7 @@ namespace CTG2
                     }
                     else
                     {
-                        Main.NewText($"CLIENT: Ignoring teleport packet - not for local player", Color.Orange);
+                        //Main.NewText($"CLIENT: Ignoring teleport packet - not for local player", Color.Orange);
                     }
                     break;
                 case (byte)MessageType.ServerSetSpawn:
