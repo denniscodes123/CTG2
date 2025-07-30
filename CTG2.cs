@@ -336,6 +336,7 @@ namespace CTG2
                     GameInfo.mapName = reader.ReadString();
                     GameInfo.blueTeamSize = reader.ReadInt32();
                     GameInfo.redTeamSize = reader.ReadInt32();
+                    GameInfo.matchStartTime = reader.ReadInt32();
                     break;
 
                 case (byte)MessageType.ServerSpectatorUpdate:
