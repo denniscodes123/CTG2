@@ -69,7 +69,7 @@ namespace CTG2
         RequestGamemodeChange = 39,
         RequestClassSelection = 40,
         RequestAudio = 41,
-
+        UpdatePickedClass = 42,
     }
 
     public class CTG2 : Mod
@@ -235,6 +235,12 @@ namespace CTG2
                     var playerToEdit = Main.player[sender];
                     playerToEdit.statLifeMax = newMax;
                     playerToEdit.statLifeMax2 = newMax;
+                    break;
+                case (byte)MessageType.UpdatePickedClass:
+                    int plyrIndx = reader.ReadInt32();
+                    bool pickedClass = reader.ReadBoolean();
+                    var playerManage = Main.player[plyrIndx].GetModPlayer<PlayerManager>();
+                    playerManage.pickedClass = pickedClass;
                     break;
                 case (byte)MessageType.RequestTeamChange:
                     int target = reader.ReadInt32();
