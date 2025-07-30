@@ -29,6 +29,8 @@ public class GameManager : ModSystem
     public int blueTeamSize = 0;
     public int redTeamSize = 0;
 
+    bool hasStartedEarly = false;
+
     public Dictionary<int, GameTeam> intToTeam;
 
     public Gem BlueGem { get; private set; }
@@ -38,6 +40,8 @@ public class GameManager : ModSystem
 
     public bool pause = false;
     public bool killonce = true;
+
+    public int matchStartTime = 1800;
 
     public bool pubsConfig = false; // this is used at the start of every game
 
@@ -189,6 +193,7 @@ public class GameManager : ModSystem
     {
         isWaitingForNewGame = false;
         IsGameActive = true;
+        hasStartedEarly = false;
         MatchTime = 0;
         if (pubsConfig)
         {
@@ -387,7 +392,7 @@ public class GameManager : ModSystem
         // Additional PvP enforcement
         //EnsureAllPlayersHavePvP();
 
-        if (MatchTime == 1800)
+        if (MatchTime == matchStartTime)
         {
             // this code will handle class selection and stuff
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"class selection is ending"), Microsoft.Xna.Framework.Color.Olive);
@@ -398,7 +403,7 @@ public class GameManager : ModSystem
         // Increase match duration by 1 tick
         MatchTime++;
 
-        if (MatchTime >= 1800)
+        if (MatchTime >= matchStartTime)
         {
             // Updates holding/capturing status of both gems.
             BlueGem.Update(RedGem, RedTeam.Players);
@@ -464,6 +469,38 @@ public class GameManager : ModSystem
                 redGemFireworkTimer = 0; // Reset 
             }
         }
+        else
+        {
+            bool endEarly = true;
+            foreach (Player plyr in Main.player)
+            {
+                if ((plyr.team == 1 || plyr.team == 3) && plyr.active && !PlayerManager.GetPlayerManager(plyr.whoAmI).pickedClass)
+                    endEarly = false;
+            }
+
+            if (endEarly && !hasStartedEarly && MatchTime < 1500)
+            {
+                var mod = ModContent.GetInstance<CTG2>();
+                
+                foreach (Player pp in Main.player)
+                {
+                    if ((pp.team == 1 || pp.team == 3) && pp.active)
+                    {
+                        PlayerManager.GetPlayerManager(pp.whoAmI).classSelectionTimer = 300;
+                        ModPacket selPacket = mod.GetPacket();
+                        selPacket.Write((byte)MessageType.SetClassSelectionTime);
+                        selPacket.Write(pp.whoAmI);
+                        selPacket.Write(300); // class selection time
+                        selPacket.Send(toClient: pp.whoAmI);
+                    }
+                }
+
+                hasStartedEarly = true;
+                matchStartTime = MatchTime + 300;
+
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"All players have selected classes. Starting the game in 5 seconds!"), Microsoft.Xna.Framework.Color.Olive);
+            }
+        }
         // Send updated GameInfo to clients every 6 ticks (every 0.1s)
         if (MatchTime % 6 == 0)
         {
@@ -484,7 +521,7 @@ public class GameManager : ModSystem
 
             // Determine match stage based on game state
             int matchStage;
-            if (MatchTime < 1800)
+            if (MatchTime < matchStartTime)
             {
                 matchStage = 1; // Class Selection phase
             }
@@ -530,6 +567,7 @@ public class GameManager : ModSystem
             packet.Write(mapName);
             packet.Write(blueTeamSize);
             packet.Write(redTeamSize);
+            packet.Write(matchStartTime);
 
             packet.Send();
         }
@@ -546,7 +584,7 @@ public class GameManager : ModSystem
             EndGame();
         }
 
-        if (!isOvertime && MatchTime >= 60 * 60 * 15 + 60 * 30)
+        if (!isOvertime && MatchTime >= 60 * 60 * 15 + matchStartTime)
         {
 
             if (BlueGem.IsHeld || RedGem.IsHeld)
@@ -690,13 +728,6 @@ public class GameManager : ModSystem
                 return;
             }
             // Check if player has original team
-            if (60 * 15 * 60 - MatchTime < 45 * 60)
-            {
-                // Player is cooked 
-
-                Console.WriteLine($"Player {player.name} cannot exit spectator mode - game is about to end soon");
-                return;
-            }
 
             playerSpectatorStatus[playerIndex] = false;
             int playerTeam = player.team;
@@ -840,6 +871,7 @@ public class GameManager : ModSystem
                 packet.Write(mapName);
                 packet.Write(blueTeamSize);
                 packet.Write(redTeamSize);
+                packet.Write(matchStartTime);
                 packet.Send();
             }
             
@@ -901,6 +933,7 @@ public class GameManager : ModSystem
                 packet.Write(mapName);
                 packet.Write(blueTeamSize);
                 packet.Write(redTeamSize);
+                packet.Write(matchStartTime);
                 packet.Send();
             }
             return;
@@ -1022,7 +1055,7 @@ public class GameManager : ModSystem
             }
 
             // Start class selection for the player
-            startPlayerClassSelection(playerIndex, MatchTime < 1800); // true if during initial game start phase
+            startPlayerClassSelection(playerIndex, MatchTime < matchStartTime); // true if during initial game start phase
 
             // Force sync stats after team change
             //ForcePlayerStatSync(playerIndex);
