@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 namespace CTG2.Content.ClientSide;
 
 public static class GameInfo
@@ -12,6 +12,5 @@ public static class GameInfo
     public static string redGemCarrier = "At Base";
     public static bool overtime = false;
     public static int overtimeTimer = 0;
-
-
+    public static string mapName = "";
 }
