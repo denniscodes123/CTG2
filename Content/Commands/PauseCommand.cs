@@ -2,6 +2,8 @@ using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
 using CTG2.Content.ClientSide;
+using Terraria.Chat;
+using Terraria.Localization;
 
 namespace CTG2.Content.Commands
 {
@@ -46,7 +48,7 @@ namespace CTG2.Content.Commands
                 packet.Send();
             }
             
-            caller.Reply(shouldPause ? "Pause requested." : "Unpause requested.", Color.Yellow);
+            ChatHelper.BroadcastChatMessage(shouldPause ? NetworkText.FromLiteral($"Game paused.") : NetworkText.FromLiteral($"Game unpaused."), Color.Yellow);
         }
     }
 }
