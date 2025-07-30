@@ -221,10 +221,18 @@ public class UIManager : ModSystem
         Utils.DrawBorderString(Main.spriteBatch, mapText, mapPos, mapCol);
 
         //draw team sizes
-        string teamText = $"{GameInfo.blueTeamSize} (Blue) vs. {GameInfo.redTeamSize} (Red)";
+        string teamText = $"[c/0000FF:{GameInfo.blueTeamSize}] vs. [c/FF0000:{GameInfo.redTeamSize}]";
         Vector2 teamTextPos = new Vector2(Main.screenWidth - 320, 350);
-        Color teamTextCol = Color.Violet;
 
-        Utils.DrawBorderString(Main.spriteBatch, teamText, teamTextPos, teamTextCol);
+        ChatManager.DrawColorCodedStringWithShadow(
+            Main.spriteBatch,
+            FontAssets.MouseText.Value,
+            teamText,
+            teamTextPos,
+            Color.White,
+            0,
+            Vector2.Zero,
+            Vector2.One
+        );
     }
 }
