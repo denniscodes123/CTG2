@@ -75,6 +75,7 @@ namespace CTG2
         DASH = 44,
         FORCE_JUMP = 45,
         GRAB_KEYS=46,
+        RequestChat=47,
     }
 
     public class CTG2 : Mod
@@ -213,7 +214,10 @@ namespace CTG2
                         // log?
                     }
                     break;
-
+                case (byte)MessageType.RequestChat:
+                    string message = reader.ReadString();
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), Microsoft.Xna.Framework.Color.Olive);
+                    break;
                 // mainly used for clown ability
                 case (byte)MessageType.RequestTeleport:
                     // teleport on server
