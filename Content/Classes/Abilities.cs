@@ -21,25 +21,25 @@ namespace CTG2.Content
     {
         public int cooldown = 0;
 
-        private int class4BuffTimer = 0;
-        private bool class4PendingBuffs = false;
+        public int class4BuffTimer = 0;
+        public bool class4PendingBuffs = false;
 
-        private int class6ReleaseTimer = -1;
+        public int class6ReleaseTimer = -1;
 
         public int class7HitCounter = 0;
 
-        private int class8HP = 0;
+        public int class8HP = 0;
         public bool psychicActive = false;
-        private int class12SwapTimer = -1;
-        private int class12ClosestDist = 99999;
-        private Player class12ClosestPlayer = null;
+        public int class12SwapTimer = -1;
+        public int class12ClosestDist = 99999;
+        public Player class12ClosestPlayer = null;
 
-        private int class15AbilityTimer = -1;
+        public int class15AbilityTimer = -1;
 
-        private CtgClass class16RushData;
-        private CtgClass class16RegenData;
-        private bool initializedMutant;
-        private int mutantState = 1;
+        public CtgClass class16RushData;
+        public CtgClass class16RegenData;
+        public bool initializedMutant;
+        public int mutantState = 1;
 
 
         private int GetItemIDByName(string itemName)
