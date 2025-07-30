@@ -15,4 +15,5 @@ public static class GameInfo
     public static string mapName = "";
     public static int blueTeamSize = 0;
     public static int redTeamSize = 0;
+    public static int matchStartTime = 1800;
 }
