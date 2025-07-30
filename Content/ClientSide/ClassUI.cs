@@ -1,4 +1,4 @@
-﻿using Terraria;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -215,6 +215,7 @@ public class ClassUI : UIState
         var playerManager = Main.LocalPlayer.GetModPlayer<PlayerManager>();
         playerManager.currentClass = cfg;
         playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
+        playerManager.pickedClass = true;
 
         var classPlayer = Main.LocalPlayer.GetModPlayer<ClassSystem>();
         classPlayer.setClass();
