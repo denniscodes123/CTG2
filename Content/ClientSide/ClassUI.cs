@@ -9,6 +9,7 @@ using System.Linq;
 using ClassesNamespace;
 using CTG2.Content.ClientSide;
 using Terraria.GameContent;
+using CTG2;
 
 public class ClassUI : UIState
 {
@@ -215,7 +216,14 @@ public class ClassUI : UIState
         var playerManager = Main.LocalPlayer.GetModPlayer<PlayerManager>();
         playerManager.currentClass = cfg;
         playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
+        
         playerManager.pickedClass = true;
+        var mod = ModContent.GetInstance<CTG2.CTG2>();
+        ModPacket classPacket = mod.GetPacket();
+        classPacket.Write((byte)MessageType.UpdatePickedClass);
+        classPacket.Write(Main.LocalPlayer.whoAmI);
+        classPacket.Write(true);
+        classPacket.Send(toClient: Main.LocalPlayer.whoAmI);
 
         var classPlayer = Main.LocalPlayer.GetModPlayer<ClassSystem>();
         classPlayer.setClass();
