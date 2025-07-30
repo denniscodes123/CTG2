@@ -163,9 +163,9 @@ public class ModifyHurtModPlayer : ModPlayer
 
         if (modPlayer.currentClass.Name == "Paladin" && Player.HeldItem.type == 4760 && Main.mouseRight) //Paladin buffs when it's hit
         {
-            Player.AddBuff(BuffID.Honey, 180);
-            Player.AddBuff(BuffID.RapidHealing, 180);
-            Player.AddBuff(ModContent.BuffType<Retaliation>(), 9);
+            Player.AddBuff(BuffID.Honey, 300); //check if honey buff even works later
+            Player.AddBuff(BuffID.RapidHealing, 300);
+            Player.AddBuff(ModContent.BuffType<Retaliation>(), 24);
         }
         else if (info.DamageSource.SourceProjectileType == ModContent.ProjectileType<AmalgamatedHandProjectile1>() || info.DamageSource.SourceProjectileType == ModContent.ProjectileType<AmalgamatedHandProjectile2>())
         {
