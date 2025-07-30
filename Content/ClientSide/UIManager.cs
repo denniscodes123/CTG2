@@ -95,6 +95,10 @@ public class UIManager : ModSystem
         {
             timeText = $"Class selection ends in: {(int) (GameInfo.matchStartTime / 60) - matchTime / 60}s";
         }
+        else if (Main.LocalPlayer.GetModPlayer<PlayerManager>().classSelectionTimer > 0 && Main.LocalPlayer.GetModPlayer<PlayerManager>().playerState == PlayerManager.PlayerState.ClassSelection)
+        {
+            timeText = $"Class selection ends in: {(int) (Main.LocalPlayer.GetModPlayer<PlayerManager>().classSelectionTimer) / 60}s";
+        }
         else if (GameInfo.overtime)
         {
             int secondsLeft = GameInfo.overtimeTimer / 60;
