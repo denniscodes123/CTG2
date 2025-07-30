@@ -684,7 +684,7 @@ namespace CTG2.Content
 
         private void MutantOnUse()
         {
-            Player.AddBuff(149, 90);
+            Player.AddBuff(149, 45);
 
             switch (mutantState)
             {
