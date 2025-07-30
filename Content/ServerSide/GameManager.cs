@@ -767,7 +767,7 @@ public class GameManager : ModSystem
         Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
 
 
-        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection (non game)"), Color.Beige);
+        //ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection (non game)"), Color.Beige);
         // Send packet to set class selection time on client
         ModPacket timePacket = mod.GetPacket();
         timePacket.Write((byte)MessageType.SetClassSelectionTime);
