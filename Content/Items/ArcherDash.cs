@@ -11,8 +11,8 @@ namespace CTG2.Content.Items
 	public class ArcherDash : ModItem
 	{
 		public override void SetDefaults() {
-			Item.width = 24;
-			Item.height = 28;
+			Item.width = 30;
+			Item.height = 30;
 			Item.rare = ItemRarityID.Red;
 			Item.accessory = true;
 		}
