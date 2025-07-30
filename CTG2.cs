@@ -20,6 +20,7 @@ using Microsoft.Xna.Framework.Audio;
 using MonoMod.Cil;
 using Humanizer;
 using System.Reflection;
+using DirectDashMod.Players;
 
 
 namespace CTG2
@@ -70,7 +71,10 @@ namespace CTG2
         RequestClassSelection = 40,
         RequestAudio = 41,
         UpdatePickedClass = 42,
-        RequestBanPlayer=43,
+        RequestBanPlayer = 43,
+        DASH = 44,
+        FORCE_JUMP = 45,
+        GRAB_KEYS=46,
     }
 
     public class CTG2 : Mod
@@ -683,9 +687,41 @@ namespace CTG2
                     }
                     break;
                 }
-                        case (byte)MessageType.RequestBanPlayer:
+                case (byte)MessageType.RequestBanPlayer:
                     ProcessRequestBanPlayer(ref reader, whoAmI);
                     break;
+
+                case (byte)MessageType.DASH:
+                {
+                    byte plyNum1 = reader.ReadByte();
+                    Player ply1 = Main.player[plyNum1];
+                    DashPlayer3 dashPly = ply1.GetModPlayer<DashPlayer3>();
+                    dashPly.RecieveDash(ply1, reader);
+                    if (Main.netMode == 2)
+                    {
+                        dashPly.SendDash(-1, whoAmI);
+                    }
+                    break;
+                }
+
+                case (byte)MessageType.FORCE_JUMP:
+                    byte plyNum2 = reader.ReadByte();
+                    Player ply2 = Main.player[plyNum2];
+                    ply2.GetModPlayer<WallJumpPlayer>().RecieveForceJump(ply2, reader, whoAmI);
+                    break;
+                case (byte)MessageType.GRAB_KEYS:
+                {   
+                    byte plyNum3 = reader.ReadByte();
+                    Player ply3 = Main.player[plyNum3];
+                    WallJumpPlayer jumpPly = ply3.GetModPlayer<WallJumpPlayer>();
+                    jumpPly.RecieveGrabKeys(ply3, reader);
+                    if (Main.netMode == 2)
+                    {
+                        jumpPly.SendGrabKeys(-1, whoAmI);
+                    }
+                    break;
+                }
+                    
 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);

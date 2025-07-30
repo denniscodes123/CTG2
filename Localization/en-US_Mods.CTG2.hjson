@@ -65,6 +65,31 @@ Items: {
 		Tooltip: ""
 		DisplayName: Hexagonal Barrier
 	}
+
+	SpaceWaterItem: {
+		DisplayName: Space Water Item
+		Tooltip: ""
+	}
+
+	DashCrystal: {
+		DisplayName: Dash Crystal
+		Tooltip: ""
+	}
+
+	DoubleDashCrystal: {
+		DisplayName: Double Dash Crystal
+		Tooltip: ""
+	}
+
+	SkippingStone: {
+		DisplayName: Skipping Stone
+		Tooltip: ""
+	}
+
+	DashPlayer3_DashEffect_Item: {
+		DisplayName: Dash Player3_ Dash Effect_ Item
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -90,12 +115,19 @@ Buffs: {
 		Description: Mods.CTG2.Buffs.Retaliation.Description
 		DisplayName: Retaliation
 	}
+
+	Buff_DashCooldown: {
+		DisplayName: Buff_ Dash Cooldown
+		Description: Mods.CTG2.Buffs.Buff_DashCooldown.Description
+	}
 }
 
 Keybinds: {
 	"Archer Dash.DisplayName": Archer  Dash
 	"Aimbot Toggle.DisplayName": Aimbot  Toggle
 	Toggle.DisplayName: Toggle
+	Dash.DisplayName: Dash
+	Grab.DisplayName: Grab
 }
 
 Configs: {
