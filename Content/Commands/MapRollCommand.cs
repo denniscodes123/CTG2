@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria.Chat;
+using CTG2;
 
 
 namespace CTG2.Content.Commands
@@ -53,7 +54,13 @@ namespace CTG2.Content.Commands
                     break;
             }
 
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name} generated the random map {mapName}!"), Microsoft.Xna.Framework.Color.Olive);
+            string msg = $"{player.name} generated the random map {mapName}!";
+            
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestChat);
+            packet.Write(msg);
+            packet.Send();
         }
     }
 }
