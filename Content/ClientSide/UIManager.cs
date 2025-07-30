@@ -81,10 +81,10 @@ public class UIManager : ModSystem
     {
         string timeText = "";
         Vector2 timeRow = new Vector2(Main.screenWidth - 320, 400);
-        Vector2 blueGemRow = new Vector2(Main.screenWidth - 320, 500);
-        Vector2 blueGemRow2 = new Vector2(Main.screenWidth - 320, 550);
-        Vector2 redGemRow = new Vector2(Main.screenWidth - 320, 600);
-        Vector2 redGemRow2 = new Vector2(Main.screenWidth - 320, 650);
+        Vector2 blueGemRow = new Vector2(Main.screenWidth - 320, 525);
+        Vector2 blueGemRow2 = new Vector2(Main.screenWidth - 320, 575);
+        Vector2 redGemRow = new Vector2(Main.screenWidth - 320, 625);
+        Vector2 redGemRow2 = new Vector2(Main.screenWidth - 320, 675);
         
         Color textColor = Color.White;
         int matchStage = GameInfo.matchStage;
@@ -156,7 +156,7 @@ public class UIManager : ModSystem
             Vector2.One
         );
         // Show gem carrier HP if gem is captured
-        Vector2 carrierHpPos = new Vector2(Main.screenWidth - 320, 700);
+        Vector2 carrierHpPos = new Vector2(Main.screenWidth - 320, 725);
 
         if (GameInfo.blueGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.blueGemCarrier))
         {
@@ -197,7 +197,7 @@ public class UIManager : ModSystem
         // draw ability timer
         int cooldown = Main.LocalPlayer.GetModPlayer<Abilities>().cooldown;
         string abilText = $"Ability cooldown: {cooldown / 60}s";
-        Vector2 abilPos = new Vector2(Main.screenWidth - 320, 450);
+        Vector2 abilPos = new Vector2(Main.screenWidth - 320, 475);
         Color abilCol = Color.Yellow;
 
         if (cooldown == 0)
@@ -211,9 +211,16 @@ public class UIManager : ModSystem
 
         //draw map name
         string mapText = $"Map: {GameInfo.mapName}";
-        Vector2 mapPos = new Vector2(Main.screenWidth - 320, 350);
+        Vector2 mapPos = new Vector2(Main.screenWidth - 320, 425);
         Color mapCol = Color.Pink;
 
         Utils.DrawBorderString(Main.spriteBatch, mapText, mapPos, mapCol);
+
+        //draw team sizes
+        string teamText = $"{GameInfo.blueTeamSize} (Blue) vs. {GameInfo.redTeamSize} (Red)";
+        Vector2 teamTextPos = new Vector2(Main.screenWidth - 320, 350);
+        Color teamTextCol = Color.Violet;
+
+        Utils.DrawBorderString(Main.spriteBatch, teamText, teamTextPos, teamTextCol);
     }
 }
