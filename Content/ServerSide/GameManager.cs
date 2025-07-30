@@ -527,7 +527,7 @@ public class GameManager : ModSystem
             EndGame();
         }
 
-        if (!isOvertime && MatchTime >= 60 * 60 * 15)
+        if (!isOvertime && MatchTime >= 60 * 60 * 15 + 60 * 30)
         {
 
             if (BlueGem.IsHeld || RedGem.IsHeld)
