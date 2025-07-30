@@ -21,6 +21,12 @@ namespace CTG2.Content.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
+            var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+            if (!modPlayer.IsAdmin)
+            {
+                caller.Reply("You must be an admin to use this command.", Color.Red);
+                return;
+            }
             Player player = caller.Player;
             var inventoryData = new List<ItemData>();
             int count = 0;
@@ -146,6 +152,12 @@ namespace CTG2.Content.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args) {
 
+            var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
+            if (!modPlayer.IsAdmin)
+            {
+                caller.Reply("You must be an admin to use this command.", Color.Red);
+                return;
+            }
             string[] inputSplit = input.Split(' ');
             string modifiedInput = inputSplit[1];
 
