@@ -75,6 +75,8 @@ public class ClientModifications : ModSystem
         {
             Mod.Logger.Error("Could not find Main.DrawPlayerChatBubbles method. Chat bubble disabling will not work.");
         }
+
+        base.Unload();
     }
     private void TeamChangeFlag(ILContext iLContext)
     {
