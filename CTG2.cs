@@ -85,6 +85,7 @@ namespace CTG2
         public static ClientConfig config = new ClientConfig();
 
         public static ModKeybind ArcherDashKeybind;
+        public static ModKeybind AdvancedBinocularsKeybind;
 
         // static methods
         private static string GetTeamName(int teamId)
@@ -133,6 +134,7 @@ namespace CTG2
             }
 
             ArcherDashKeybind = KeybindLoader.RegisterKeybind(this, "Archer Dash", "LeftShift");
+            AdvancedBinocularsKeybind = KeybindLoader.RegisterKeybind(this, "Advanced Binoculars", "MouseRight");
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
