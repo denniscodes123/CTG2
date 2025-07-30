@@ -70,6 +70,7 @@ namespace CTG2
         RequestClassSelection = 40,
         RequestAudio = 41,
         UpdatePickedClass = 42,
+        RequestBanPlayer=43,
     }
 
     public class CTG2 : Mod
@@ -682,6 +683,9 @@ namespace CTG2
                     }
                     break;
                 }
+                        case (byte)MessageType.RequestBanPlayer:
+                    ProcessRequestBanPlayer(ref reader, whoAmI);
+                    break;
 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
@@ -689,6 +693,19 @@ namespace CTG2
 
             }
         }
+		private static void ProcessRequestBanPlayer(ref BinaryReader reader, int playerNumber)
+		{
+				string playertoban = reader.ReadString();
+				for (int k = 0; k < 255; k++)
+				{
+					if (Main.player[k].active && Main.player[k].name.ToLower() == playertoban)
+					{
+						Netplay.AddBan(k);
+						NetMessage.SendData(2, k, -1, NetworkText.FromKey("CLI.BanMessage", new object[0]), 0, 0f, 0f, 0f, 0, 0, 0);
+					}
+				}
+			
+		}
 
 
         public void setRequestedNpcIndex(int index)
