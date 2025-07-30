@@ -13,6 +13,8 @@ using ClassesNamespace;
 using CTG2.Content.ClientSide;
 using CTG2.Content.Classes;
 using CTG2.Content.Items;
+using Terraria.Audio;
+using Microsoft.Xna.Framework.Audio;
 
 
 namespace CTG2.Content
@@ -27,6 +29,7 @@ namespace CTG2.Content
         public int class6ReleaseTimer = -1;
 
         public int class7HitCounter = 0;
+        public int class7EndTimer = -1;
 
         public int class8HP = 0;
         public bool psychicActive = false;
@@ -40,6 +43,10 @@ namespace CTG2.Content
         public CtgClass class16RegenData;
         public bool initializedMutant;
         public int mutantState = 1;
+
+        SoundStyle abilityStart = new SoundStyle("CTG2/Content/Classes/AbilityStart");
+	    SoundStyle abilityEnd = new SoundStyle("CTG2/Content/Classes/AbilityEnd");
+        SoundStyle whiteMageHeal = new SoundStyle("CTG2/Content/Classes/WhiteMageHeal");
 
 
         private int GetItemIDByName(string itemName)
@@ -368,6 +375,8 @@ namespace CTG2.Content
                 Player.AddBuff(137, 420);
                 Player.AddBuff(320, 420);
 
+                class7EndTimer = 420;
+
                 Player.GetModPlayer<Abilities>().class7HitCounter = 0;
 
                 Main.NewText("Ability activated!");
@@ -447,6 +456,8 @@ namespace CTG2.Content
                     packet3.Write(2);
                     packet3.Write(480);
                     packet3.Send();
+
+                    SoundEngine.PlaySound(whiteMageHeal, Player.Center);
                 }
             }
         }
@@ -708,10 +719,52 @@ namespace CTG2.Content
                 initializedMutant = true;
             }
 
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            int selectedClass = playerManager.currentClass.AbilityID;
+
+            switch (selectedClass)
+            {
+                case 1:
+                    if (cooldown == 30 * 60)
+                        SoundEngine.PlaySound(abilityEnd.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+
+                    break;
+
+                case 4:
+                    if (cooldown == 30 * 60)
+                        SoundEngine.PlaySound(abilityEnd.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+
+                    break;
+
+                case 7:
+                    if (class7EndTimer == 0)
+                        SoundEngine.PlaySound(abilityEnd.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+
+                    break;
+
+                case 11:
+                    if (cooldown == 32 * 60)
+                        SoundEngine.PlaySound(abilityEnd.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+
+                    break;
+
+                case 13:
+                    if (cooldown == 35 * 60)
+                        SoundEngine.PlaySound(abilityEnd.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+
+                    break;
+
+                case 17:
+                    if (cooldown == 35 * 60)
+                        SoundEngine.PlaySound(abilityEnd.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+
+                    break;
+            }
+
             if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && cooldown == 0) // Only activate if not on cooldown
             {
-                var playerManager = Player.GetModPlayer<PlayerManager>();
-                int selectedClass = playerManager.currentClass.AbilityID;
+                if (selectedClass == 1 || selectedClass == 4 || selectedClass == 7 || selectedClass == 11 || selectedClass == 13 || selectedClass == 17)
+                    SoundEngine.PlaySound(abilityStart.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
 
                 switch (selectedClass)
                 {
@@ -836,6 +889,9 @@ namespace CTG2.Content
 
             if (cooldown > 0)
                 cooldown--;
+
+            if (class7EndTimer >= 0)
+                class7EndTimer--;
         }
     public override void UpdateLifeRegen()
 {
