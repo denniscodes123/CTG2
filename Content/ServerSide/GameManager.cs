@@ -44,6 +44,8 @@ public class GameManager : ModSystem
 
     public GameMap Map { get; private set; }
 
+    private string mapName = "";
+
     // Spectator tracking
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
@@ -224,6 +226,7 @@ public class GameManager : ModSystem
         {
             ClearHoneyForMap();
             Map.LoadMap(result);
+            mapName = result.ToString();
             if (result == MapTypes.Kraken || result == MapTypes.Stalactite)
             {
                 FillHoneyForMap(result);
@@ -235,6 +238,7 @@ public class GameManager : ModSystem
             var randomMap = (MapTypes)CTG2.randomGenerator.Next(0, 7);
             ClearHoneyForMap();
             Map.LoadMap(randomMap);
+            mapName = result.ToString();
             FillLavaInDesignatedArea();
             if (randomMap == MapTypes.Kraken || randomMap == MapTypes.Stalactite)
             {
@@ -268,6 +272,8 @@ public class GameManager : ModSystem
         BlueGem.Reset();
         RedGem.Reset();
         Console.WriteLine("GameManager: Reset gems");
+
+        mapName = "";
 
         var mod = ModContent.GetInstance<CTG2>();
 
@@ -512,6 +518,9 @@ public class GameManager : ModSystem
             else packet.Write("At Base");
             if (RedGem.IsHeld) packet.Write(Main.player[RedGem.HeldBy].name);
             else packet.Write("At Base");
+
+            packet.Write(mapName);
+
             packet.Send();
         }
 
@@ -811,6 +820,7 @@ public class GameManager : ModSystem
                 packet.Write((int)0); // Red gem position
                 packet.Write("Waiting for new game..."); // Blue gem status
                 packet.Write("Waiting for new game..."); // Red gem status
+                packet.Write(mapName);
                 packet.Send();
             }
             
@@ -869,6 +879,7 @@ public class GameManager : ModSystem
                 packet.Write((int)0); // Red gem position
                 packet.Write("No game active"); // Blue gem status
                 packet.Write("No game active"); // Red gem status
+                packet.Write(mapName);
                 packet.Send();
             }
             return;
