@@ -28,6 +28,7 @@ public class PlayerManager : ModPlayer
     public static int previousMatchStage = 0;
     public int customRespawnTimer = -1;
     public bool awaitingRespawn = false;
+    public bool pickedClass = false;
     public ClassConfig currentClass = new ClassConfig();
     public UpgradeConfig currentUpgrade = new UpgradeConfig();
     public GameManager gameManager = ModContent.GetInstance<GameManager>();
@@ -216,6 +217,8 @@ public class PlayerManager : ModPlayer
         { //custom 
             if (GameInfo.matchStage == 3)
                 return; // Don't decrement ability/buff timers
+            if (pickedClass && classSelectionTimer > 300)
+                classSelectionTimer = 300;
             classSelectionTimer--;
         }
         else if (classSelectionTimer == 0 && !isGameStartClassSelection) // class selection time expired
