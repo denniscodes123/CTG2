@@ -724,12 +724,19 @@ public class GameManager : ModSystem
         Player player = Main.player[playerIndex];
         int team = player.team;
 
+        PlayerManager.GetPlayerManager(player.whoAmI).pickedClass = false;
+        var mod = ModContent.GetInstance<CTG2>();
+        ModPacket classPacket = mod.GetPacket();
+        classPacket.Write((byte)MessageType.UpdatePickedClass);
+        classPacket.Write(playerIndex);
+        classPacket.Write(false);
+        classPacket.Send(toClient: playerIndex);
+
         Console.WriteLine($"GameManager: startPlayerClassSelection called for player {playerIndex}, team {team}, gameStarted: {gameStarted}");
 
 
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[DEBUG] {playerIndex} successfully entered class selection (non game)"), Color.Beige);
         // Send packet to set class selection time on client
-        var mod = ModContent.GetInstance<CTG2>();
         ModPacket timePacket = mod.GetPacket();
         timePacket.Write((byte)MessageType.SetClassSelectionTime);
         timePacket.Write(playerIndex);
@@ -950,14 +957,6 @@ public class GameManager : ModSystem
         int oldTeam = player.team;
 
         Console.WriteLine($"GameManager: HandlePlayerTeamChange called for player {playerIndex} from team {oldTeam} to team {newTeam}");
-
-        // Check if too late to change teams during active game (similar to spectator logic)
-        if (IsGameActive && MatchTime >= 60 * 60 * 15 - 45 * 60)
-        {
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[TEAM] {player.name} cannot change teams - game ending soon"), Microsoft.Xna.Framework.Color.Red);
-            Console.WriteLine($"Player {player.name} cannot change teams - game ending soon");
-            return;
-        }
 
         // Set the new team
         player.team = newTeam;
