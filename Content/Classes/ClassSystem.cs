@@ -75,8 +75,8 @@ namespace ClassesNamespace
         private float bonusMoveSpeed = 0;
         public int clownSwapCaller = -1; //Gets updated by clownonuse to store who the caller is
 
-        private int currentHP = 100;
-        private int currentMana = 20;
+        public int currentHP = 100;
+        public int currentMana = 20;
 
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {
