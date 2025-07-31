@@ -84,8 +84,8 @@ namespace CTG2
         RequestChat = 47,
         RequestMatchTime = 48,
         UpdateMusic = 49,
-
-        ChangeMusic = 50
+        ChangeMusic = 50,
+	SetCurrentClass = 51,
     }
 
     public class CTG2 : Mod
@@ -215,6 +215,88 @@ namespace CTG2
                     
                     player.AddBuff(buffType, time);
                     NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, playerID, buffType, time);
+
+                    break;
+		case (byte)MessageType.SetCurrentClass:
+                    int play = reader.ReadInt32();
+                    int classNum = reader.ReadInt32();
+                    string className = "";
+                    Player ppp = Main.player[play];
+                    var playerMnger = ppp.GetModPlayer<PlayerManager>();
+
+                    switch (classNum)
+                    {
+                        case 1:
+                            className = "Archer";
+                            break;
+                        case 2:
+                            className = "Ninja";
+                            break;
+                        case 3:
+                            className = "Beast";
+                            break;
+                        case 4:
+                            className = "Gladiator";
+                            break;
+                        case 5:
+                            className = "Paladin";
+                            break;
+                        case 6:
+                            className = "Jungle Man";
+                            break;
+                        case 7:
+                            className = "Black Mage";
+                            break;
+                        case 8:
+                            className = "Psychic";
+                            break;
+                        case 9:
+                            className = "White Mage";
+                            break;
+                        case 10:
+                            className = "Miner";
+                            break;
+                        case 11:
+                            className = "Fish";
+                            break;
+                        case 12:
+                            className = "Clown";
+                            break;
+                        case 13:
+                            className = "Flame Bunny";
+                            break;
+                        case 14:
+                            className = "Tiki Priest";
+                            break;
+                        case 15:
+                            className = "Tree";
+                            break;
+                        case 16:
+                            className = "Mutant";
+                            break;
+                        case 17:
+                            className = "Leech";
+                            break;
+                    }
+
+                    foreach (var classes in CTG2.config.Classes)
+                    {
+                        if (classes.Name == className)
+                        {
+                            var cls = classes;
+
+                            playerMnger.currentClass = cls;
+                            
+                            var classPlayer = ppp.GetModPlayer<ClassSystem>();
+                            classPlayer.setClass();
+
+                            Console.WriteLine("Succesfully picked random class");
+                            break;
+                        }
+                    }
+
+                    if (!playerMnger.pickedClass)
+                        Console.WriteLine("Failed to pick random class");
 
                     break;
                 case (byte)MessageType.RequestNextMap:
