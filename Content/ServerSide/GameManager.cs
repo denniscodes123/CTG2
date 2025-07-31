@@ -810,18 +810,40 @@ public class GameManager : ModSystem
         packet.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
     }
+
+    
     public void endPlayerClassSelection(int playerIndex)
     {
         // Use vanilla Player.team instead of PlayerManager on server
         Player player = Main.player[playerIndex];
+        var playerManager = player.GetModPlayer<PlayerManager>();
         int team = player.team;
+        var mod = ModContent.GetInstance<CTG2>();
 
         if (!intToTeam.ContainsKey(team))
             return;
 
-        GameTeam gameTeam = intToTeam[team];
+        if (!playerManager.pickedClass)
+        {
+            Random random = new Random();
 
-        var mod = ModContent.GetInstance<CTG2>();
+            int num = random.Next(1, 18);
+
+            ModPacket classPacket = mod.GetPacket();
+            classPacket.Write((byte)MessageType.SetCurrentClass);
+            classPacket.Write(player.whoAmI);
+            classPacket.Write(num);
+            classPacket.Send(toClient: player.whoAmI);
+
+            ModPacket classPacket2 = mod.GetPacket();
+            classPacket2.Write((byte)MessageType.UpdatePickedClass);
+            classPacket2.Write(player.whoAmI);
+            classPacket2.Write(true);
+            classPacket2.Send(toClient: player.whoAmI);
+            playerManager.pickedClass = true;
+        }
+
+        GameTeam gameTeam = intToTeam[team];
 
         PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.Active;
         ModPacket statePacket = mod.GetPacket();
@@ -844,11 +866,14 @@ public class GameManager : ModSystem
         packet.Write((int)gameTeam.BaseLocation.Y);
         packet.Send(toClient: playerIndex);
 
-        ModPacket healpacket = mod.GetPacket(); //do heal server side
+        ModPacket healpacket = Mod.GetPacket(); //do heal server side
         healpacket.Write((byte)MessageType.RequestFullHeal);
-        healpacket.Write(playerIndex);
-        healpacket.Send(toClient: playerIndex);
+        healpacket.Write(player.whoAmI);
+        healpacket.Send(toClient: player.whoAmI);
+        player.Heal(600);
     }
+
+    
     public override void PostUpdateWorld()
     {
         if (!Main.dedServ) return;
