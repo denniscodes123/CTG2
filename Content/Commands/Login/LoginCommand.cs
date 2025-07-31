@@ -7,7 +7,7 @@ namespace CTG2.Content.Commands
 {
     public class LoginCommand : ModCommand
     {
-        private const string Password = "newctg5"; 
+        private const string Password = "prayrisarat"; 
         public override CommandType Type => CommandType.Chat;
         public override string Command => "login";
         public override string Description => "Log in as admin.";
