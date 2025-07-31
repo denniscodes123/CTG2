@@ -31,15 +31,17 @@ namespace CTG2.Content.Functionality
             {
                 case 0:
                     if (CTG2.AdvancedBinocularsKeybind.JustPressed && !recentlyPressed)
+                    {
                         state = 1;
-                    
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    }
+
                     break;
                 
                 case 1:
                     mouseOffset = Main.MouseWorld - player.Center;
-
                     state = 2;
-                    
+
                     break;
                 
                 case 2:
@@ -50,7 +52,10 @@ namespace CTG2.Content.Functionality
                     Main.screenPosition = Vector2.Lerp(Main.screenPosition, targetPosition, 1f);
                     
                     if (CTG2.AdvancedBinocularsKeybind.JustPressed && !recentlyPressed)
+                    {
                         state = 0;
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    }
                     
                     break;
             }
