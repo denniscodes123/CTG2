@@ -1,36 +1,46 @@
+
+using Microsoft.Xna.Framework;
+using System;
 using Terraria;
+using Terraria.Graphics.Capture;
+using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace CTG2.Content.ClientSide;
-
-public class CTGMusicScene : ModSceneEffect
+namespace CTG2.Content
 {
-    public override SceneEffectPriority Priority => SceneEffectPriority.BiomeHigh;
+// Shows setting up two basic biomes. For a more complicated example, please request.
+public class CTG2Biome : ModBiome
+{
+// Select all the scenery
 
-    // This method will now print a message to chat once per second.
-    public override bool IsSceneEffectActive(Player player)
-    {
-        // Use a timer (the game's update count) to avoid spamming the chat.
-        if (Main.GameUpdateCount % 60 == 0)
-        {
-            Main.NewText("DEBUG: CTGMusicScene is Active!");
+
+// Select Music
+public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/clashroyaleOT");
+        /* If you need the music choice to be conditional, such as supporting the Otherworld soundtrack toggle, you can use this approach:
+        public override int Music {
+        get {
+        if (!Main.swapMusic == Main.drunkWorld && !Main.remixWorld) {
+        return MusicID.OtherworldlyEerie;
         }
-        return true;
-    }
+        return MusicLoader.GetMusicSlot(Mod, "Assets/Music/MysteriousMystery");
+        }
+        }
+        */
 
-    // This property will now print the Music ID it finds.
-    public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/clashroyaleOT");
-    // public override int Music
-    // {
-    //     get
-    //     {
-    //         int musicId = MusicLoader.GetMusicSlot(mod, "Assets/Music/clashroyaleOT");
 
-    //         if (Main.GameUpdateCount % 60 == 0)
-    //         {
-    //             Main.NewText($"DEBUG: Trying to play Music ID: {musicId}");
-    //         }
-    //         return musicId;
-    //     }
-    // }
+
+        // Populate the Bestiary Filter
+
+
+        // Calculate when the biome is active.
+
+        public override bool IsBiomeActive(Player player)
+        {
+            // First, we will use the exampleBlockCount from our added ModSystem for our first custom condition
+            return true;
+        }
+
+// Declare biome priority. The default is BiomeLow so this is only necessary if it needs a higher priority.
+public override SceneEffectPriority Priority => SceneEffectPriority.BossHigh;
+}
 }

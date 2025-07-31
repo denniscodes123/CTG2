@@ -80,9 +80,12 @@ namespace CTG2
         RequestBanPlayer = 43,
         DASH = 44,
         FORCE_JUMP = 45,
-        GRAB_KEYS=46,
-        RequestChat=47,
-        RequestMatchTime =48,
+        GRAB_KEYS = 46,
+        RequestChat = 47,
+        RequestMatchTime = 48,
+        UpdateMusic = 49,
+
+        ChangeMusic = 50
     }
 
     public class CTG2 : Mod
@@ -742,13 +745,34 @@ namespace CTG2
                     break;
                 }
                   
-                // case (byte)MessageType.UpdateMusic:
-                //     if (Main.netMode == NetmodeID.MultiplayerClient)
-                //     {
-                //         int musicId = reader.ReadInt32();
-                //         MusicManager.CurrentMusicId = musicId;
-                //     }
-                //     break;
+                case (byte)MessageType.UpdateMusic:
+                    // if (Main.netMode == NetmodeID.MultiplayerClient)
+                    // {
+                    //     // Read the music path sent by the server.
+                    //     string musicPath = reader.ReadString();
+                    //     int newMusicId = -1;
+
+                    //     if (!string.IsNullOrEmpty(musicPath) && ModContent.HasAsset(musicPath))
+                    //     {
+                    //         // Get the integer ID for the music path.
+                    //         newMusicId = MusicLoader.GetMusicSlot(this, musicPath);
+                    //     }
+                    //     else
+                    //     {
+                    //         Logger.WarnFormat("errorM");
+                    //     }
+
+                    //     // Update the static variable in our biome.
+                    //         GameMusicBiome.ChangeMusic(newMusicId);
+                        
+                    //     // Manually trigger the music fade. This is important!
+                    //     // Just changing the biome's property won't work if the biome is already active.
+                    //     if (Main.curMusic != newMusicId)
+                    //     {
+                    //         Main.newMusic = newMusicId;
+                    //     }
+                    // }
+                    break;
                     
 
                 default:

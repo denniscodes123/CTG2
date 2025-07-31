@@ -128,6 +128,9 @@ Keybinds: {
 	Toggle.DisplayName: Toggle
 	Dash.DisplayName: Dash
 	Grab.DisplayName: Grab
+	"Ability 1.DisplayName": Ability 1
+	AdvancedBinoculars.DisplayName: Advanced Binoculars
+	ArcherDash.DisplayName: Archer Dash
 }
 
 Configs: {
@@ -138,5 +141,17 @@ Configs: {
 		}
 
 		DisplayName: C T G2 Config
+	}
+}
+
+Biomes: {
+	CTG2Biome: {
+		DisplayName: C T G2 Biome
+		TownNPCDialogueName: the C T G2 Biome
+	}
+
+	GameMusicBiome: {
+		DisplayName: Game Music Biome
+		TownNPCDialogueName: the Game Music Biome
 	}
 }
