@@ -852,7 +852,7 @@ public class GameManager : ModSystem
         statePacket.Write((byte)PlayerManager.PlayerState.Active);
         statePacket.Send(toClient: playerIndex);
 
-        NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
+        //NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
 
         // Force sync player stats to ensure HP displays correctly to other players
         //ForcePlayerStatSync(playerIndex);
