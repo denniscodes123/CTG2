@@ -15,6 +15,7 @@ using CTG2.Content.ClientSide;
 using Terraria.Localization;
 using Terraria.Chat;
 using CTG2.Content;
+using CTG2.Content.ServerSide;
 
 
 namespace ClassesNamespace
@@ -74,8 +75,8 @@ namespace ClassesNamespace
         private float bonusMoveSpeed = 0;
         public int clownSwapCaller = -1; //Gets updated by clownonuse to store who the caller is
 
-        private int currentHP = 100;
-        private int currentMana = 20;
+        public int currentHP = 100;
+        public int currentMana = 20;
 
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {
@@ -400,10 +401,7 @@ namespace ClassesNamespace
 
         public override void UpdateEquips()
         {
-            if (Main.expertMode || Main.masterMode)
-            {
-                Player.extraAccessory = true;
-            }
+            Player.extraAccessory = true;
         }
         public override void PreUpdate()
         {
@@ -463,22 +461,79 @@ namespace ClassesNamespace
 
             //Miner bombs over time logic (port dirt config to here later)
             var playerManager = Player.GetModPlayer<PlayerManager>();
-            if (playerManager.currentClass?.Name == "Miner" && Main.GameUpdateCount % 1800 == 0) //30 seconds
+            int gameTime = GameInfo.matchTime - GameInfo.matchStartTime;
+            
+            if (gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
             {
+                if (playerManager.currentClass?.Name == "Miner")
+                {
+                    Item bomb = new Item();
+                    bomb.SetDefaults(ItemID.StickyBomb);
+                    bomb.stack = 1;
 
-                Item bomb = new Item();
-                bomb.SetDefaults(ItemID.StickyBomb);
-                bomb.stack = 1;
+                    Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+                }
 
-                Item overflow = Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
-            }
-            if (Player.ghost == false && Main.GameUpdateCount % 1800==0 && Player.team!=0 && GameInfo.matchStage ==2)
-            {
                 Item dirt = new Item();
                 dirt.SetDefaults(ItemID.DirtBlock);
-                dirt.stack = 50;
 
-                Item overflow = Player.GetItem(Player.whoAmI, dirt, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+                if (gameTime <= 9000)
+                    switch (playerManager.currentClass?.Name)
+                    {
+                        case "Archer":
+                            dirt.stack = 50;
+                            break;
+                        case "Ninja":
+                            dirt.stack = 50;
+                            break;
+                        case "Beast":
+                            dirt.stack = 50;
+                            break;
+                        case "Gladiator":
+                            dirt.stack = 50;
+                            break;
+                        case "Paladin":
+                            dirt.stack = 50;
+                            break;
+                        case "Jungle Man":
+                            dirt.stack = 50;
+                            break;
+                        case "Black Mage":
+                            dirt.stack = 50;
+                            break;
+                        case "Psychic":
+                            dirt.stack = 50;
+                            break;
+                        case "White Mage":
+                            dirt.stack = 50;
+                            break;
+                        case "Miner":
+                            dirt.stack = 50;
+                            break;
+                        case "Fish":
+                            dirt.stack = 50;
+                            break;
+                        case "Clown":
+                            dirt.stack = 50;
+                            break;
+                        case "Flame Bunny":
+                            dirt.stack = 50;
+                            break;
+                        case "Tiki Priest":
+                            dirt.stack = 50;
+                            break;
+                        case "Tree":
+                            dirt.stack = 50;
+                            break;
+                        case "Mutant":
+                            dirt.stack = 50;
+                            break;
+                        case "Leech":
+                            dirt.stack = 50;
+                            break;
+                    }
+
+                Player.GetItem(Player.whoAmI, dirt, GetItemSettings.InventoryEntityToPlayerInventorySettings);
             }
             
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds

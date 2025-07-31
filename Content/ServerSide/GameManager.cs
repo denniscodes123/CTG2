@@ -574,6 +574,14 @@ public class GameManager : ModSystem
 
             packet.Send();
         }
+        else
+        {
+            var mod = ModContent.GetInstance<CTG2>();
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)MessageType.RequestMatchTime);
+            packet.Write((int)MatchTime);
+            packet.Send();
+        }
 
         if (BlueGem.IsCaptured)
         {

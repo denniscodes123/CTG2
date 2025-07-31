@@ -124,7 +124,7 @@ namespace CTG2.Content
         public override bool CanExplode(int i, int j, int type)
         {
 
-            if (type != TileID.Dirt)
+            if (type != TileID.Dirt && type != TileID.Bubble && type != TileID.Mud)
                 return false;
 
             return base.CanExplode(i, j, type);

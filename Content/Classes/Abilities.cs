@@ -761,10 +761,12 @@ namespace CTG2.Content
                     break;
             }
 
-            if (Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0 && cooldown == 0) // Only activate if not on cooldown
+            if (((Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0) || CTG2.Ability1Keybind.JustPressed) && cooldown == 0 && playerManager.playerState == PlayerManager.PlayerState.Active) // Only activate if not on cooldown
             {
                 if (selectedClass == 1 || selectedClass == 4 || selectedClass == 7 || selectedClass == 11 || selectedClass == 13 || selectedClass == 17)
                     SoundEngine.PlaySound(abilityStart.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
+                if (CTG2.Ability1Keybind.JustPressed && !(Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0))
+                    SoundEngine.PlaySound(SoundID.Item16);
 
                 switch (selectedClass)
                 {

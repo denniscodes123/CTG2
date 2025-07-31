@@ -8,7 +8,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics.Tracing;
@@ -26,7 +25,7 @@ public class PlayerManager : ModPlayer
     public bool ShowGameUI = false;
 
     public static int previousMatchStage = 0;
-    public int customRespawnTimer = -1;
+    public float customRespawnTimer = -1;
     public bool awaitingRespawn = false;
     public bool pickedClass = false;
     public ClassConfig currentClass = new ClassConfig();
@@ -115,8 +114,8 @@ public class PlayerManager : ModPlayer
         }
 
         // How much time has passed since match started
-        int timeElapsed = GameInfo.matchTime / 60 - 30;
-        int extraSeconds = Math.Max(0, timeElapsed / 120); // +1s for every 2 minutes
+        float timeElapsed = (GameInfo.matchTime - GameInfo.matchStartTime) / 60;
+        float extraSeconds = Math.Max(0, timeElapsed / 100f); // +1s for every 2 minutes
 
         Player.respawnTimer = 0;
 

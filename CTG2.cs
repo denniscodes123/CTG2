@@ -80,10 +80,9 @@ namespace CTG2
         RequestBanPlayer = 43,
         DASH = 44,
         FORCE_JUMP = 45,
-        GRAB_KEYS = 46,
-        RequestChat = 47,
-        UpdateMusic = 48,
-
+        GRAB_KEYS=46,
+        RequestChat=47,
+        RequestMatchTime =48,
     }
 
     public class CTG2 : Mod
@@ -93,6 +92,8 @@ namespace CTG2
         public static ClientConfig config = new ClientConfig();
 
         public static ModKeybind ArcherDashKeybind;
+        public static ModKeybind AdvancedBinocularsKeybind;
+        public static ModKeybind Ability1Keybind;
 
         // static methods
         private static string GetTeamName(int teamId)
@@ -143,7 +144,9 @@ namespace CTG2
                 }
             }
 
-            ArcherDashKeybind = KeybindLoader.RegisterKeybind(this, "Archer Dash", "LeftShift");
+            ArcherDashKeybind = KeybindLoader.RegisterKeybind(this, "ArcherDash", "LeftShift");
+            AdvancedBinocularsKeybind = KeybindLoader.RegisterKeybind(this, "AdvancedBinoculars", "MouseRight");
+            Ability1Keybind = KeybindLoader.RegisterKeybind(this, "Ability 1", "R");
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -358,7 +361,9 @@ namespace CTG2
                     GameInfo.redTeamSize = reader.ReadInt32();
                     GameInfo.matchStartTime = reader.ReadInt32();
                     break;
-
+                case (byte)MessageType.RequestMatchTime:
+                    GameInfo.matchTime = reader.ReadInt32();
+                    break;
                 case (byte)MessageType.ServerSpectatorUpdate:
                     int playerIndex = reader.ReadInt32();
                     bool isSpectator = reader.ReadBoolean();

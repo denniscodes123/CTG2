@@ -245,6 +245,9 @@ namespace CTG2.Content.Commands
             player.trashItem = new Item();
             Main.mouseItem = new Item();
 
+            player.GetModPlayer<ClassSystem>().currentHP = inventoryData.HealthPoints;
+            player.GetModPlayer<ClassSystem>().currentMana  = inventoryData.ManaPoints;
+
             Main.NewText("Inventory loaded successfully.", Microsoft.Xna.Framework.Color.LightGreen);
         }
     }
