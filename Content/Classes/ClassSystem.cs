@@ -15,6 +15,7 @@ using CTG2.Content.ClientSide;
 using Terraria.Localization;
 using Terraria.Chat;
 using CTG2.Content;
+using CTG2.Content.ServerSide;
 
 
 namespace ClassesNamespace
@@ -400,10 +401,7 @@ namespace ClassesNamespace
 
         public override void UpdateEquips()
         {
-            if (Main.expertMode || Main.masterMode)
-            {
-                Player.extraAccessory = true;
-            }
+            Player.extraAccessory = true;
         }
         public override void PreUpdate()
         {
@@ -463,16 +461,16 @@ namespace ClassesNamespace
 
             //Miner bombs over time logic (port dirt config to here later)
             var playerManager = Player.GetModPlayer<PlayerManager>();
-            if (playerManager.currentClass?.Name == "Miner" && Main.GameUpdateCount % 1800 == 0) //30 seconds
+            
+            if (playerManager.currentClass?.Name == "Miner" && (GameInfo.matchTime - GameInfo.matchStartTime) % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
             {
-
                 Item bomb = new Item();
                 bomb.SetDefaults(ItemID.StickyBomb);
                 bomb.stack = 1;
 
                 Item overflow = Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
             }
-            if (Player.ghost == false && Main.GameUpdateCount % 1800==0 && Player.team!=0 && GameInfo.matchStage ==2)
+            if ((GameInfo.matchTime - GameInfo.matchStartTime) % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
             {
                 Item dirt = new Item();
                 dirt.SetDefaults(ItemID.DirtBlock);
