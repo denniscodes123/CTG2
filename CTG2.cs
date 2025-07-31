@@ -76,6 +76,7 @@ namespace CTG2
         FORCE_JUMP = 45,
         GRAB_KEYS=46,
         RequestChat=47,
+        RequestMatchTime =48,
     }
 
     public class CTG2 : Mod
@@ -351,7 +352,9 @@ namespace CTG2
                     GameInfo.redTeamSize = reader.ReadInt32();
                     GameInfo.matchStartTime = reader.ReadInt32();
                     break;
-
+                case (byte)MessageType.RequestMatchTime:
+                    GameInfo.matchTime = reader.ReadInt32();
+                    break;
                 case (byte)MessageType.ServerSpectatorUpdate:
                     int playerIndex = reader.ReadInt32();
                     bool isSpectator = reader.ReadBoolean();
