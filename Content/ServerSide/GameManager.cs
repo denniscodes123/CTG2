@@ -45,7 +45,7 @@ public class GameManager : ModSystem
 
     public bool pubsConfig = false; // this is used at the start of every game
 
-    private bool isOvertime = false;
+    public bool isOvertime = false;
     private int overtimeTimer = 0;
     private const int OVERTIME_DURATION = 60 * 2 * 60; // 2 minutes in ticks (60 ticks/sec)
 
@@ -61,7 +61,7 @@ public class GameManager : ModSystem
     private Vector2 spectatorSpawnPoint = new Vector2((13332 + 19316) / 2, 11000); // Center area for spectators
 
     // New game delay tracking
-    private bool isWaitingForNewGame = false;
+    public bool isWaitingForNewGame = false;
     private int newGameTimer = 0;
     private int blueGemFireworkTimer = 0;
     private int redGemFireworkTimer = 0;

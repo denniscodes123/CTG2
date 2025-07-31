@@ -23,6 +23,12 @@ using System.Reflection;
 using DirectDashMod.Players;
 
 
+using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
+using Terraria.Graphics.CameraModifiers;
+
+
+
 namespace CTG2
 {
     public enum MessageType : byte
@@ -74,8 +80,10 @@ namespace CTG2
         RequestBanPlayer = 43,
         DASH = 44,
         FORCE_JUMP = 45,
-        GRAB_KEYS=46,
-        RequestChat=47,
+        GRAB_KEYS = 46,
+        RequestChat = 47,
+        UpdateMusic = 48,
+
     }
 
     public class CTG2 : Mod
@@ -113,8 +121,11 @@ namespace CTG2
             };
         }
         // overrides
+
         public override void Load()
         {
+          
+            //MusicLoader.AddMusic(this, "Assets/Music/clashroyaleOT");
             base.Load();
             // load client config in
             using (var stream = GetFileStream($"Content/Classes/clientconfig.json"))
@@ -725,6 +736,14 @@ namespace CTG2
                     }
                     break;
                 }
+                  
+                // case (byte)MessageType.UpdateMusic:
+                //     if (Main.netMode == NetmodeID.MultiplayerClient)
+                //     {
+                //         int musicId = reader.ReadInt32();
+                //         MusicManager.CurrentMusicId = musicId;
+                //     }
+                //     break;
                     
 
                 default:

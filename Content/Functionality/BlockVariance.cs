@@ -11,25 +11,25 @@ public class DamageVariance : ModSystem
 
     public override void Load()
     {
-        var damageVarMethodInfo = typeof(Main).GetMethod("DamageVar", new[] { typeof(float), typeof(float) });
+        var damageVarMethodInfo = typeof(Main).GetMethod("DamageVar", new[] { typeof(float), typeof(int), typeof(float) });
         if (damageVarMethodInfo != null)
         {
-            IL_Main.DamageVar_float_float += DisableDamageVariance_Hook;
+            IL_Main.DamageVar_float_int_float += DisableDamageVariance_Hook;
         }
         else
         {
             Mod.Logger.Error("Could not find Main.DamageVar(float, float) method.");
         }
-        
+
         //On_Main.DamageVar_float_int_float += RemoveVariance;
 
     }
     public override void Unload()
     {
-        var damageVarMethodInfo = typeof(Main).GetMethod("DamageVar", new[] { typeof(float), typeof(float) });
+        var damageVarMethodInfo = typeof(Main).GetMethod("DamageVar", new[] { typeof(float), typeof(int), typeof(float) });
         if (damageVarMethodInfo != null)
         {
-            IL_Main.DamageVar_float_float -= DisableDamageVariance_Hook;
+            IL_Main.DamageVar_float_int_float -= DisableDamageVariance_Hook;
         }
         else
         {
@@ -40,18 +40,11 @@ public class DamageVariance : ModSystem
     private void DisableDamageVariance_Hook(ILContext il)
     {
         var c = new ILCursor(il);
-
-
-        c.RemoveRange(c.Instrs.Count);
-        c.Emit(OpCodes.Ldarg_0);
-        c.Emit(OpCodes.Conv_R8);
-        c.Emit(OpCodes.Call, typeof(Math).GetMethod("Round", new[] { typeof(double) })); 
-        c.Emit(OpCodes.Conv_I4);
-        c.Emit(OpCodes.Ret);
+        while (c.TryGotoNext(MoveType.After, i => i.MatchCallvirt<Terraria.Utilities.UnifiedRandom>("Next")))
+        {
+            c.Emit(OpCodes.Pop);
+            c.Emit(OpCodes.Ldc_I4_0);
+        }
     }
 
-    // private static int RemoveVariance(On_Main.orig_DamageVar_float_int_float orig, float dmg, int percent, float luck)
-    // {
-    //     return (int)Math.Round(dmg);
-    // }
 }

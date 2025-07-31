@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<!-- Import tModLoader mod properties -->
-	<Import Project="..\tModLoader.targets" />
+  <PropertyGroup>
+    
+  </PropertyGroup>
 
-	<!-- General -->
-	<PropertyGroup>
-		
-	</PropertyGroup>
-	<ItemGroup>
-	  <Folder Include="Content\NPCs\" />
-	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\NPCs\" />
+  </ItemGroup>
 
-	<!-- References -->
+  <ItemGroup>
+    <Content Include="Assets\**" />
+  </ItemGroup>
+  <Import Project="..\tModLoader.targets" />
 
 </Project>
