@@ -27,7 +27,7 @@ namespace CTG2.Content
         }
 
         public override bool IsBiomeActive(Player player)
-            => ModContent.GetInstance<GameManager>().isOvertime; //make biome only active during overtime
+            => GameInfo.overtime; //make biome only active during overtime
             //todo: Make sure isovertime is synced clientside
 
         public override SceneEffectPriority Priority
