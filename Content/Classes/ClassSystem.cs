@@ -444,6 +444,24 @@ namespace ClassesNamespace
             //Miner bombs over time logic (port dirt config to here later)
             var playerManager = Player.GetModPlayer<PlayerManager>();
             int gameTime = GameInfo.matchTime - GameInfo.matchStartTime;
+
+            if (gameTime % 60 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && playerManager.currentClass?.Name == "Ninja")
+            {
+                for (int i = 0; i < Player.inventory.Length; i++)
+                {
+                    Item item = Player.inventory[i];
+                    if (item.type == 2)
+                    {
+                        int stack = item.stack;
+
+                        Item mud = new Item();
+                        mud.SetDefaults(ItemID.MudBlock);
+                        mud.stack = stack;
+                        Player.GetItem(Player.whoAmI, mud, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+                        Player.inventory[i].TurnToAir();
+                    }
+                }
+            }
             
             if (gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
             {
