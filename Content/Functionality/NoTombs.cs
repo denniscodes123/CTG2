@@ -44,6 +44,12 @@ namespace CTG2.Content.Functionality
                     if (Main.netMode == NetmodeID.Server && itemID != 0 && itemID.HasValue)
                         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(msg), Color.White);
                 }
+                else if (self.HasBuff(BuffID.OnFire))
+                {
+                    string msg = $"[i:3184] {victimName}";
+                    if (Main.netMode == NetmodeID.Server)
+                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(msg), Color.OrangeRed);
+                }
                 else if (damageSource.SourceOtherIndex >= 0) //lava death
                 {
                     string msg = $"[i:207] {victimName}";
