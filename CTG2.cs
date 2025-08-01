@@ -86,6 +86,8 @@ namespace CTG2
         UpdateMusic = 49,
         ChangeMusic = 50,
 	SetCurrentClass = 51,
+    RequestAudioToClient = 52,
+    RequestAudioToClientPacket = 53,
     }
 
     public class CTG2 : Mod
@@ -609,6 +611,21 @@ namespace CTG2
                     string filepath = reader.ReadString();
                     SoundStyle sound = new SoundStyle(filepath);
                     SoundEngine.PlaySound(sound);
+                    break;
+                case (byte)MessageType.RequestAudioToClient:
+                    string filepa = reader.ReadString();
+                    int playerIndx = reader.ReadInt32();
+                    
+                    var audMod = ModContent.GetInstance<CTG2>();
+                    ModPacket audioPacket = audMod.GetPacket();
+                    audioPacket.Write((byte)MessageType.RequestAudioToClientPacket);
+                    audioPacket.Write(filepa);
+                    audioPacket.Send(toClient: playerIndx);
+                    break;
+                case (byte)MessageType.RequestAudioToClientPacket:
+                    string filep = reader.ReadString();
+                    SoundStyle soun = new SoundStyle(filep);
+                    SoundEngine.PlaySound(soun);
                     break;
                 case (byte)MessageType.RequestDie:
                     int playerWhoDies = reader.ReadInt32();
