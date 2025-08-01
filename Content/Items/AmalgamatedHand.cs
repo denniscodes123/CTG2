@@ -594,7 +594,7 @@ namespace CTG2.Content.Items {
 				// This is how far the chain would go measured in pixels
 				float maxChainLength = 170f;
 				Projectile.tileCollide = true;
-    				Projectile.netUpdate = true; send netupdate when initially thrown too
+    			Projectile.netUpdate = true; //send netupdate when initially thrown too
 
 				if (currentChainLength > maxChainLength) {
 					// If we reach maxChainLength, we change behavior.
