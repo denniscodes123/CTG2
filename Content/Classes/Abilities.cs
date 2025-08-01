@@ -427,6 +427,8 @@ namespace CTG2.Content
 
         private void WhiteMageOnUse()
         {
+            var mod = ModContent.GetInstance<CTG2>();
+
             foreach (Player other in Main.player)
             {
                 if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
@@ -434,8 +436,6 @@ namespace CTG2.Content
 
                 if (Vector2.Distance(Player.Center, other.Center) <= 25 * 16 && Player.team == other.team) // 25 block radius
                 {
-                    var mod = ModContent.GetInstance<CTG2>();
-
                     ModPacket packet1 = mod.GetPacket();
                     packet1.Write((byte)MessageType.RequestAddBuff);
                     packet1.Write(other.whoAmI);
@@ -457,9 +457,19 @@ namespace CTG2.Content
                     packet3.Write(480);
                     packet3.Send();
 
-                    SoundEngine.PlaySound(whiteMageHeal, Player.Center);
+                    ModPacket audioPacket = mod.GetPacket();
+                    audioPacket.Write((byte)MessageType.RequestAudioToClient);
+                    audioPacket.Write("CTG2/Content/Classes/WhiteMageHeal");
+                    audioPacket.Write(other.whoAmI);
+                    audioPacket.Send();
                 }
             }
+
+            ModPacket audioPacketSelf = mod.GetPacket();
+            audioPacketSelf.Write((byte)MessageType.RequestAudioToClient);
+            audioPacketSelf.Write("CTG2/Content/Classes/WhiteMageHeal");
+            audioPacketSelf.Write(Player.whoAmI);
+            audioPacketSelf.Send();
         }
 
 
