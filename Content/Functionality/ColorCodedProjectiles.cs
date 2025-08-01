@@ -38,7 +38,7 @@ namespace CTG2.Content
             if (player.team == 1)
                 teamColor = new Color(255, 0, 0, 255);
             if (player.team == 3)
-                if (projectile.type == ProjectileID.ThornChakram || projectile.type == ProjectileID.Flamarang || projectile.type == BallofFire || projectile.type == ProjectileID.Bananarang || projectile.type == 304)
+                if (projectile.type == ProjectileID.ThornChakram || projectile.type == ProjectileID.Flamarang || projectile.type == 15 || projectile.type == ProjectileID.Bananarang || projectile.type == 304)
                     teamColor = new Color(0, 0, 255, 255); // all these projectiles are bright shades of red/orange/yellow and require a gray sprite to properly color - black for now
                 else
                     teamColor = new Color(50, 50, 255, 255);
