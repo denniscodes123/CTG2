@@ -6,6 +6,7 @@ using Terraria.Graphics.Capture;
 using Terraria.ID;
 using Terraria.ModLoader;
 using CTG2.Content.ServerSide;
+using CTG2.Content.ClientSide;
 using CTG2.Content.Configs;
 
 
