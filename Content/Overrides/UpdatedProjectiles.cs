@@ -144,7 +144,15 @@ public class ModifyHurtModPlayer : ModPlayer
 
         return base.CanHitPvpWithProj(proj, target);
     }
+    public override bool PreKill(Projectile projectile, int timeLeft)
+    {
+        if (projectile.type == ProjectileID.NebulaArcanum)
+        {
+            projectile.damage = 0;
+        }
 
+        return true;
+    }
 
     public override void OnHurt(Player.HurtInfo info)
     {
