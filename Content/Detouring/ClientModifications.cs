@@ -25,6 +25,7 @@ public class ClientModifications : ModSystem
     public override void Load()
     {
         IL_Player.TeamChangeAllowed += TeamChangeFlag;
+        IL_Player.KillMe += RemoveServerDeathMessage;
         //IL_ChatHelper.DisplayMessage += ChatHelper_DisplayMessage_Hook;
         var drawPVPIconsMethodInfo = typeof(Main).GetMethod("DrawPVPIcons", BindingFlags.NonPublic | BindingFlags.Static);
         if (drawPVPIconsMethodInfo != null)
@@ -53,6 +54,7 @@ public class ClientModifications : ModSystem
     public override void Unload()
     {
         IL_Player.TeamChangeAllowed -= TeamChangeFlag;
+        IL_Player.KillMe -= RemoveServerDeathMessage;
         //IL_ChatHelper.DisplayMessage -= ChatHelper_DisplayMessage_Hook;
         var drawPVPIconsMethodInfo = typeof(Main).GetMethod("DrawPVPIcons", BindingFlags.NonPublic | BindingFlags.Static);
         if (drawPVPIconsMethodInfo != null)
@@ -78,6 +80,42 @@ public class ClientModifications : ModSystem
 
         base.Unload();
     }
+    private void RemoveServerDeathMessage(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        if (!c.TryGotoNext(MoveType.After,
+            i => i.MatchLdcI4(2), // gamemode is server
+            i => i.MatchBneUn(out _), // branch 
+            i => i.MatchLdloc(out _), // load death text
+            i => i.MatchLdcI4(225),
+            i => i.MatchLdcI4(25),
+            i => i.MatchLdcI4(25),
+            i => i.MatchNewobj(out _),
+            i => i.MatchLdcI4(-1),
+            i => i.MatchCall(typeof(ChatHelper), nameof(ChatHelper.BroadcastChatMessage))
+            ))
+        {
+
+            Mod.Logger.Error("failed hooked is fucked");
+            return;
+        }
+
+
+        // ldloc.s deathText
+        // ldc.i4 225
+        // ldc.i4.s 25
+        // ldc.i4.s 25
+        // newobj Color
+        // ldc.i4.m1
+        
+
+        c.Index -= 8; // ad one for call
+        c.RemoveRange(8);
+        Mod.Logger.Info("Successfully applied IL edit to Player.KillMe: Removed server death messages.");
+    }
+
+    
     private void TeamChangeFlag(ILContext iLContext)
     {
         var c = new ILCursor(iLContext);
