@@ -44,6 +44,7 @@ namespace CTG2.Content
         public bool initializedMutant;
         public int mutantState = 1;
 
+        SoundStyle abilityReady = new SoundStyle("CTG2/Content/Classes/AbilityReady");
         SoundStyle abilityStart = new SoundStyle("CTG2/Content/Classes/AbilityStart");
 	    SoundStyle abilityEnd = new SoundStyle("CTG2/Content/Classes/AbilityEnd");
         SoundStyle whiteMageHeal = new SoundStyle("CTG2/Content/Classes/WhiteMageHeal");
@@ -770,6 +771,9 @@ namespace CTG2.Content
 
                     break;
             }
+
+            if (cooldown == 1)
+                SoundEngine.PlaySound(abilityReady.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
 
             if (((Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0) || CTG2.Ability1Keybind.JustPressed) && cooldown == 0 && playerManager.playerState == PlayerManager.PlayerState.Active) // Only activate if not on cooldown
             {
