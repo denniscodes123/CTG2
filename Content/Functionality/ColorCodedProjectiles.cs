@@ -18,7 +18,7 @@ namespace CTG2.Content
     {
         public override bool PreDraw(Projectile projectile, ref Color lightColor)
         {
-            Player player = Main.LocalPlayer;
+            Player player = Main.player[projectile.owner];
             
             if (player.team == 0)
                 return true;
