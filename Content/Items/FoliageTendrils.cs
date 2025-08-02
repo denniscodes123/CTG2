@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
@@ -41,7 +41,7 @@ namespace CTG2.Content.Items
 
 		// Old Web Slinger is 256, Amethyst Hook is 300
 		public override float GrappleRange() {
-			return 328f;
+			return 362f;
 		}
 
 		public override void NumGrappleHooks(Player player, ref int numHooks) {
