@@ -58,7 +58,7 @@ namespace CTG2.Content.Items
 
 			dashKeybindActive = CTG2.ArcherDashKeybind.JustPressed;
 
-			if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.Item35);
+			if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.Item35, Player.Center);
 
 			lastDashDelay = DashDelay;
 		}

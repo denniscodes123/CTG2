@@ -13,6 +13,17 @@ public class ProjectileOverrides : GlobalProjectile
     public override bool InstancePerEntity => true;
 
 
+    public override bool PreKill(Projectile projectile, int timeLeft)
+    {
+        if (projectile.type == ProjectileID.NebulaArcanum)
+        {
+            projectile.damage = 0;
+        }
+
+        return true;
+    }
+
+
     public override void AI(Projectile projectile)
     {
         if (projectile.type == 167 || projectile.type == 169)
@@ -171,15 +182,17 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.ClearBuff(BuffID.OnFire);
         }
-        else if (info.DamageSource.SourceProjectileType == ProjectileID.PoisonDart && attackerIndex >= 0 && attackerIndex < Main.maxPlayers)
+        else if (info.DamageSource.SourceProjectileType == 267)
         {
             Player attacker = Main.player[attackerIndex];
             var attackerPlayer = attacker.GetModPlayer<PlayerManager>();
             if (attackerPlayer.currentClass.Name == "Tiki Priest")
                 attacker.Heal(4);
+            Player.ClearBuff(BuffID.Poisoned);
         }
         else if (info.DamageSource.SourceProjectileType == ProjectileID.ThornChakram)
         {
+            Main.NewText("test3");
             Player.ClearBuff(BuffID.Poisoned);
         }
         else if (info.DamageSource.SourceProjectileType == ProjectileID.CursedFlameFriendly)

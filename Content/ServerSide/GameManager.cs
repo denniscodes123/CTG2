@@ -55,6 +55,11 @@ public class GameManager : ModSystem
 
     private int pauseTimer = 0;
 
+    public int blueAttempts = 0;
+    public int redAttempts = 0;
+    private bool blueHoldCounted = false;
+    private bool redHoldCounted = false;
+
     // Spectator tracking
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
@@ -417,6 +422,12 @@ public class GameManager : ModSystem
             if (BlueGem.IsHeld)
             {
                 blueGemFireworkTimer++;
+                if (!redHoldCounted)
+                {
+                    redAttempts++;
+                    redHoldCounted = true;
+                }
+
                 if (blueGemFireworkTimer >= FIREWORK_INTERVAL)
                 {
                     blueGemFireworkTimer = 0;
@@ -441,11 +452,18 @@ public class GameManager : ModSystem
             else
             {
                 blueGemFireworkTimer = 0;
+                redHoldCounted = false;
             }
 
             if (RedGem.IsHeld)
             {
                 redGemFireworkTimer++;
+                if (!blueHoldCounted)
+                {
+                    blueAttempts++;
+                    blueHoldCounted = true;
+                }
+
                 if (redGemFireworkTimer >= FIREWORK_INTERVAL)
                 {
                     redGemFireworkTimer = 0;
@@ -469,7 +487,8 @@ public class GameManager : ModSystem
             }
             else
             {
-                redGemFireworkTimer = 0; // Reset 
+                redGemFireworkTimer = 0; // Reset
+                blueHoldCounted = false;
             }
         }
         else
@@ -562,15 +581,17 @@ public class GameManager : ModSystem
             else packet.Write((int)0);
 
             // Blue and red gem holders
-            if (BlueGem.IsHeld) packet.Write(Main.player[BlueGem.HeldBy].name);
+            if (BlueGem.IsHeld) packet.Write($"{Main.player[BlueGem.HeldBy].name}: [c/00FFFF:{Main.player[BlueGem.HeldBy].statLife}/{Main.player[BlueGem.HeldBy].statLifeMax2}]");
             else packet.Write("At Base");
-            if (RedGem.IsHeld) packet.Write(Main.player[RedGem.HeldBy].name);
+            if (RedGem.IsHeld) packet.Write($"{Main.player[RedGem.HeldBy].name}: [c/00FFFF:{Main.player[RedGem.HeldBy].statLife}/{Main.player[RedGem.HeldBy].statLifeMax2}]");
             else packet.Write("At Base");
 
             packet.Write(mapName);
             packet.Write(blueTeamSize);
             packet.Write(redTeamSize);
             packet.Write(matchStartTime);
+            packet.Write(blueAttempts);
+            packet.Write(redAttempts);
 
             packet.Send();
         }
@@ -810,18 +831,40 @@ public class GameManager : ModSystem
         packet.Send(toClient: playerIndex);
         Console.WriteLine($"GameManager: Sent ServerTeleport packet to player {playerIndex} to {gameTeam.BaseLocation}");
     }
+
+    
     public void endPlayerClassSelection(int playerIndex)
     {
         // Use vanilla Player.team instead of PlayerManager on server
         Player player = Main.player[playerIndex];
+        var playerManager = player.GetModPlayer<PlayerManager>();
         int team = player.team;
+        var mod = ModContent.GetInstance<CTG2>();
 
         if (!intToTeam.ContainsKey(team))
             return;
 
-        GameTeam gameTeam = intToTeam[team];
+        if (!playerManager.pickedClass)
+        {
+            Random random = new Random();
 
-        var mod = ModContent.GetInstance<CTG2>();
+            int num = random.Next(1, 18);
+
+            ModPacket classPacket = mod.GetPacket();
+            classPacket.Write((byte)MessageType.SetCurrentClass);
+            classPacket.Write(player.whoAmI);
+            classPacket.Write(num);
+            classPacket.Send(toClient: player.whoAmI);
+
+            ModPacket classPacket2 = mod.GetPacket();
+            classPacket2.Write((byte)MessageType.UpdatePickedClass);
+            classPacket2.Write(player.whoAmI);
+            classPacket2.Write(true);
+            classPacket2.Send(toClient: player.whoAmI);
+            playerManager.pickedClass = true;
+        }
+
+        GameTeam gameTeam = intToTeam[team];
 
         PlayerManager.GetPlayerManager(player.whoAmI).playerState = PlayerManager.PlayerState.Active;
         ModPacket statePacket = mod.GetPacket();
@@ -830,7 +873,7 @@ public class GameManager : ModSystem
         statePacket.Write((byte)PlayerManager.PlayerState.Active);
         statePacket.Send(toClient: playerIndex);
 
-        NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
+        //NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, playerIndex);
 
         // Force sync player stats to ensure HP displays correctly to other players
         //ForcePlayerStatSync(playerIndex);
@@ -844,11 +887,14 @@ public class GameManager : ModSystem
         packet.Write((int)gameTeam.BaseLocation.Y);
         packet.Send(toClient: playerIndex);
 
-        ModPacket healpacket = mod.GetPacket(); //do heal server side
+        ModPacket healpacket = Mod.GetPacket(); //do heal server side
         healpacket.Write((byte)MessageType.RequestFullHeal);
-        healpacket.Write(playerIndex);
-        healpacket.Send(toClient: playerIndex);
+        healpacket.Write(player.whoAmI);
+        healpacket.Send(toClient: player.whoAmI);
+        player.Heal(600);
     }
+
+    
     public override void PostUpdateWorld()
     {
         if (!Main.dedServ) return;
@@ -902,6 +948,8 @@ public class GameManager : ModSystem
                 packet.Write(blueTeamSize);
                 packet.Write(redTeamSize);
                 packet.Write(matchStartTime);
+                packet.Write(blueAttempts);
+                packet.Write(redAttempts);
                 packet.Send();
             }
             
@@ -964,6 +1012,8 @@ public class GameManager : ModSystem
                 packet.Write(blueTeamSize);
                 packet.Write(redTeamSize);
                 packet.Write(matchStartTime);
+                packet.Write(blueAttempts);
+                packet.Write(redAttempts);
                 packet.Send();
             }
             return;

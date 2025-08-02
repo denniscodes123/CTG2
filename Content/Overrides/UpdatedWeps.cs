@@ -136,6 +136,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     item.useAnimation = 28;
                     item.scale = 0f;
                     item.crit = 0;
+                    item.mana = 14;
                     break;
 
                 case ItemID.IceRod:

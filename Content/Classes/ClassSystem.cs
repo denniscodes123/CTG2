@@ -147,15 +147,9 @@ namespace ClassesNamespace
             
             //Player.statLife = classData.HealthPoints; set this after modifymax
             //Player.statLife = classData.HealthPoints; set this after modifymax
-            Player.statManaMax2 = classData.ManaPoints;
-            Player.statManaMax = classData.ManaPoints;
-            Player.statMana = classData.ManaPoints;
 
             currentHP = classData.HealthPoints;
             currentMana = classData.ManaPoints;
-
-            currentHP = classData.HealthPoints;
-            
 
             Console.WriteLine($"Player hp is {currentHP}");
             Console.WriteLine($" {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax2}");
@@ -222,15 +216,10 @@ namespace ClassesNamespace
             Main.mouseItem = new Item();
             /*this may not work lol
             */
-            
-            currentMana = classData.ManaPoints;
-            Player.statMana = currentMana;
-            
 
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{currentHP}, {Player.statLife}"), Microsoft.Xna.Framework.Color.Olive);
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
             SyncPlayer(-1, Player.whoAmI);
-            
         }
 
 
@@ -311,12 +300,8 @@ namespace ClassesNamespace
             var playerManager = Player.GetModPlayer<PlayerManager>();
             if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
             {
-
-            for (int i = Player.buffType.Length - 1; i >= 0; i--)
-            {
-                Player.DelBuff(i);
-            }
-
+                for (int i = Player.buffType.Length - 1; i >= 0; i--)
+                    Player.DelBuff(i);  
 
                 string selectedClass = playerManager.currentClass.Inventory;
                 using (var stream = Mod.GetFileStream($"Content/Classes/{selectedClass}.json"))
@@ -343,9 +328,6 @@ namespace ClassesNamespace
                 packet.Write(Player.whoAmI);
                 packet.Write(name);
                 packet.Send();
-
-                // Apply First upgrade by default when new class selected
-                //ApplyUpgrade(playerManager.currentClass.Upgrades[0]);
             }
         }
 
@@ -462,6 +444,24 @@ namespace ClassesNamespace
             //Miner bombs over time logic (port dirt config to here later)
             var playerManager = Player.GetModPlayer<PlayerManager>();
             int gameTime = GameInfo.matchTime - GameInfo.matchStartTime;
+
+            if (gameTime % 60 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && playerManager.currentClass?.Name == "Ninja")
+            {
+                for (int i = 0; i < Player.inventory.Length; i++)
+                {
+                    Item item = Player.inventory[i];
+                    if (item.type == 2)
+                    {
+                        int stack = item.stack;
+
+                        Item mud = new Item();
+                        mud.SetDefaults(ItemID.MudBlock);
+                        mud.stack = stack;
+                        Player.GetItem(Player.whoAmI, mud, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+                        Player.inventory[i].TurnToAir();
+                    }
+                }
+            }
             
             if (gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
             {

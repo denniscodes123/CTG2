@@ -15,6 +15,7 @@ namespace CTG2.Content.Commands
         }
     }
 
+
     public class DisableAllDeath : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
@@ -26,7 +27,9 @@ namespace CTG2.Content.Commands
         {
         }
     }
-        public class DisableMeCommand : ModCommand
+
+
+    public class DisableMeCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat;
         public override string Command => "me";
@@ -38,4 +41,17 @@ namespace CTG2.Content.Commands
         }
     }
     
+
+    
+    public class DisableDeathCommand : ModCommand
+    {
+        public override CommandType Type => CommandType.Chat;
+        public override string Command => "death";
+
+        public override string Description => null;
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+        }
+    }
 }

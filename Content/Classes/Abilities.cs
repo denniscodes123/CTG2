@@ -44,6 +44,7 @@ namespace CTG2.Content
         public bool initializedMutant;
         public int mutantState = 1;
 
+        SoundStyle abilityReady = new SoundStyle("CTG2/Content/Classes/AbilityReady");
         SoundStyle abilityStart = new SoundStyle("CTG2/Content/Classes/AbilityStart");
 	    SoundStyle abilityEnd = new SoundStyle("CTG2/Content/Classes/AbilityEnd");
         SoundStyle whiteMageHeal = new SoundStyle("CTG2/Content/Classes/WhiteMageHeal");
@@ -427,6 +428,8 @@ namespace CTG2.Content
 
         private void WhiteMageOnUse()
         {
+            var mod = ModContent.GetInstance<CTG2>();
+
             foreach (Player other in Main.player)
             {
                 if (!other.active || other.dead || other.whoAmI == Player.whoAmI)
@@ -434,8 +437,6 @@ namespace CTG2.Content
 
                 if (Vector2.Distance(Player.Center, other.Center) <= 25 * 16 && Player.team == other.team) // 25 block radius
                 {
-                    var mod = ModContent.GetInstance<CTG2>();
-
                     ModPacket packet1 = mod.GetPacket();
                     packet1.Write((byte)MessageType.RequestAddBuff);
                     packet1.Write(other.whoAmI);
@@ -457,9 +458,19 @@ namespace CTG2.Content
                     packet3.Write(480);
                     packet3.Send();
 
-                    SoundEngine.PlaySound(whiteMageHeal, Player.Center);
+                    ModPacket audioPacket = mod.GetPacket();
+                    audioPacket.Write((byte)MessageType.RequestAudioToClient);
+                    audioPacket.Write("CTG2/Content/Classes/WhiteMageHeal");
+                    audioPacket.Write(other.whoAmI);
+                    audioPacket.Send();
                 }
             }
+
+            ModPacket audioPacketSelf = mod.GetPacket();
+            audioPacketSelf.Write((byte)MessageType.RequestAudioToClient);
+            audioPacketSelf.Write("CTG2/Content/Classes/WhiteMageHeal");
+            audioPacketSelf.Write(Player.whoAmI);
+            audioPacketSelf.Send();
         }
 
 
@@ -760,6 +771,9 @@ namespace CTG2.Content
 
                     break;
             }
+
+            if (cooldown == 1)
+                SoundEngine.PlaySound(abilityReady.WithVolumeScale(Main.soundVolume * 2f), Player.Center);
 
             if (((Player.HeldItem.type == ItemID.WhoopieCushion && Player.controlUseItem && Player.itemTime == 0) || CTG2.Ability1Keybind.JustPressed) && cooldown == 0 && playerManager.playerState == PlayerManager.PlayerState.Active) // Only activate if not on cooldown
             {
