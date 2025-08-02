@@ -100,15 +100,12 @@ public class ClientModifications : ModSystem
             Mod.Logger.Error("failed hooked is fucked");
             return;
         }
-
-
         // ldloc.s deathText
         // ldc.i4 225
         // ldc.i4.s 25
         // ldc.i4.s 25
         // newobj Color
         // ldc.i4.m1
-        
 
         c.Index -= 8; // ad one for call
         c.RemoveRange(8);
