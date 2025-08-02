@@ -447,6 +447,8 @@ namespace CTG2
                     GameInfo.blueTeamSize = reader.ReadInt32();
                     GameInfo.redTeamSize = reader.ReadInt32();
                     GameInfo.matchStartTime = reader.ReadInt32();
+                    GameInfo.blueAttempts = reader.ReadInt32();
+                    GameInfo.redAttempts = reader.ReadInt32();
                     break;
                 case (byte)MessageType.RequestMatchTime:
                     GameInfo.matchTime = reader.ReadInt32();
