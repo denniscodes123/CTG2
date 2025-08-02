@@ -80,11 +80,11 @@ public class UIManager : ModSystem
     private void DrawMatchTimer()
     {
         string timeText = "";
-        Vector2 timeRow = new Vector2(Main.screenWidth - 320, 400);
-        Vector2 blueGemRow = new Vector2(Main.screenWidth - 320, 525);
-        Vector2 blueGemRow2 = new Vector2(Main.screenWidth - 320, 575);
-        Vector2 redGemRow = new Vector2(Main.screenWidth - 320, 625);
-        Vector2 redGemRow2 = new Vector2(Main.screenWidth - 320, 675);
+        Vector2 timeRow = new Vector2(Main.screenWidth - 320, 375);
+        Vector2 blueGemRow = new Vector2(Main.screenWidth - 320, 500);
+        Vector2 blueGemRow2 = new Vector2(Main.screenWidth - 320, 550);
+        Vector2 redGemRow = new Vector2(Main.screenWidth - 320, 600);
+        Vector2 redGemRow2 = new Vector2(Main.screenWidth - 320, 650);
         
         Color textColor = Color.White;
         int matchStage = GameInfo.matchStage;
@@ -159,49 +159,48 @@ public class UIManager : ModSystem
             Vector2.Zero,
             Vector2.One
         );
-        // Show gem carrier HP if gem is captured
-        Vector2 carrierHpPos = new Vector2(Main.screenWidth - 320, 725);
+        // // Show gem carrier HP if gem is captured
+        // Vector2 carrierHpPos = new Vector2(Main.screenWidth - 320, 700);
 
-        if (GameInfo.blueGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.blueGemCarrier))
-        {
+        // if (GameInfo.blueGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.blueGemCarrier))
+        // {
     
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                Player carrier = Main.player[i];
+        //     for (int i = 0; i < Main.maxPlayers; i++)
+        //     {
+        //         Player carrier = Main.player[i];
     
-                if (carrier.active && carrier.name == GameInfo.blueGemCarrier)
-                {
+        //         if (carrier.active && carrier.name == GameInfo.blueGemCarrier)
+        //         {
                 
-                    string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
-                    Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Cyan);
+        //             string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
+        //             Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Cyan);
                   
-                    carrierHpPos.Y += 40; 
+        //             carrierHpPos.Y += 40; 
                     
-                
-                    break; 
-                }
-            }
-        }
+        //             break; 
+        //         }
+        //     }
+        // }
 
 
-        if (GameInfo.redGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.redGemCarrier))
-        {
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                Player carrier = Main.player[i];
-                if (carrier.active && carrier.name == GameInfo.redGemCarrier)
-                {
-                    string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
-                    Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Red);
-                    break; 
-                }
-            }
-        }
+        // if (GameInfo.redGemCarrier != "At Base" && !string.IsNullOrEmpty(GameInfo.redGemCarrier))
+        // {
+        //     for (int i = 0; i < Main.maxPlayers; i++)
+        //     {
+        //         Player carrier = Main.player[i];
+        //         if (carrier.active && carrier.name == GameInfo.redGemCarrier)
+        //         {
+        //             string hpText = $"{carrier.name}: {carrier.statLife}/{carrier.statLifeMax2}";
+        //             Utils.DrawBorderString(Main.spriteBatch, hpText, carrierHpPos, Color.Red);
+        //             break; 
+        //         }
+        //     }
+        // }
 
         // draw ability timer
         int cooldown = Main.LocalPlayer.GetModPlayer<Abilities>().cooldown;
         string abilText = $"Ability cooldown: {cooldown / 60}s";
-        Vector2 abilPos = new Vector2(Main.screenWidth - 320, 475);
+        Vector2 abilPos = new Vector2(Main.screenWidth - 320, 450);
         Color abilCol = Color.Yellow;
 
         if (cooldown == 0)
@@ -215,20 +214,35 @@ public class UIManager : ModSystem
 
         //draw map name
         string mapText = $"Map: {GameInfo.mapName}";
-        Vector2 mapPos = new Vector2(Main.screenWidth - 320, 425);
+        Vector2 mapPos = new Vector2(Main.screenWidth - 320, 400);
         Color mapCol = Color.Pink;
 
         Utils.DrawBorderString(Main.spriteBatch, mapText, mapPos, mapCol);
 
         //draw team sizes
-        string teamText = $"[c/0000FF:{GameInfo.blueTeamSize}] vs. [c/FF0000:{GameInfo.redTeamSize}]";
-        Vector2 teamTextPos = new Vector2(Main.screenWidth - 320, 350);
+        string teamText = $"Team size: [c/0000FF:{GameInfo.blueTeamSize}] v [c/FF0000:{GameInfo.redTeamSize}]";
+        Vector2 teamTextPos = new Vector2(Main.screenWidth - 320, 325);
 
         ChatManager.DrawColorCodedStringWithShadow(
             Main.spriteBatch,
             FontAssets.MouseText.Value,
             teamText,
             teamTextPos,
+            Color.White,
+            0,
+            Vector2.Zero,
+            Vector2.One
+        );
+
+        //draw cap attempt counters
+        string attempts = $"Capture attempts: [c/0000FF:{GameInfo.blueAttempts}] v [c/FF0000:{GameInfo.redAttempts}]";
+        Vector2 attemptsPos = new Vector2(Main.screenWidth - 320, 700);
+
+        ChatManager.DrawColorCodedStringWithShadow(
+            Main.spriteBatch,
+            FontAssets.MouseText.Value,
+            attempts,
+            attemptsPos,
             Color.White,
             0,
             Vector2.Zero,
