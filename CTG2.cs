@@ -85,9 +85,11 @@ namespace CTG2
         RequestMatchTime = 48,
         UpdateMusic = 49,
         ChangeMusic = 50,
-	SetCurrentClass = 51,
-    RequestAudioToClient = 52,
-    RequestAudioToClientPacket = 53,
+        SetCurrentClass = 51,
+        RequestAudioToClient = 52,
+        RequestAudioToClientPacket = 53,
+        SyncBiomeMusic = 54,
+
     }
 
     public class CTG2 : Mod
@@ -99,6 +101,7 @@ namespace CTG2
         public static ModKeybind ArcherDashKeybind;
         public static ModKeybind AdvancedBinocularsKeybind;
         public static ModKeybind Ability1Keybind;
+        //public static int BiomeMusicId = 0; // client side 
 
         // static methods
         private static string GetTeamName(int teamId)
@@ -874,7 +877,14 @@ namespace CTG2
                     //     }
                     // }
                     break;
-                    
+                case (byte) MessageType.SyncBiomeMusic:
+                int newMusicId = reader.ReadInt32();
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    //Main.newMusic = newMusicId;
+                }
+
+                break;
 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);

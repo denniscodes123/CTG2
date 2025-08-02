@@ -71,6 +71,9 @@ public class GameManager : ModSystem
     private int blueGemFireworkTimer = 0;
     private int redGemFireworkTimer = 0;
     private const int FIREWORK_INTERVAL = 120;
+    private int _currentMusicChoice = 0;
+
+
     public static void FillLavaInDesignatedArea()
     {
         //hard coded coords for the right.wld if you are on the wrong wld it will spawn lava in wrong spot!!!
@@ -1020,8 +1023,26 @@ public class GameManager : ModSystem
         }
 
         UpdateGame();
+        if (Main.netMode == NetmodeID.Server)
+        {
+            int newMusicChoice = MusicSelectionLogic();
+            if (newMusicChoice != _currentMusicChoice)
+            {
+            _currentMusicChoice = newMusicChoice;
+            var packet = Mod.GetPacket();
+            packet.Write((byte)MessageType.SyncBiomeMusic);
+            packet.Write(_currentMusicChoice);
+            packet.Send(); // Sends to all clients
+            }
+        }
 
         base.PostUpdateWorld();
+    }
+
+    public int MusicSelectionLogic()
+    {
+        
+        return MusicLoader.GetMusicSlot(Mod, "Assets/Music/clashroyaleOT");
     }
 
     private void ClearPlayerInventory(Player player)
