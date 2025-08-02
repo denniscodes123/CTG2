@@ -55,6 +55,11 @@ public class GameManager : ModSystem
 
     private int pauseTimer = 0;
 
+    public int blueAttempts = 0;
+    public int redAttempts = 0;
+    private bool blueHoldCounted = false;
+    private bool redHoldCounted = false;
+
     // Spectator tracking
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
     private Dictionary<int, int> spectatorOriginalTeams = new Dictionary<int, int>();
@@ -417,6 +422,12 @@ public class GameManager : ModSystem
             if (BlueGem.IsHeld)
             {
                 blueGemFireworkTimer++;
+                if (!redHoldCounted)
+                {
+                    redAttempts++;
+                    redHoldCounted = true;
+                }
+
                 if (blueGemFireworkTimer >= FIREWORK_INTERVAL)
                 {
                     blueGemFireworkTimer = 0;
@@ -441,11 +452,18 @@ public class GameManager : ModSystem
             else
             {
                 blueGemFireworkTimer = 0;
+                redHoldCounted = false;
             }
 
             if (RedGem.IsHeld)
             {
                 redGemFireworkTimer++;
+                if (!blueHoldCounted)
+                {
+                    blueAttempts++;
+                    blueHoldCounted = true;
+                }
+
                 if (redGemFireworkTimer >= FIREWORK_INTERVAL)
                 {
                     redGemFireworkTimer = 0;
@@ -469,7 +487,8 @@ public class GameManager : ModSystem
             }
             else
             {
-                redGemFireworkTimer = 0; // Reset 
+                redGemFireworkTimer = 0; // Reset
+                blueHoldCounted = false;
             }
         }
         else
@@ -562,15 +581,17 @@ public class GameManager : ModSystem
             else packet.Write((int)0);
 
             // Blue and red gem holders
-            if (BlueGem.IsHeld) packet.Write(Main.player[BlueGem.HeldBy].name);
+            if (BlueGem.IsHeld) packet.Write($"{Main.player[BlueGem.HeldBy].name}: [c/00FFFF:{Main.player[BlueGem.HeldBy].statLife}/{Main.player[BlueGem.HeldBy].statLifeMax2}]");
             else packet.Write("At Base");
-            if (RedGem.IsHeld) packet.Write(Main.player[RedGem.HeldBy].name);
+            if (RedGem.IsHeld) packet.Write($"{Main.player[RedGem.HeldBy].name}: [c/00FFFF:{Main.player[RedGem.HeldBy].statLife}/{Main.player[RedGem.HeldBy].statLifeMax2}]");
             else packet.Write("At Base");
 
             packet.Write(mapName);
             packet.Write(blueTeamSize);
             packet.Write(redTeamSize);
             packet.Write(matchStartTime);
+            packet.Write(blueAttempts);
+            packet.Write(redAttempts);
 
             packet.Send();
         }
@@ -927,6 +948,8 @@ public class GameManager : ModSystem
                 packet.Write(blueTeamSize);
                 packet.Write(redTeamSize);
                 packet.Write(matchStartTime);
+                packet.Write(blueAttempts);
+                packet.Write(redAttempts);
                 packet.Send();
             }
             
@@ -989,6 +1012,8 @@ public class GameManager : ModSystem
                 packet.Write(blueTeamSize);
                 packet.Write(redTeamSize);
                 packet.Write(matchStartTime);
+                packet.Write(blueAttempts);
+                packet.Write(redAttempts);
                 packet.Send();
             }
             return;
