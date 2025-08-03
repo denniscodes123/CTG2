@@ -11,6 +11,10 @@ namespace CTG2.Content.Configs
         [DefaultValue(false)]
         public bool ClashRoyaleOTMusic;
 
+        [Label("Enable projectile team coloring")]
+        [DefaultValue(true)]
+        public bool EnableProjectileTeamColoring;
+
 
     }
 }
