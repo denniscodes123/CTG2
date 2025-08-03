@@ -14,6 +14,12 @@ namespace CTG2.Content.Functionality
         {
             Terraria.On_Player.DropTombstone += (orig, self, coins, deathText, hitDir) => { };
 
+            Terraria.DataStructures.On_PlayerDeathReason.GetDeathText += (orig, self, deadPlayerName) =>
+        {
+            return NetworkText.FromLiteral("");
+            
+        };
+
             Terraria.On_Player.KillMe += (orig, self, damageSource, dmg, hitDirection, pvp) => {
                 // Get killer info
                 int killerIndex = damageSource.SourcePlayerIndex;
