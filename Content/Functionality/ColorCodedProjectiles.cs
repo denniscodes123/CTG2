@@ -10,17 +10,40 @@ using Terraria.GameContent;
 using Microsoft.Xna.Framework.Audio;
 using Terraria.Audio;
 using CTG2.Content.Items;
+using System.IO;
+using CTG2.Content.Configs;
+
 
 
 namespace CTG2.Content
 {
     public class ColorCodedProjectiles : GlobalProjectile
     {
+        public override void OnSpawn(Projectile projectile, IEntitySource source)
+        {
+
+                projectile.localAI[0] = Main.player[projectile.owner].team;
+                projectile.netUpdate = true;
+            
+        }
+        public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)		
+        {
+            binaryWriter.Write(projectile.localAI[0]);
+        }
+
+        public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader binaryReader)
+        {
+            projectile.localAI[0] = binaryReader.ReadSingle();
+        }
         public override bool PreDraw(Projectile projectile, ref Color lightColor)
         {
-            Player player = Main.player[projectile.owner];
-            
-            if (player.team == 0)
+            var config = ModContent.GetInstance<CTG2Config>();
+            if (!config.EnableProjectileTeamColoring){
+                return true;}
+
+            int team = (int)projectile.localAI[0];
+
+            if (team == 0)
                 return true;
             if (projectile.type == 153 || projectile.type == 699 || projectile.type == 228 || projectile.type == 480 || projectile.type == ModContent.ProjectileType<ChargedBowProjectile>() ||
                 projectile.type == ModContent.ProjectileType<AmalgamatedHandProjectile1>() || projectile.type == ModContent.ProjectileType<AmalgamatedHandProjectile2>() || projectile.type == 80) // don't include in the color mask
@@ -35,9 +58,9 @@ namespace CTG2.Content
 
             Color teamColor = Color.Gray;
 
-            if (player.team == 1)
+            if (team == 1)
                 teamColor = new Color(255, 0, 0, 255);
-            if (player.team == 3)
+            if (team == 3)
                 if (projectile.type == ProjectileID.ThornChakram || projectile.type == ProjectileID.Flamarang || projectile.type == 15 || projectile.type == ProjectileID.Bananarang || projectile.type == 304)
                     teamColor = new Color(0, 0, 255, 255); // all these projectiles are bright shades of red/orange/yellow and require a gray sprite to properly color - black for now
                 else
