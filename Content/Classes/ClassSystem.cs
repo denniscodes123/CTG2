@@ -463,7 +463,7 @@ namespace ClassesNamespace
                 }
             }
             
-            if (gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
+            if (gameTime % 1200 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
             {
                 if (playerManager.currentClass?.Name == "Miner")
                 {
