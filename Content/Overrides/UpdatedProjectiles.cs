@@ -192,7 +192,6 @@ public class ModifyHurtModPlayer : ModPlayer
         }
         else if (info.DamageSource.SourceProjectileType == ProjectileID.ThornChakram)
         {
-            Main.NewText("test3");
             Player.ClearBuff(BuffID.Poisoned);
         }
         else if (info.DamageSource.SourceProjectileType == ProjectileID.CursedFlameFriendly)
