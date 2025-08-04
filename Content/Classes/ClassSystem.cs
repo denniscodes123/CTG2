@@ -67,6 +67,7 @@ namespace ClassesNamespace
     {
         public GameClass playerClass = GameClass.None;
         public bool clearonce= true;
+        public bool applyHPonce= true;
         private string lastPlayerClass = "";
         private string lastUpgrade = "";
         private int bonusHP = 0;
@@ -83,7 +84,7 @@ namespace ClassesNamespace
             base.ModifyMaxStats(out health, out mana);
 
             health = new StatModifier(0f, 0f, 0f, 0f);
-            health.Flat = currentHP;
+            health.Flat = currentHP + bonusHP;
 
             mana = new StatModifier(0f, 0f, 0f, 0f);
             mana.Flat = currentMana;
@@ -264,12 +265,15 @@ namespace ClassesNamespace
             bonusRegen = 0;
             bonusDef = 0;
             bonusMoveSpeed = 0;
+            var playerManager = Player.GetModPlayer<PlayerManager>();
+            playerManager.currentUpgrade.Name = upgrade.Id;
+
 
             switch (upgrade.Id)
             {
                 case "charge_bow":
                     Item newItem = new Item();
-                    var itemType = 5549;
+                    var itemType = 5553;
                     newItem.SetDefaults(itemType);
                     newItem.stack = 1;
                     newItem.prefix = 0;
@@ -282,7 +286,9 @@ namespace ClassesNamespace
                     bonusMoveSpeed += upgrade.Value / 100f;
                     break;
                 case "bonus_health":
+                    //if(applyHPonce)
                     bonusHP += upgrade.Value;
+                    //applyHPonce = false;
                     break;
                 case "bonus_def":
                     bonusDef += upgrade.Value;
@@ -291,7 +297,7 @@ namespace ClassesNamespace
                     Main.NewText("upgrade id not found");
                     break;
             }
-            
+            lastUpgrade = upgrade.Id;
         }
 
         public void setClass()
@@ -334,6 +340,7 @@ namespace ClassesNamespace
 
         public override void ResetEffects()
         {
+            var playerManager = Player.GetModPlayer<PlayerManager>();
             // THIS METHOD IS BROKEN NEED TO FIX 
             Player.AddBuff(BuffID.Shine, 54000);
             Player.AddBuff(BuffID.NightOwl, 54000);
@@ -345,20 +352,20 @@ namespace ClassesNamespace
             // Player.statLifeMax2 = currentHP;
             // Player.statManaMax2 = currentMana;
 
-            // if (playerManager.currentUpgrade.Name != lastUpgrade)
-            // {
-            //     // apply upgrades here
-            //     ApplyUpgrade(playerManager.currentUpgrade);
-            // }
+            if (playerManager.currentUpgrade.Name != lastUpgrade && playerManager.currentUpgrade.Name != null)
+             {
+                 // apply upgrades here
+                 ApplyUpgrade(playerManager.currentUpgrade);
+             }
 
-            // Player.lifeRegen += bonusRegen;
-            // Player.moveSpeed += bonusMoveSpeed;
-            // Player.statDefense += bonusDef;
-            // Player.statLifeMax2 += bonusHP;
+            Player.lifeRegen += bonusRegen;
+            Player.moveSpeed += bonusMoveSpeed;
+            Player.statDefense += bonusDef;
+            //Player.statLifeMax2 += bonusHP;
 
-            // // Update currentHP to include bonuses for proper sync
-            // currentHP = Player.statLifeMax2;
-            // currentMana = Player.statManaMax2;
+            // Update currentHP to include bonuses for proper sync
+            //currentHP = Player.statLifeMax2;
+            //currentMana = Player.statManaMax2;
 
             // Add Player buffs here instead (delete switch once config is populated with the required buffs)
            /* try
