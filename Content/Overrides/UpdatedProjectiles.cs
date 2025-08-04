@@ -18,6 +18,8 @@ public class ProjectileOverrides : GlobalProjectile
         if (projectile.type == ProjectileID.NebulaArcanum)
         {
             projectile.damage = 0;
+
+            return false;
         }
 
         return true;
@@ -102,16 +104,19 @@ public class ProjectileOverrides : GlobalProjectile
         {
             projectile.damage = 0; //make explosion 0 damage
             projectile.scale = 0;
+            projectile.Kill();
         }
         if (projectile.type == ProjectileID.NebulaArcanumSubshot)
         {
             projectile.damage = 0;
             projectile.scale = 0;
+            projectile.Kill();
         }
         if (projectile.type == ProjectileID.NebulaArcanumExplosionShotShard)
         {
             projectile.damage = 0;
             projectile.scale = 0;
+            projectile.Kill();
         } //If nebula code doesnt work we have to kill the projectiles onspawn
     }
 
