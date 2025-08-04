@@ -22,8 +22,12 @@ namespace CTG2.Content
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
 
+            if (projectile.type == 496) { } //bmage prob already stores data in localai[0] so we have to do this
+            else
+            {
                 projectile.localAI[0] = Main.player[projectile.owner].team;
                 projectile.netUpdate = true;
+            }
             
         }
         public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)		
