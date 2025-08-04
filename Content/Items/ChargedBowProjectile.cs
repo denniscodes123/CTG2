@@ -54,6 +54,9 @@ public class ChargedBowProjectile : ModProjectile
 		}
 
 		Player player = Main.player[Projectile.owner];
+		Vector2 directionToCursor = Main.MouseWorld - player.MountedCenter;
+		if (t2 != 1)
+			player.direction = (directionToCursor.X < 0) ? -1 : 1;
 
 		if (player.channel)
 		{
