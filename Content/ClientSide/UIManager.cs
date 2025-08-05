@@ -235,14 +235,29 @@ public class UIManager : ModSystem
         );
 
         //draw cap attempt counters
-        string attempts = $"Capture attempts: [c/0000FF:{GameInfo.blueAttempts}] v [c/FF0000:{GameInfo.redAttempts}]";
-        Vector2 attemptsPos = new Vector2(Main.screenWidth - 320, 700);
+        // string attempts = $"Capture attempts: [c/0000FF:{GameInfo.blueAttempts}] v [c/FF0000:{GameInfo.redAttempts}]";
+        // Vector2 attemptsPos = new Vector2(Main.screenWidth - 320, 700);
+
+        // ChatManager.DrawColorCodedStringWithShadow(
+        //     Main.spriteBatch,
+        //     FontAssets.MouseText.Value,
+        //     attempts,
+        //     attemptsPos,
+        //     Color.White,
+        //     0,
+        //     Vector2.Zero,
+        //     Vector2.One
+        // );
+
+        //draw cap progress counters
+        string progress = $"Furthest gem carry: [c/0000FF:{GameInfo.blueFurthest}%] v [c/FF0000:{GameInfo.redFurthest}%]";
+        Vector2 progressPos = new Vector2(Main.screenWidth - 320, 700);
 
         ChatManager.DrawColorCodedStringWithShadow(
             Main.spriteBatch,
             FontAssets.MouseText.Value,
-            attempts,
-            attemptsPos,
+            progress,
+            progressPos,
             Color.White,
             0,
             Vector2.Zero,
