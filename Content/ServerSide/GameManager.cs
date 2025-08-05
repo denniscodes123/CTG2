@@ -57,8 +57,12 @@ public class GameManager : ModSystem
 
     public int blueAttempts = 0;
     public int redAttempts = 0;
+    public float blueFurthest = 0;
+    public float redFurthest = 0;
     private bool blueHoldCounted = false;
     private bool redHoldCounted = false;
+
+    private int winner = 0;
 
     // Spectator tracking
     private Dictionary<int, bool> playerSpectatorStatus = new Dictionary<int, bool>();
@@ -285,6 +289,8 @@ public class GameManager : ModSystem
         IsGameActive = false;
         HasRoundStarted = false;
         MatchTime = 0;
+        blueAttempts = 0;
+        redAttempts = 0;
 
         // Reset gems
         BlueGem.Reset();
@@ -380,6 +386,23 @@ public class GameManager : ModSystem
         // Broadcast game end message
         //ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended! New game starting in 15 seconds..."), Microsoft.Xna.Framework.Color.Yellow);
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended!"), Microsoft.Xna.Framework.Color.Yellow);
+        
+        switch (winner)
+        {
+            case 0:
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"Furthest gem carry: [c/0000FF:{blueFurthest}%] v [c/FF0000:{redFurthest}%]"), Microsoft.Xna.Framework.Color.Yellow);
+                break;
+            case 1:
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"Furthest gem carry: [c/0000FF:100%] v [c/FF0000:{redFurthest}%]"), Microsoft.Xna.Framework.Color.Yellow);
+                break;
+            case 2:
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"Furthest gem carry: [c/0000FF:{blueFurthest}%] v [c/FF0000:100%]"), Microsoft.Xna.Framework.Color.Yellow);
+                break;
+        }
+        winner = 0;
+
+        blueFurthest = 0;
+        redFurthest = 0;
 
         Console.WriteLine("GameManager: EndGame sequence completed");
         ClearFloatingItems();
@@ -568,6 +591,9 @@ public class GameManager : ModSystem
                 var distFromGem = Main.player[BlueGem.HeldBy].position.X - BlueGem.Position.X;
                 var intPercentage = (int)Math.Round(distFromGem / distBetweenGems * 100);
                 intPercentage = Math.Clamp(intPercentage, 0, 100);
+                float floatPercentage = (float)Math.Round(Math.Clamp(distFromGem / distBetweenGems * 100, 0f, 100f), 2);
+                if (floatPercentage > redFurthest)
+                    redFurthest = floatPercentage;
                 packet.Write(intPercentage);
             }
             else packet.Write((int)0);
@@ -579,6 +605,9 @@ public class GameManager : ModSystem
                 var distFromGem = -(Main.player[RedGem.HeldBy].position.X - RedGem.Position.X);
                 var intPercentage = (int)Math.Round(distFromGem / distBetweenGems * 100);
                 intPercentage = Math.Clamp(intPercentage, 0, 100);
+                float floatPercentage = (float)Math.Round(Math.Clamp(distFromGem / distBetweenGems * 100, 0f, 100f), 2);
+                if (floatPercentage > blueFurthest)
+                    blueFurthest = floatPercentage;
                 packet.Write(intPercentage);
             }
             else packet.Write((int)0);
@@ -595,6 +624,8 @@ public class GameManager : ModSystem
             packet.Write(matchStartTime);
             packet.Write(blueAttempts);
             packet.Write(redAttempts);
+            packet.Write(blueFurthest);
+            packet.Write(redFurthest);
 
             packet.Send();
         }
@@ -610,12 +641,14 @@ public class GameManager : ModSystem
         if (BlueGem.IsCaptured)
         {
             Console.WriteLine("Blue gem captured!");
+            winner = 2;
             EndGame();
         }
 
         else if (RedGem.IsCaptured)
         {
             Console.WriteLine("Red gem captured!");
+            winner = 1;
             EndGame();
         }
 
@@ -640,9 +673,16 @@ public class GameManager : ModSystem
         {
             overtimeTimer--;
 
-            if (BlueGem.IsCaptured || RedGem.IsCaptured)
+            if (BlueGem.IsCaptured)
             {
                 EndGame();
+                winner = 2;
+                return;
+            }
+            else if (RedGem.IsCaptured)
+            {
+                EndGame();
+                winner = 1;
                 return;
             }
 
@@ -953,6 +993,8 @@ public class GameManager : ModSystem
                 packet.Write(matchStartTime);
                 packet.Write(blueAttempts);
                 packet.Write(redAttempts);
+                packet.Write(blueFurthest);
+                packet.Write(redFurthest);
                 packet.Send();
             }
             
@@ -1017,6 +1059,8 @@ public class GameManager : ModSystem
                 packet.Write(matchStartTime);
                 packet.Write(blueAttempts);
                 packet.Write(redAttempts);
+                packet.Write(blueFurthest);
+                packet.Write(redFurthest);
                 packet.Send();
             }
             return;
