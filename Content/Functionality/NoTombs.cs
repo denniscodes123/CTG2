@@ -12,6 +12,21 @@ namespace CTG2.Content.Functionality
     {
         public override void Load()
         {
+            Terraria.Chat.On_ChatHelper.DisplayMessage += (orig, text, color, messageAuthor) =>
+            {
+                if (Main.player[messageAuthor].team == 3) { color = Color.PowderBlue; }
+                if (Main.player[messageAuthor].team == 1) { color = Color.OrangeRed; }
+                
+                orig(text, color, messageAuthor);
+            };
+            Terraria.GameContent.UI.Chat.On_NameTagHandler.GenerateTag += (orig, name) =>
+            {
+                var player = Array.Find(Main.player, p => p.active && p.name == name);
+                if (player.GetModPlayer<AdminPlayer>().IsAdmin) {return "[i:5554] [Admin] " + name + ":";}
+                //TODO: we have to sync who is admin server side so other clients can see that this player is admin
+                else { return "[i:58]" + name + ":"; }
+                 };
+        
             Terraria.On_Player.DropTombstone += (orig, self, coins, deathText, hitDir) => { };
 
             Terraria.DataStructures.On_PlayerDeathReason.GetDeathText += (orig, self, deadPlayerName) =>
