@@ -4,6 +4,8 @@ using Terraria.Localization;
 using Microsoft.Xna.Framework;
 using Terraria.ID;
 using Terraria.Chat;
+using System.Collections.Generic;
+using System;
 
 
 namespace CTG2.Content.Functionality
