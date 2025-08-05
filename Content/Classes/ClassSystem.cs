@@ -327,7 +327,7 @@ namespace ClassesNamespace
 
                 SetInventory(classInfo);
 
-                string name = playerManager.currentClass.Inventory;
+                string name = playerManager.currentClass.Name;
 
                 ModPacket packet = Mod.GetPacket();
                 packet.Write((byte)MessageType.RequestClassSelection);
