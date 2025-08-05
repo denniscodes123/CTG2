@@ -245,6 +245,18 @@ public class GameManager : ModSystem
         RedGem.Reset();
         bool isMapPicked = mapQueue.TryDequeue(out MapTypes result);
 
+        blueGemCarrier = "At Base";
+        ModPacket packetBlueGemCarrier = mod.GetPacket();
+        packetBlueGemCarrier.Write((byte)MessageType.UpdateBlueGemCarrier);
+        packetBlueGemCarrier.Write(blueGemCarrier);
+        packetBlueGemCarrier.Send();
+
+        redGemCarrier = "At Base";
+        ModPacket packetRedGemCarrier = mod.GetPacket();
+        packetRedGemCarrier.Write((byte)MessageType.UpdateRedGemCarrier);
+        packetRedGemCarrier.Write(redGemCarrier);
+        packetRedGemCarrier.Send();
+
         BlueTeam.UpdateTeam();
         RedTeam.UpdateTeam();
         foreach (Player player in Main.player)
@@ -709,6 +721,12 @@ public class GameManager : ModSystem
             packetBlueGemX.Write((byte)MessageType.UpdateBlueGemX);
             packetBlueGemX.Write(intPercentageBlue);
             packetBlueGemX.Send();
+
+            blueGemCarrier = $"{Main.player[BlueGem.HeldBy].name}: [c/00FFFF:{Main.player[BlueGem.HeldBy].statLife}/{Main.player[BlueGem.HeldBy].statLifeMax2}]";
+            ModPacket packetBlueGemCarrier = mod.GetPacket();
+            packetBlueGemCarrier.Write((byte)MessageType.UpdateBlueGemCarrier);
+            packetBlueGemCarrier.Write(blueGemCarrier);
+            packetBlueGemCarrier.Send();
         }
         else if (!BlueGem.IsHeld && blueWasHeld)
         {
@@ -739,6 +757,12 @@ public class GameManager : ModSystem
             packetRedGemX.Write((byte)MessageType.UpdateRedGemX);
             packetRedGemX.Write(intPercentageRed);
             packetRedGemX.Send();
+
+            redGemCarrier = $"{Main.player[RedGem.HeldBy].name}: [c/00FFFF:{Main.player[RedGem.HeldBy].statLife}/{Main.player[RedGem.HeldBy].statLifeMax2}]";
+            ModPacket packetRedGemCarrier = mod.GetPacket();
+            packetRedGemCarrier.Write((byte)MessageType.UpdateRedGemCarrier);
+            packetRedGemCarrier.Write(redGemCarrier);
+            packetRedGemCarrier.Send();
         }
         else if (!RedGem.IsHeld && redWasHeld)
         {
@@ -749,15 +773,7 @@ public class GameManager : ModSystem
         }
 
         // Blue and red gem holders
-        if (BlueGem.IsHeld && !blueWasHeld)
-        {
-            blueGemCarrier = $"{Main.player[BlueGem.HeldBy].name}: [c/00FFFF:{Main.player[BlueGem.HeldBy].statLife}/{Main.player[BlueGem.HeldBy].statLifeMax2}]";
-            ModPacket packetBlueGemCarrier = mod.GetPacket();
-            packetBlueGemCarrier.Write((byte)MessageType.UpdateBlueGemCarrier);
-            packetBlueGemCarrier.Write(blueGemCarrier);
-            packetBlueGemCarrier.Send();
-        }
-        else if (!BlueGem.IsHeld && blueWasHeld)
+        if (!BlueGem.IsHeld && blueWasHeld)
         {
             blueGemCarrier = "At Base";
             ModPacket packetBlueGemCarrier = mod.GetPacket();
@@ -767,15 +783,7 @@ public class GameManager : ModSystem
         }
         blueWasHeld = BlueGem.IsHeld;
 
-        if (RedGem.IsHeld && !redWasHeld)
-        {
-            redGemCarrier = $"{Main.player[RedGem.HeldBy].name}: [c/00FFFF:{Main.player[RedGem.HeldBy].statLife}/{Main.player[RedGem.HeldBy].statLifeMax2}]";
-            ModPacket packetRedGemCarrier = mod.GetPacket();
-            packetRedGemCarrier.Write((byte)MessageType.UpdateRedGemCarrier);
-            packetRedGemCarrier.Write(redGemCarrier);
-            packetRedGemCarrier.Send();
-        }
-        else if (!RedGem.IsHeld && redWasHeld)
+        if (!RedGem.IsHeld && redWasHeld)
         {
             redGemCarrier = "At Base";
             ModPacket packetRedGemCarrier = mod.GetPacket();
