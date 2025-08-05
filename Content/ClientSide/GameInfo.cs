@@ -18,4 +18,6 @@ public static class GameInfo
     public static int matchStartTime = 1800;
     public static int blueAttempts = 0;
     public static int redAttempts = 0;
+    public static float blueFurthest = 0;
+    public static float redFurthest = 0;
 }
