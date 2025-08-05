@@ -11,6 +11,9 @@ using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics.Tracing;
+using Terraria.Chat;
+using Terraria.Localization;
+using Microsoft.Xna.Framework;
 
 
 namespace CTG2.Content.ClientSide;
@@ -288,6 +291,8 @@ public class PlayerManager : ModPlayer
             info.DamageSource = default;
         }
     }
+
+
     public override void OnEnterWorld()
     {
         if (ModContent.GetInstance<GameManager>().pubsConfig && GameInfo.matchStage != 1 && !GameInfo.overtime && GameInfo.matchStage != 0)
@@ -299,7 +304,13 @@ public class PlayerManager : ModPlayer
             packet.Write(-1); 
             packet.Send();
         }
+
+        ModPacket packetSync = ModContent.GetInstance<CTG2>().GetPacket();
+        packetSync.Write((byte)MessageType.RequestSyncGameInfo);
+        packetSync.Write(Main.myPlayer);
+        packetSync.Send();
     }
+
 
     // When a player disconnects, this hook can clean up their data.
     public override void PlayerDisconnect()
