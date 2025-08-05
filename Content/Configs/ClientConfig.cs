@@ -12,8 +12,13 @@ namespace CTG2.Content.Configs
         public bool ClashRoyaleOTMusic;
 
         [Label("Enable projectile team coloring")]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool EnableProjectileTeamColoring;
+
+
+        [Label("Selected Track: 0=None, 1=Clash, 2=Mystery")]
+        public int SelectedMusicIndex { get; set; } = 0;
+
 
 
     }
