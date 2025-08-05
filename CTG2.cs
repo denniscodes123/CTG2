@@ -89,7 +89,23 @@ namespace CTG2
         RequestAudioToClient = 52,
         RequestAudioToClientPacket = 53,
         SyncBiomeMusic = 54,
-
+        UpdateMatchStage = 55,
+        UpdateBlueGemX = 56,
+        UpdateRedGemX = 57,
+        UpdateBlueGemCarrier = 58,
+        UpdateRedGemCarrier = 59,
+        UpdateOvertime = 60,
+        UpdateOvertimeTimer = 61,
+        UpdateMapName = 62,
+        UpdateBlueTeamSize = 63,
+        UpdateRedTeamSize = 64,
+        UpdateMatchStartTime = 65,
+        UpdateBlueAttempts = 66,
+        UpdateRedAttempts = 67,
+        UpdateBlueFurthest = 68,
+        UpdateRedFurthest = 69,
+        RequestSyncGameInfo = 70,
+        SyncGameInformation = 71,
     }
 
     public class CTG2 : Mod
@@ -438,6 +454,61 @@ namespace CTG2
                 // Gems Status Updates
                 case (byte)MessageType.ServerGameUpdate:
                     // Populate GameInfo fields
+                    GameInfo.matchTime = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateMatchStage:
+                    GameInfo.matchStage = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateBlueGemX:
+                    GameInfo.blueGemX = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateRedGemX:
+                    GameInfo.redGemX = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateBlueGemCarrier:
+                    GameInfo.blueGemCarrier = reader.ReadString();
+                    break;
+                case (byte)MessageType.UpdateRedGemCarrier:
+                    GameInfo.redGemCarrier = reader.ReadString();
+                    break;
+                case (byte)MessageType.UpdateOvertime:
+                    GameInfo.overtime = reader.ReadBoolean();
+                    break;
+                case (byte)MessageType.UpdateOvertimeTimer:
+                    GameInfo.overtimeTimer = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateMapName:
+                    GameInfo.mapName = reader.ReadString();
+                    break;
+                case (byte)MessageType.UpdateBlueTeamSize:
+                    GameInfo.blueTeamSize = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateRedTeamSize:
+                    GameInfo.redTeamSize = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateMatchStartTime:
+                    GameInfo.matchStartTime = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateBlueAttempts:
+                    GameInfo.blueAttempts = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateRedAttempts:
+                    GameInfo.redAttempts = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.UpdateBlueFurthest:
+                    GameInfo.blueFurthest = reader.ReadSingle();
+                    break;
+                case (byte)MessageType.UpdateRedFurthest:
+                    GameInfo.redFurthest = reader.ReadSingle();
+                    break;
+                case (byte)MessageType.RequestMatchTime:
+                    GameInfo.matchTime = reader.ReadInt32();
+                    break;
+                case (byte)MessageType.RequestSyncGameInfo:
+                    int playerCalling = reader.ReadInt32();
+                    ModContent.GetInstance<GameManager>().SyncGameInfo(playerCalling);
+                    break;
+                case (byte)MessageType.SyncGameInformation:
                     GameInfo.matchStage = reader.ReadInt32();
                     GameInfo.matchTime = reader.ReadInt32();
                     GameInfo.overtime = reader.ReadBoolean();
@@ -454,9 +525,6 @@ namespace CTG2
                     GameInfo.redAttempts = reader.ReadInt32();
                     GameInfo.blueFurthest = reader.ReadSingle();
                     GameInfo.redFurthest = reader.ReadSingle();
-                    break;
-                case (byte)MessageType.RequestMatchTime:
-                    GameInfo.matchTime = reader.ReadInt32();
                     break;
                 case (byte)MessageType.ServerSpectatorUpdate:
                     int playerIndex = reader.ReadInt32();
