@@ -72,7 +72,7 @@ Items: {
 	}
 
 	DashCrystal: {
-		DisplayName: Dash Crystal
+		DisplayName: Celeste Dash
 		Tooltip: ""
 	}
 
@@ -94,7 +94,7 @@ Items: {
 
 NPCs: {
 	TimedNPC.DisplayName: Timed N P C
-	StationaryBeast.DisplayName: Stationary Beast
+	StationaryBeast.DisplayName: Stationary Slimer
 	TikiTotem.DisplayName: Tiki Totem
 	PaladinShield.DisplayName: Paladin Shield
 }
@@ -140,7 +140,7 @@ Configs: {
 			Tooltip: ""
 		}
 
-		DisplayName: C T G2 Config
+		DisplayName: CTG2 Config
 	}
 }
 
