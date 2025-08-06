@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework;
 using CTG2.Content.ClientSide;
 using Terraria.Chat;
 using Terraria.Localization;
+using CTG2.Content.ServerSide;
+
 
 namespace CTG2.Content.Commands
 {
@@ -13,7 +15,6 @@ namespace CTG2.Content.Commands
         public override string Command => "pause";
         public override string Usage => "/pause";
         public override string Description => "Pauses or unpauses the game (admin only, only during active match)";
-        public bool shouldPause = false;
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
@@ -31,24 +32,11 @@ namespace CTG2.Content.Commands
                 return;
             }
 
-            // Toggle pause state
-            shouldPause = !shouldPause;
-
             // Send the pause request packet to the server
             var mod = ModContent.GetInstance<CTG2>();
             var packet = mod.GetPacket();
-            if (shouldPause)
-            {
-                packet.Write((byte)MessageType.RequestPause);
-                packet.Send();
-            }
-            else
-            {
-                packet.Write((byte)MessageType.RequestUnpause);
-                packet.Send();
-            }
-            
-            ChatHelper.BroadcastChatMessage(shouldPause ? NetworkText.FromLiteral($"Game paused.") : NetworkText.FromLiteral($"Game unpaused."), Color.Yellow);
+            packet.Write((byte)MessageType.RequestTogglePause);
+            packet.Send();
         }
     }
 }
