@@ -261,43 +261,43 @@ namespace ClassesNamespace
         public void ApplyUpgrade(UpgradeConfig upgrade)
         {
             // reset all bonus stats
-            bonusHP = 0;
-            bonusRegen = 0;
-            bonusDef = 0;
-            bonusMoveSpeed = 0;
-            var playerManager = Player.GetModPlayer<PlayerManager>();
-            playerManager.currentUpgrade.Name = upgrade.Id;
+            // bonusHP = 0;
+            // bonusRegen = 0;
+            // bonusDef = 0;
+            // bonusMoveSpeed = 0;
+            // var playerManager = Player.GetModPlayer<PlayerManager>();
+            // playerManager.currentUpgrade.Name = upgrade.Id;
 
 
-            switch (upgrade.Id)
-            {
-                case "charge_bow":
-                    Item newItem = new Item();
-                    var itemType = 5553;
-                    newItem.SetDefaults(itemType);
-                    newItem.stack = 1;
-                    newItem.prefix = 0;
-                    Player.inventory[2] = newItem;
-                    break;
-                case "bonus_regen":
-                    bonusRegen += 2 * upgrade.Value;
-                    break;
-                case "bonus_speed":
-                    bonusMoveSpeed += upgrade.Value / 100f;
-                    break;
-                case "bonus_health":
-                    //if(applyHPonce)
-                    bonusHP += upgrade.Value;
-                    //applyHPonce = false;
-                    break;
-                case "bonus_def":
-                    bonusDef += upgrade.Value;
-                    break;
-                default:
-                    Main.NewText("upgrade id not found");
-                    break;
-            }
-            lastUpgrade = upgrade.Id;
+            // switch (upgrade.Id)
+            // {
+            //     case "charge_bow":
+            //         Item newItem = new Item();
+            //         var itemType = 5553;
+            //         newItem.SetDefaults(itemType);
+            //         newItem.stack = 1;
+            //         newItem.prefix = 0;
+            //         Player.inventory[2] = newItem;
+            //         break;
+            //     case "bonus_regen":
+            //         bonusRegen += 2 * upgrade.Value;
+            //         break;
+            //     case "bonus_speed":
+            //         bonusMoveSpeed += upgrade.Value / 100f;
+            //         break;
+            //     case "bonus_health":
+            //         //if(applyHPonce)
+            //         bonusHP += upgrade.Value;
+            //         //applyHPonce = false;
+            //         break;
+            //     case "bonus_def":
+            //         bonusDef += upgrade.Value;
+            //         break;
+            //     default:
+            //         Main.NewText("upgrade id not found");
+            //         break;
+            // }
+            // lastUpgrade = upgrade.Id;
         }
 
         public void setClass()
