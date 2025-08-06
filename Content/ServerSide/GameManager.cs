@@ -353,6 +353,7 @@ public class GameManager : ModSystem
         endGameCalled = true;
         IsGameActive = false;
         HasRoundStarted = false;
+        pause = false;
 
         // Reset gems
         BlueGem.Reset();
@@ -679,7 +680,7 @@ public class GameManager : ModSystem
         }
 
         // Determine match stage based on game state
-        if (MatchTime < matchStartTime && matchStage != 1)
+        if (MatchTime < matchStartTime && (matchStage == 0 || matchStage == 3))
         {
             matchStage = 1; // Class Selection phase
             ModPacket packetMatchStage = mod.GetPacket();
@@ -687,7 +688,7 @@ public class GameManager : ModSystem
             packetMatchStage.Write(matchStage);
             packetMatchStage.Send();
         }
-        else if (matchStage != 2)
+        else if (MatchTime >= matchStartTime && matchStage == 1)
         {
             matchStage = 2; // Active Gameplay phase
             ModPacket packetMatchStage = mod.GetPacket();
