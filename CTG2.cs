@@ -37,7 +37,7 @@ namespace CTG2
         RequestEndGame = 1,  // client → server
         ServerGameStart = 2,  // server → client
         ServerGameEnd = 3,  // server → client
-        RequestPause = 4,  // client -> server
+        RequestTogglePause = 4,  // client -> server
         ServerGameUpdate = 5,  // server → client
         ServerTeleport = 6, // server -> client
         ServerSetSpawn = 7, // server -> client
@@ -67,7 +67,7 @@ namespace CTG2
         RequestWeb = 30,
         RequestSyncStats = 31,
         RequestFullHeal = 32,
-        RequestUnpause = 33,
+        //RequestUnpause = 33,
         RequestMute = 34,
         Mute = 35,
         RequestUnmute = 36,
@@ -106,6 +106,7 @@ namespace CTG2
         UpdateRedFurthest = 69,
         RequestSyncGameInfo = 70,
         SyncGameInformation = 71,
+        SyncStats = 72,
     }
 
     public class CTG2 : Mod
@@ -191,11 +192,14 @@ namespace CTG2
                     manager.EndGame();
                     Console.WriteLine("Server Received Game End Request!");
                     break;
-                case (byte)MessageType.RequestPause:
-                    manager.PauseGame();
-                    break;
-                case (byte)MessageType.RequestUnpause:
-                    manager.UnpauseGame();
+                case (byte)MessageType.RequestTogglePause:
+                    ChatHelper.BroadcastChatMessage(!manager.pause ? NetworkText.FromLiteral($"Game paused.") : NetworkText.FromLiteral($"Game unpaused."), Color.Yellow);
+
+                    if (!manager.pause)
+                        manager.PauseGame();
+                    else
+                        manager.UnpauseGame();
+
                     break;
                 case (byte)MessageType.RequestSpawnNpc:
                     var npcX = reader.ReadInt32();
@@ -777,16 +781,18 @@ namespace CTG2
 
                 case (byte)MessageType.RequestSyncStats:
                     {
-                        byte pIndex = reader.ReadByte();
-                        var modPlayer = Main.player[pIndex].GetModPlayer<ClassSystem>();
+                        var fromWho = reader.ReadByte();
+                        var modPlayer = Main.player[fromWho].GetModPlayer<ClassSystem>();
                         modPlayer.ReceiveSync(reader);
 
                         if (Main.netMode == NetmodeID.Server)
                         {
-                            modPlayer.SyncPlayer(-1, pIndex);
+                            modPlayer.SyncPlayer(-1, fromWho);
                         }
+                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"sync called once"), Color.Orange);
                         break;
                     }
+                case (byte)MessageType.SyncStats:
 
                 case (byte)MessageType.RequestFullHeal:
                     {
