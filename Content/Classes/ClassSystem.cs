@@ -448,11 +448,10 @@ namespace ClassesNamespace
                 clearonce = true;
             }
 
-            //Miner bombs over time logic (port dirt config to here later)
             var playerManager = Player.GetModPlayer<PlayerManager>();
             int gameTime = GameInfo.matchTime - GameInfo.matchStartTime;
 
-            if (gameTime % 60 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && playerManager.currentClass?.Name == "Ninja")
+            if (gameTime % 60 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && playerManager.currentClass?.Name == "Ninja") // ninja block conversion
             {
                 for (int i = 0; i < Player.inventory.Length; i++)
                 {
@@ -470,7 +469,7 @@ namespace ClassesNamespace
                 }
             }
             
-            if (gameTime % 1200 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0)
+            if (gameTime != 0 && gameTime % 1200 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0) // miner bombs over time
             {
                 if (playerManager.currentClass?.Name == "Miner")
                 {
@@ -480,65 +479,67 @@ namespace ClassesNamespace
 
                     Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
                 }
+            }
 
+            if (gameTime != 0 && gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000) // blocks over time
+            {
                 Item dirt = new Item();
                 dirt.SetDefaults(ItemID.DirtBlock);
 
-                if (gameTime <= 9000)
-                    switch (playerManager.currentClass?.Name)
-                    {
-                        case "Archer":
-                            dirt.stack = 50;
-                            break;
-                        case "Ninja":
-                            dirt.stack = 50;
-                            break;
-                        case "Beast":
-                            dirt.stack = 50;
-                            break;
-                        case "Gladiator":
-                            dirt.stack = 50;
-                            break;
-                        case "Paladin":
-                            dirt.stack = 50;
-                            break;
-                        case "Jungle Man":
-                            dirt.stack = 50;
-                            break;
-                        case "Black Mage":
-                            dirt.stack = 50;
-                            break;
-                        case "Psychic":
-                            dirt.stack = 50;
-                            break;
-                        case "White Mage":
-                            dirt.stack = 50;
-                            break;
-                        case "Miner":
-                            dirt.stack = 50;
-                            break;
-                        case "Fish":
-                            dirt.stack = 50;
-                            break;
-                        case "Clown":
-                            dirt.stack = 50;
-                            break;
-                        case "Flame Bunny":
-                            dirt.stack = 50;
-                            break;
-                        case "Tiki Priest":
-                            dirt.stack = 50;
-                            break;
-                        case "Tree":
-                            dirt.stack = 50;
-                            break;
-                        case "Mutant":
-                            dirt.stack = 50;
-                            break;
-                        case "Leech":
-                            dirt.stack = 50;
-                            break;
-                    }
+                switch (playerManager.currentClass?.Name)
+                {
+                    case "Archer":
+                        dirt.stack = 50;
+                        break;
+                    case "Ninja":
+                        dirt.stack = 50;
+                        break;
+                    case "Beast":
+                        dirt.stack = 50;
+                        break;
+                    case "Gladiator":
+                        dirt.stack = 50;
+                        break;
+                    case "Paladin":
+                        dirt.stack = 50;
+                        break;
+                    case "Jungle Man":
+                        dirt.stack = 50;
+                        break;
+                    case "Black Mage":
+                        dirt.stack = 50;
+                        break;
+                    case "Psychic":
+                        dirt.stack = 50;
+                        break;
+                    case "White Mage":
+                        dirt.stack = 50;
+                        break;
+                    case "Miner":
+                        dirt.stack = 50;
+                        break;
+                    case "Fish":
+                        dirt.stack = 50;
+                        break;
+                    case "Clown":
+                        dirt.stack = 50;
+                        break;
+                    case "Flame Bunny":
+                        dirt.stack = 50;
+                        break;
+                    case "Tiki Priest":
+                        dirt.stack = 50;
+                        break;
+                    case "Tree":
+                        dirt.stack = 50;
+                        break;
+                    case "Mutant":
+                        dirt.stack = 50;
+                        break;
+                    case "Leech":
+                        dirt.stack = 50;
+                        break;
+                }
 
                 Player.GetItem(Player.whoAmI, dirt, GetItemSettings.InventoryEntityToPlayerInventorySettings);
             }
