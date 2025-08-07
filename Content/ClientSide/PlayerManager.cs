@@ -297,7 +297,6 @@ public class PlayerManager : ModPlayer
     {
         if (ModContent.GetInstance<GameManager>().pubsConfig && GameInfo.matchStage != 1 && !GameInfo.overtime && GameInfo.matchStage != 0)
         {
-            
             ModPacket packet = ModContent.GetInstance<CTG2>().GetPacket();
             packet.Write((byte)MessageType.RequestTeamChange);
             packet.Write(Main.myPlayer);
