@@ -106,7 +106,7 @@ namespace CTG2
         UpdateRedFurthest = 69,
         RequestSyncGameInfo = 70,
         SyncGameInformation = 71,
-        SyncStats = 72,
+        SyncPlayerArmor = 72,
     }
 
     public class CTG2 : Mod
@@ -789,11 +789,20 @@ namespace CTG2
                         {
                             modPlayer.SyncPlayer(-1, fromWho);
                         }
-                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"sync called once"), Color.Orange);
+                        //ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"sync called once"), Color.Orange);
                         break;
                     }
-                case (byte)MessageType.SyncStats:
-
+                case(byte)MessageType.SyncPlayerArmor:
+                    byte playerIDd = reader.ReadByte();
+                    Player targetd = Main.player[playerIDd];
+                    for (int i = 0; i < targetd.armor.Length; i++)
+                    {
+                        short netID = reader.ReadInt16();
+                        byte prefix = reader.ReadByte();
+                        targetd.armor[i].SetDefaults(netID);
+                        targetd.armor[i].Prefix(prefix);
+                    }
+                    break;
                 case (byte)MessageType.RequestFullHeal:
                     {
                         int plyrindex = reader.ReadInt32();
