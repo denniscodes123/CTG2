@@ -662,8 +662,6 @@ public class GameManager : ModSystem
         {
             foreach (Player p in Main.player)
             {
-                if (MatchTime % 30 == 0 && p.active) ForcePlayerStatSync(p.whoAmI);
-                
                 if (p.team == 1) redTeamSize++;
                 else if (p.team == 3) blueTeamSize++;
             }
@@ -1144,6 +1142,14 @@ public class GameManager : ModSystem
             return;
         }
 
+        if (Main.GameUpdateCount % 30 == 0)
+        {
+            foreach (Player p in Main.player)
+            {
+                if (p.active) ForcePlayerStatSync(-1, p.whoAmI);
+            }
+        }
+
         if (pubsConfig)
         {
             // Handle new game timer
@@ -1456,15 +1462,15 @@ public class GameManager : ModSystem
         }
     }
     
-    public static void ForcePlayerStatSync(int playerIndex)
+    public static void ForcePlayerStatSync(int toWho, int fromWho)
     {
-        if (playerIndex < 0 || playerIndex >= Main.player.Length) return;
+        if (fromWho < 0 || fromWho >= Main.player.Length) return;
 
-        Player player = Main.player[playerIndex];
+        Player player = Main.player[fromWho];
         if (!player.active) return;
 
         var classSystem = player.GetModPlayer<ClassSystem>();
-        classSystem.SyncPlayerStats();
+        classSystem.SyncPlayerStats(toWho, fromWho);
 
         //Console.WriteLine($"GameManager: Force synced stats for player {player.name}");
     }
