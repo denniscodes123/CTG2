@@ -662,7 +662,7 @@ public class GameManager : ModSystem
         {
             foreach (Player p in Main.player)
             {
-                ForcePlayerStatSync(p.whoAmI);
+                if (MatchTime % 30 == 0 && p.active) ForcePlayerStatSync(p.whoAmI);
                 
                 if (p.team == 1) redTeamSize++;
                 else if (p.team == 3) blueTeamSize++;
