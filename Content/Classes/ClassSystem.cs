@@ -570,7 +570,7 @@ namespace ClassesNamespace
             }
         }
 
-        public void SyncPlayerStats()
+        public void SyncPlayerStats(int toWho, int fromWho)
         {
             // First ensure the Player's max stats are updated
             // Player.statLifeMax = currentHP;
@@ -586,6 +586,21 @@ namespace ClassesNamespace
 
             //NetMessage.SendData(MessageID.PlayerLifeMana, -1, -1, null, Player.whoAmI, Player.statLife, Player.statLifeMax, Player.statMana, Player.statManaMax);
             NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, Player.whoAmI);
+            SyncPlayer(-1, Player.whoAmI);
+            
+            ModPacket packet = Mod.GetPacket();
+            packet.Write((byte)MessageType.SyncPlayerArmor);
+            packet.Write((byte)Player.whoAmI);
+
+            // Send armor info manually if needed
+            for (int i = 0; i < Player.armor.Length; i++)
+            {
+                packet.Write((short)Player.armor[i].netID);
+                packet.Write((byte)Player.armor[i].prefix);
+            }
+
+            packet.Send(toWho, fromWho);
+
 
             //Console.WriteLine($"ClassSystem: Synced stats for {Player.name} - HP: {Player.statLife}/{Player.statLifeMax}, Mana: {Player.statMana}/{Player.statManaMax}");
         }
