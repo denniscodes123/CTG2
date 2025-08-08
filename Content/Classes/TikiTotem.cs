@@ -66,6 +66,7 @@ namespace CTG2.Content.Classes
             NPC.noGravity = false;
             NPC.noTileCollide = false;
             NPC.friendly = false;
+            NPC.chaseable = false;
         }
         
         
