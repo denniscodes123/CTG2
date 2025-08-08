@@ -107,6 +107,12 @@ namespace CTG2
         RequestSyncGameInfo = 70,
         SyncGameInformation = 71,
         SyncPlayerArmor = 72,
+        RequestChatColored = 73,
+        UpdateIsHeld = 74,
+        UpdateHeldBy = 75,
+        UpdateIsCaptured = 76,
+        RequestAudioClientSide = 77,
+        AudioClientSide = 78,
     }
 
     public class CTG2 : Mod
@@ -341,6 +347,37 @@ namespace CTG2
                 case (byte)MessageType.RequestChat:
                     string message = reader.ReadString();
                     ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), Microsoft.Xna.Framework.Color.Olive);
+                    break;
+                case (byte)MessageType.RequestChatColored:
+                    string msg = reader.ReadString();
+                    uint clrVal = reader.ReadUInt32();
+                    Color clr = new Color();
+                    clr.PackedValue = clrVal;
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(msg), clr);
+                    break;
+                case (byte)MessageType.UpdateIsHeld:
+                    int gemType1 = reader.ReadInt32();
+                    bool isHeld = reader.ReadBoolean();
+                    if (gemType1 == 1)
+                        ModContent.GetInstance<GameManager>().RedGem.IsHeld = isHeld;
+                    else
+                        ModContent.GetInstance<GameManager>().BlueGem.IsHeld = isHeld;
+                    break;
+                case (byte)MessageType.UpdateHeldBy:
+                    int gemType2 = reader.ReadInt32();
+                    int heldBy = reader.ReadInt32();
+                    if (gemType2 == 1)
+                        ModContent.GetInstance<GameManager>().RedGem.HeldBy = heldBy;
+                    else
+                        ModContent.GetInstance<GameManager>().BlueGem.HeldBy = heldBy;
+                    break;
+                case (byte)MessageType.UpdateIsCaptured:
+                    int gemType3 = reader.ReadInt32();
+                    bool isCaptured = reader.ReadBoolean();
+                    if (gemType3 == 1)
+                        ModContent.GetInstance<GameManager>().RedGem.IsCaptured = isCaptured;
+                    else
+                        ModContent.GetInstance<GameManager>().BlueGem.IsCaptured = isCaptured;
                     break;
                 // mainly used for clown ability
                 case (byte)MessageType.RequestTeleport:
@@ -690,6 +727,19 @@ namespace CTG2
                     string filepath = reader.ReadString();
                     SoundStyle sound = new SoundStyle(filepath);
                     SoundEngine.PlaySound(sound);
+                    break;
+                case (byte)MessageType.RequestAudioClientSide:
+                    string filepathh = reader.ReadString();
+                    var audoMod = ModContent.GetInstance<CTG2>();
+                    ModPacket audoPacket = audoMod.GetPacket();
+                    audoPacket.Write((byte)MessageType.AudioClientSide);
+                    audoPacket.Write(filepathh);
+                    audoPacket.Send();
+                    break;
+                case (byte)MessageType.AudioClientSide:
+                    string filepathhh = reader.ReadString();
+                    SoundStyle sounddd = new SoundStyle(filepathhh);
+                    SoundEngine.PlaySound(sounddd);
                     break;
                 case (byte)MessageType.RequestAudioToClient:
                     string filepa = reader.ReadString();
