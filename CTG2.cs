@@ -868,6 +868,11 @@ namespace CTG2
                         targetd.armor[i].SetDefaults(netID);
                         targetd.armor[i].Prefix(prefix);
                     }
+                    for (int j = 0; j < targetd.dye.Length; j++)
+                    {
+                        short netID = reader.ReadInt16();
+                        targetd.dye[j].SetDefaults(netID);
+                    }
                     break;
                 case (byte)MessageType.RequestFullHeal:
                     {
