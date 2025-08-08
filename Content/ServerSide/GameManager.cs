@@ -249,12 +249,14 @@ public class GameManager : ModSystem
         ModPacket packetBlueGemCarrier = mod.GetPacket();
         packetBlueGemCarrier.Write((byte)MessageType.UpdateBlueGemCarrier);
         packetBlueGemCarrier.Write(blueGemCarrier);
+        packetBlueGemCarrier.Write("");
         packetBlueGemCarrier.Send();
 
         redGemCarrier = "At Base";
         ModPacket packetRedGemCarrier = mod.GetPacket();
         packetRedGemCarrier.Write((byte)MessageType.UpdateRedGemCarrier);
         packetRedGemCarrier.Write(redGemCarrier);
+        packetRedGemCarrier.Write("");
         packetRedGemCarrier.Send();
 
         BlueTeam.UpdateTeam();
@@ -731,6 +733,7 @@ public class GameManager : ModSystem
             ModPacket packetBlueGemCarrier = mod.GetPacket();
             packetBlueGemCarrier.Write((byte)MessageType.UpdateBlueGemCarrier);
             packetBlueGemCarrier.Write(blueGemCarrier);
+            packetBlueGemCarrier.Write(Main.player[BlueGem.HeldBy].name);
             packetBlueGemCarrier.Send();
         }
         else if (!BlueGem.IsHeld && blueWasHeld)
@@ -767,6 +770,7 @@ public class GameManager : ModSystem
             ModPacket packetRedGemCarrier = mod.GetPacket();
             packetRedGemCarrier.Write((byte)MessageType.UpdateRedGemCarrier);
             packetRedGemCarrier.Write(redGemCarrier);
+            packetRedGemCarrier.Write(Main.player[RedGem.HeldBy].name);
             packetRedGemCarrier.Send();
         }
         else if (!RedGem.IsHeld && redWasHeld)
@@ -784,6 +788,7 @@ public class GameManager : ModSystem
             ModPacket packetBlueGemCarrier = mod.GetPacket();
             packetBlueGemCarrier.Write((byte)MessageType.UpdateBlueGemCarrier);
             packetBlueGemCarrier.Write(blueGemCarrier);
+            packetBlueGemCarrier.Write("");
             packetBlueGemCarrier.Send();
         }
         blueWasHeld = BlueGem.IsHeld;
@@ -794,6 +799,7 @@ public class GameManager : ModSystem
             ModPacket packetRedGemCarrier = mod.GetPacket();
             packetRedGemCarrier.Write((byte)MessageType.UpdateRedGemCarrier);
             packetRedGemCarrier.Write(redGemCarrier);
+            packetRedGemCarrier.Write("");
             packetRedGemCarrier.Send();
         }
         redWasHeld = RedGem.IsHeld;
