@@ -35,6 +35,9 @@ public class PlayerManager : ModPlayer
     public UpgradeConfig currentUpgrade = new UpgradeConfig();
     public GameManager gameManager = ModContent.GetInstance<GameManager>();
 
+    public int kills = 0;
+    public int deaths = 0;
+
     public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;
     public bool isGameStartClassSelection = false; // Track if this is game start vs mid-game class selection
@@ -96,6 +99,7 @@ public class PlayerManager : ModPlayer
     public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
     {
         var modPlayer = Player.GetModPlayer<ClassSystem>();
+        var victimManager = Player.GetModPlayer<PlayerManager>();
 
         if (pvp)
         {
@@ -107,7 +111,10 @@ public class PlayerManager : ModPlayer
                 killer.statLife += 20;
                 killer.HealEffect(20, true);
             }
+
+            killerManager.kills++;
         }
+        victimManager.deaths++;
 
         if (GameInfo.matchStage == 2)
         {
