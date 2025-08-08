@@ -423,14 +423,16 @@ public class GameManager : ModSystem
             statePacket.Send(toClient: player.whoAmI);
 
             Color teamColor = (player.team == 1) ? Color.Red : Color.Blue;
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name}'s KDR: {PlayerManager.GetPlayerManager(player.whoAmI).kills}-{PlayerManager.GetPlayerManager(player.whoAmI).deaths}"), teamColor);
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"{player.name}'s stats: {PlayerManager.GetPlayerManager(player.whoAmI).kills} kills  |  {PlayerManager.GetPlayerManager(player.whoAmI).deaths} deaths  |  {PlayerManager.GetPlayerManager(player.whoAmI).damage} damage"), teamColor);
 
             PlayerManager.GetPlayerManager(player.whoAmI).kills = 0;
             PlayerManager.GetPlayerManager(player.whoAmI).deaths = 0;
+            PlayerManager.GetPlayerManager(player.whoAmI).damage = 0;
 
             ModPacket kdrPacket = mod.GetPacket();
             kdrPacket.Write((byte)MessageType.UpdatePlayerKDR);
             kdrPacket.Write(player.whoAmI);
+            kdrPacket.Write(0);
             kdrPacket.Write(0);
             kdrPacket.Write(0);
             kdrPacket.Send(toClient: player.whoAmI);
