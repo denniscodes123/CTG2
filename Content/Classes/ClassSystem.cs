@@ -598,6 +598,10 @@ namespace ClassesNamespace
                 packet.Write((short)Player.armor[i].netID);
                 packet.Write((byte)Player.armor[i].prefix);
             }
+            for (int j = 0; j < Player.dye.Length; j++)
+            {
+                packet.Write((short)Player.dye[j].netID);
+            }
 
             packet.Send(toWho, fromWho);
 
