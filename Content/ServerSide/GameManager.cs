@@ -36,8 +36,8 @@ public class GameManager : ModSystem
 
     public Dictionary<int, GameTeam> intToTeam;
 
-    public Gem BlueGem { get; private set; }
-    public Gem RedGem { get; private set; }
+    public Gem BlueGem { get; set; }
+    public Gem RedGem { get; set; }
 
     private bool blueWasHeld = false;
     private bool redWasHeld = false;
@@ -358,6 +358,12 @@ public class GameManager : ModSystem
         // Reset gems
         BlueGem.Reset();
         RedGem.Reset();
+        BlueGem.IsHeld = false;
+        BlueGem.IsCaptured = false;
+        BlueGem.HeldBy = -1;
+        RedGem.IsHeld = false;
+        RedGem.IsCaptured = false;
+        RedGem.HeldBy = -1;
         Console.WriteLine("GameManager: Reset gems");
 
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended!"), Microsoft.Xna.Framework.Color.Yellow);
@@ -800,6 +806,7 @@ public class GameManager : ModSystem
             Console.WriteLine("Blue gem captured!");
             winner = 2;
             EndGame();
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test1"), Microsoft.Xna.Framework.Color.OrangeRed);
         }
 
         else if (RedGem.IsCaptured && !endGameCalled)
@@ -807,6 +814,7 @@ public class GameManager : ModSystem
             Console.WriteLine("Red gem captured!");
             winner = 1;
             EndGame();
+            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test2"), Microsoft.Xna.Framework.Color.OrangeRed);
         }
 
         if (!isOvertime && MatchTime >= 60 * 60 * 15 + matchStartTime)
@@ -834,6 +842,7 @@ public class GameManager : ModSystem
             else if (!endGameCalled)
             {
                 EndGame();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test3"), Microsoft.Xna.Framework.Color.OrangeRed);
                 return;
             }
         }
@@ -853,12 +862,14 @@ public class GameManager : ModSystem
             if (BlueGem.IsCaptured && !endGameCalled)
             {
                 EndGame();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test4"), Microsoft.Xna.Framework.Color.OrangeRed);
                 winner = 2;
                 return;
             }
             else if (RedGem.IsCaptured && !endGameCalled)
             {
                 EndGame();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test5"), Microsoft.Xna.Framework.Color.OrangeRed);
                 winner = 1;
                 return;
             }
@@ -867,6 +878,7 @@ public class GameManager : ModSystem
             {
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[OVERTIME] Overtime ended: No gem is being held."), Microsoft.Xna.Framework.Color.Yellow);
                 EndGame();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test6"), Microsoft.Xna.Framework.Color.OrangeRed);
                 return;
             }
 
@@ -874,6 +886,7 @@ public class GameManager : ModSystem
             {
                 ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("[OVERTIME] Overtime expired! No capture."), Microsoft.Xna.Framework.Color.Red);
                 EndGame();
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("test7"), Microsoft.Xna.Framework.Color.OrangeRed);
                 return;
             }
         }
