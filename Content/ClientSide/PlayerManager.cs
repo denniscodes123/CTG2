@@ -37,6 +37,7 @@ public class PlayerManager : ModPlayer
 
     public int kills = 0;
     public int deaths = 0;
+    public int damage = 0;
 
     public PlayerState playerState = PlayerState.None; // UPDATE THIS EVERY STATE TRANSITION 
     public double classSelectionTimer = -1;
@@ -133,7 +134,6 @@ public class PlayerManager : ModPlayer
         customRespawnTimer = (currentClass.RespawnTime + extraSeconds) * 60;
     }
 
-
     // Set Custom Spawn Points
     public override void OnRespawn()
     {
@@ -192,9 +192,7 @@ public class PlayerManager : ModPlayer
 
     // Lock team/pvp, Enable/disable UI
     public override void PreUpdate()
-
     {
-
         EnforceTeamLock(); // lock team
 
         // wecan probably delete (state transitions handle all of this)
@@ -297,6 +295,12 @@ public class PlayerManager : ModPlayer
             info.HitDirection = 0;
             info.DamageSource = default;
         }
+
+        int attackerIndex = info.DamageSource.SourcePlayerIndex;
+        Player attacker = Main.player[attackerIndex];
+        var attackerManager = attacker.GetModPlayer<PlayerManager>();
+
+        attackerManager.damage += info.Damage;
     }
 
 
