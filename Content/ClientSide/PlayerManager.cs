@@ -297,10 +297,13 @@ public class PlayerManager : ModPlayer
         }
 
         int attackerIndex = info.DamageSource.SourcePlayerIndex;
-        Player attacker = Main.player[attackerIndex];
-        var attackerManager = attacker.GetModPlayer<PlayerManager>();
+        if (attackerIndex != -1)
+        {
+            Player attacker = Main.player[attackerIndex];
+            var attackerManager = attacker.GetModPlayer<PlayerManager>();
 
-        attackerManager.damage += info.Damage;
+            attackerManager.damage += info.Damage;
+        }
     }
 
 
