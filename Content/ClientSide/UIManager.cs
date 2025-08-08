@@ -80,7 +80,7 @@ public class UIManager : ModSystem
     private void DrawMatchTimer()
     {
         string timeText = "";
-        Vector2 timeRow = new Vector2(Main.screenWidth - 320, 375);
+        Vector2 timeRow = new Vector2(Main.screenWidth - 320, 350);
         Vector2 blueGemRow = new Vector2(Main.screenWidth - 320, 500);
         Vector2 blueGemRow2 = new Vector2(Main.screenWidth - 320, 550);
         Vector2 redGemRow = new Vector2(Main.screenWidth - 320, 600);
@@ -114,7 +114,8 @@ public class UIManager : ModSystem
             int remainder = secondsLeft % 60;
             timeText = $"Time left in match: {minutesLeft}:{remainder.ToString("D2")}";
         }
-        var blueGemStatus = GameInfo.blueGemCarrier;
+        /*GameInfo.blueGemCarrier;*/
+        string blueGemStatus = GameInfo.blueGemCarrier;
         var redGemStatus = GameInfo.redGemCarrier;
         var blueGemPosition = GameInfo.blueGemX;
         var redGemPosition = GameInfo.redGemX;
@@ -263,5 +264,15 @@ public class UIManager : ModSystem
             Vector2.Zero,
             Vector2.One
         );
+
+        //draw dirt timer
+        int secondsPassed = matchTime / 60 - GameInfo.matchStartTime / 60;
+        int secondsRemaining = 900 - secondsPassed;
+        int dirtSeconds = secondsRemaining % 30;
+        string dirtText = (secondsRemaining >= 600 && secondsRemaining < 900) ? $"Time left until dirt received: {dirtSeconds}s" : "No more dirt will be received!";
+        Vector2 dirtRow = new Vector2(Main.screenWidth - 320, 375);
+        if (matchStage == 2)
+            Utils.DrawBorderString(Main.spriteBatch, dirtText, dirtRow, Color.White);
+        //if (matchTime % 60 == 0) Main.NewText(GameInfo.blueGemCarrier);
     }
 }
