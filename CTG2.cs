@@ -646,6 +646,7 @@ namespace CTG2
                     int statePlayerIdxx = reader.ReadInt32();
                     int newKills = reader.ReadInt32();
                     int newDeaths = reader.ReadInt32();
+                    int newDamage = reader.ReadInt32();
 
                     if (statePlayerIdxx == Main.myPlayer)
                     {
@@ -653,6 +654,7 @@ namespace CTG2
 
                         playerManager.kills = newKills;
                         playerManager.deaths = newDeaths;
+                        playerManager.damage = newDamage;
                     }
                     break;
                 case (byte)MessageType.RequestViewMap:
