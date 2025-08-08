@@ -24,7 +24,7 @@ public class ClientModifications : ModSystem
 {
     public override void Load()
     {
-
+        IL_Player.IsItemSlotUnlockedAndUsable += AddItemSlotAlways;
         IL_Player.TeamChangeAllowed += TeamChangeFlag;
         //IL_Player.KillMe += RemoveServerDeathMessage;
         //IL_ChatHelper.DisplayMessage += ChatHelper_DisplayMessage_Hook;
@@ -54,6 +54,7 @@ public class ClientModifications : ModSystem
     }
     public override void Unload()
     {
+        IL_Player.IsItemSlotUnlockedAndUsable -= AddItemSlotAlways;
         IL_Player.TeamChangeAllowed -= TeamChangeFlag;
         //IL_Player.KillMe -= RemoveServerDeathMessage;
         //IL_ChatHelper.DisplayMessage -= ChatHelper_DisplayMessage_Hook;
@@ -192,6 +193,15 @@ public class ClientModifications : ModSystem
 
             return originalName;
         });
+
+    }
+      private void AddItemSlotAlways(ILContext iLContext)
+    {
+      var c = new ILCursor(iLContext);
+      c.Goto(0); //go to first line 
+
+      c.Emit(OpCodes.Ldc_I4_1); //push 1 onto the stack to return true
+      c.Emit(OpCodes.Ret); //return immediately rather than running vanilla code
 
     }
 }
