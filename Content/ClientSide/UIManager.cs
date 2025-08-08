@@ -252,7 +252,7 @@ public class UIManager : ModSystem
 
         //draw cap progress counters
         string progress = $"Furthest gem carry: [c/0000FF:{GameInfo.blueFurthest}%] v [c/FF0000:{GameInfo.redFurthest}%]";
-        Vector2 progressPos = new Vector2(Main.screenWidth - 320, 700);
+        Vector2 progressPos = new Vector2(Main.screenWidth - 320, 675);
 
         ChatManager.DrawColorCodedStringWithShadow(
             Main.spriteBatch,
@@ -274,5 +274,11 @@ public class UIManager : ModSystem
         if (matchStage == 2)
             Utils.DrawBorderString(Main.spriteBatch, dirtText, dirtRow, Color.White);
         //if (matchTime % 60 == 0) Main.NewText(GameInfo.blueGemCarrier);
+
+        //draw kdr
+        string kdrText = $"Kills: {Main.LocalPlayer.GetModPlayer<PlayerManager>().kills}  |  Deaths: {Main.LocalPlayer.GetModPlayer<PlayerManager>().deaths}";
+        Vector2 kdrRow = new Vector2(Main.screenWidth - 320, 725);
+        if (matchStage == 2)
+            Utils.DrawBorderString(Main.spriteBatch, kdrText, kdrRow, Color.BlueViolet);
     }
 }
