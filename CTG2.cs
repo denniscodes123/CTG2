@@ -113,6 +113,7 @@ namespace CTG2
         UpdateIsCaptured = 76,
         RequestAudioClientSide = 77,
         AudioClientSide = 78,
+        UpdatePlayerKDR = 79,
     }
 
     public class CTG2 : Mod
@@ -639,6 +640,19 @@ namespace CTG2
                     else
                     {
                         //Main.NewText($"CLIENT: Ignoring state update packet - not for local player", Color.Orange);
+                    }
+                    break;
+                case (byte)MessageType.UpdatePlayerKDR:
+                    int statePlayerIdxx = reader.ReadInt32();
+                    int newKills = reader.ReadInt32();
+                    int newDeaths = reader.ReadInt32();
+
+                    if (statePlayerIdxx == Main.myPlayer)
+                    {
+                        var playerManager = Main.player[statePlayerIdxx].GetModPlayer<PlayerManager>();
+
+                        playerManager.kills = newKills;
+                        playerManager.deaths = newDeaths;
                     }
                     break;
                 case (byte)MessageType.RequestViewMap:
