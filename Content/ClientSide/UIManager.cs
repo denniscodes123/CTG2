@@ -276,7 +276,7 @@ public class UIManager : ModSystem
         //if (matchTime % 60 == 0) Main.NewText(GameInfo.blueGemCarrier);
 
         //draw kdr
-        string kdrText = $"Kills: {Main.LocalPlayer.GetModPlayer<PlayerManager>().kills}  |  Deaths: {Main.LocalPlayer.GetModPlayer<PlayerManager>().deaths}";
+        string kdrText = $"Kills: {Main.LocalPlayer.GetModPlayer<PlayerManager>().kills}  |  Deaths: {Main.LocalPlayer.GetModPlayer<PlayerManager>().deaths}  |  Damage: {Main.LocalPlayer.GetModPlayer<PlayerManager>().damage}";
         Vector2 kdrRow = new Vector2(Main.screenWidth - 320, 725);
         if (matchStage == 2)
             Utils.DrawBorderString(Main.spriteBatch, kdrText, kdrRow, Color.BlueViolet);
