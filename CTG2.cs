@@ -508,9 +508,11 @@ namespace CTG2
                     break;
                 case (byte)MessageType.UpdateBlueGemCarrier:
                     GameInfo.blueGemCarrier = reader.ReadString();
+                    GameInfo.blueGemCarrierName= reader.ReadString();
                     break;
                 case (byte)MessageType.UpdateRedGemCarrier:
                     GameInfo.redGemCarrier = reader.ReadString();
+                    GameInfo.redGemCarrierName = reader.ReadString();
                     break;
                 case (byte)MessageType.UpdateOvertime:
                     GameInfo.overtime = reader.ReadBoolean();
