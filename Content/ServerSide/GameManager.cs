@@ -332,6 +332,8 @@ public class GameManager : ModSystem
 
     public void EndGame()
     {
+        var mod = ModContent.GetInstance<CTG2>();
+
         Console.WriteLine("GameManager: Starting EndGame sequence");
 
         matchStage = 0;
@@ -360,12 +362,43 @@ public class GameManager : ModSystem
         // Reset gems
         BlueGem.Reset();
         RedGem.Reset();
-        BlueGem.IsHeld = false;
-        BlueGem.IsCaptured = false;
-        BlueGem.HeldBy = -1;
-        RedGem.IsHeld = false;
-        RedGem.IsCaptured = false;
-        RedGem.HeldBy = -1;
+        
+        ModPacket packetIsCaptured = mod.GetPacket();
+        packetIsCaptured.Write((byte)MessageType.UpdateIsCaptured);
+        packetIsCaptured.Write(1);
+        packetIsCaptured.Write(false);
+        packetIsCaptured.Send();
+
+        ModPacket packetIsHeld = mod.GetPacket();
+        packetIsHeld.Write((byte)MessageType.UpdateIsHeld);
+        packetIsHeld.Write(1);
+        packetIsHeld.Write(false);
+        packetIsHeld.Send();
+
+        ModPacket packetHeldBy = mod.GetPacket();
+        packetHeldBy.Write((byte)MessageType.UpdateHeldBy);
+        packetHeldBy.Write(1);
+        packetHeldBy.Write(-1);
+        packetHeldBy.Send();
+
+        ModPacket packetIsCaptured2 = mod.GetPacket();
+        packetIsCaptured2.Write((byte)MessageType.UpdateIsCaptured);
+        packetIsCaptured2.Write(2);
+        packetIsCaptured2.Write(false);
+        packetIsCaptured2.Send();
+
+        ModPacket packetIsHeld2 = mod.GetPacket();
+        packetIsHeld2.Write((byte)MessageType.UpdateIsHeld);
+        packetIsHeld2.Write(2);
+        packetIsHeld2.Write(false);
+        packetIsHeld2.Send();
+
+        ModPacket packetHeldBy2 = mod.GetPacket();
+        packetHeldBy2.Write((byte)MessageType.UpdateHeldBy);
+        packetHeldBy2.Write(2);
+        packetHeldBy2.Write(-1);
+        packetHeldBy2.Send();
+
         Console.WriteLine("GameManager: Reset gems");
 
         ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Game has ended!"), Microsoft.Xna.Framework.Color.Yellow);
@@ -383,8 +416,6 @@ public class GameManager : ModSystem
                 break;
         }
         winner = 0;
-
-        var mod = ModContent.GetInstance<CTG2>();
 
         ModPacket packet = mod.GetPacket();
         packet.Write((byte)MessageType.SyncGameInformation);
