@@ -175,7 +175,6 @@ public class ChargedBowProjectile : ModProjectile
 			{
 				Projectile arrow = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
 				item.GetGlobalItem<Charged>().PostShotUpdate();
-				arrow.extraUpdates = 1; // determines how quickly the projectile falls and velocity magnitude
 			}
 
 			SoundEngine.PlaySound(bowSound2.WithVolumeScale(Main.soundVolume * 2.5f), Projectile.position); // sound played when fired
