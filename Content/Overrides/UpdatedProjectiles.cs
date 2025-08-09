@@ -38,6 +38,10 @@ public class ProjectileOverrides : GlobalProjectile
                 projectile.timeLeft = 120;
             }
         }
+        if (projectile.type == 41)
+        {
+            projectile.extraUpdates = 1; // determines how quickly the projectile falls and velocity magnitude
+        }
 
         if (projectile.type == ProjectileID.ThornChakram)
         {
