@@ -16,18 +16,36 @@ namespace CTG2.Content.Functionality
         {
             Terraria.Chat.On_ChatHelper.DisplayMessage += (orig, text, color, messageAuthor) =>
             {
-                if (Main.player[messageAuthor].team == 3) { color = Color.PowderBlue; }
-                if (Main.player[messageAuthor].team == 1) { color = Color.OrangeRed; }
+                var x = ModContent.GetInstance<CTG2>();
+                if (CTG2.UuidByWhoAmI.TryGetValue(messageAuthor, out var uuid) && x.PlayerDataDictionary.TryGetValue(uuid, out var pd) && pd.myAdminStatus)
+                {
+                    color = new Color(140, 43, 79, 255);
+                }
+
+                else
+                {
+                    if (Main.player[messageAuthor].team == 3) { color = Color.PowderBlue; }
+                    if (Main.player[messageAuthor].team == 1) { color = Color.OrangeRed; }
+                }
                 
                 orig(text, color, messageAuthor);
             };
             Terraria.GameContent.UI.Chat.On_NameTagHandler.GenerateTag += (orig, name) =>
             {
-                var player = Array.Find(Main.player, p => p.active && p.name == name);
-                if (player.GetModPlayer<AdminPlayer>().IsAdmin) {return "[i:5554] [Admin] " + name + ":";}
-                //TODO: we have to sync who is admin server side so other clients can see that this player is admin
-                else { return "[i:58]" + name + ":"; }
-                 };
+                var p = Array.Find(Main.player, pl => pl.active && pl.name == name);
+                if (p != null &&
+                    CTG2.UuidByWhoAmI.TryGetValue(p.whoAmI, out var uuid) && ModContent.GetInstance<CTG2>().PlayerDataDictionary.TryGetValue(uuid, out var data))
+                {
+                    if (data.myAdminStatus && data.chatFlairItemId ==58) 
+                        return "[i:5554] [Admin] " + name + ":";
+
+                    if (data.chatFlairItemId >= 0)
+                        return "[i:" + data.chatFlairItemId + "] " + name + ":";
+                }
+
+                return name + ":"; // fallback
+            };
+
         
             Terraria.On_Player.DropTombstone += (orig, self, coins, deathText, hitDir) => { };
 

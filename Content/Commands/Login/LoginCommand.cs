@@ -2,6 +2,7 @@ using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
 using System.IO;
+using Terraria.ID;
 
 namespace CTG2.Content.Commands
 {
@@ -25,6 +26,11 @@ namespace CTG2.Content.Commands
             {
                 var modPlayer = caller.Player.GetModPlayer<AdminPlayer>();
                 modPlayer.IsAdmin = true;
+                if (Main.netMode == NetmodeID.MultiplayerClient) {
+                var pkt = ModContent.GetInstance<CTG2>().GetPacket();
+                pkt.Write((byte)MessageType.RequestMakeMeAdmin);
+                pkt.Write(Main.clientUUID);   // caller’s UUID
+                pkt.Send();}
                 caller.Reply("You are now logged in as admin.", Color.Green);
             }
             else

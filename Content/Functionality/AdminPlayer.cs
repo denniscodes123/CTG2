@@ -1,5 +1,6 @@
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using CTG2;
 
 namespace CTG2.Content
 {
@@ -9,6 +10,7 @@ namespace CTG2.Content
 
         public override void OnEnterWorld()
         {
+
             IsAdmin = false; // Reset on join
         }
 

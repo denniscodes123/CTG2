@@ -141,6 +141,16 @@ Configs: {
 		}
 
 		DisplayName: CTG2 Config
+
+		EnableProjectileTeamColoring: {
+			Label: Enable projectile team coloring
+			Tooltip: ""
+		}
+
+		SelectedMusicIndex: {
+			Label: Selected Track: 0=None, 1=Clash, 2=Mystery
+			Tooltip: ""
+		}
 	}
 }
 
@@ -153,5 +163,10 @@ Biomes: {
 	GameMusicBiome: {
 		DisplayName: Game Music Biome
 		TownNPCDialogueName: the Game Music Biome
+	}
+
+	DynamicMusic: {
+		DisplayName: Dynamic Music
+		TownNPCDialogueName: the Dynamic Music
 	}
 }

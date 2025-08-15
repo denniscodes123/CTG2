@@ -21,23 +21,15 @@
       "ability-id": 1,
       "upgrades": [
         {
-          "id":    "charge_bow",
-          "name":  "Charge Bow",
-          "icon":  89,
-          "value": 20
+          "id":    "cloudInAbottle",
+          "name":  "Cloud in a bottle"
         },
         {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 2
-        },
-        {
-          "id":    "bonus_speed",
-          "name":  "Speed Boost",
-          "icon":  0,
-          "value": 10
+          "id":    "reset",
+          "name":  "Reset"
         }
+
+
       ]
     },
     {
@@ -51,26 +43,7 @@
       "respawn-time": 5,
       "buffs": [6, 36, 107, 115, 146, 158],
       "ability-id": 2,
-      "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
-      ]
+      "upgrades": []
     },
     {
       "name": "Beast",
@@ -83,26 +56,7 @@
       "respawn-time": 4,
       "buffs": [6, 107, 108, 146, 158],
       "ability-id": 3,
-      "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
-      ]
+      "upgrades": []
     },
     {
       "name": "Gladiator",
@@ -121,18 +75,6 @@
           "name":  "Extra Jump",
           "icon":  89,
           "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_speed",
-          "name":  "Faster Movement",
-          "icon":  0,
-          "value": 2
         }
       ]
     },
@@ -148,24 +90,7 @@
       "buffs": [6, 25, 33, 107, 114, 115, 146, 158],
       "ability-id": 5,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -180,24 +105,7 @@
       "buffs": [3, 6, 36, 107, 115],
       "ability-id": 6,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -212,24 +120,7 @@
       "buffs": [6, 36, 107, 158],
       "ability-id": 7,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -244,24 +135,7 @@
       "buffs": [26, 29, 107, 115],
       "ability-id": 8,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -276,24 +150,7 @@
       "buffs": [3, 6, 7, 36, 107, 115, 158],
       "ability-id": 9,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -308,24 +165,7 @@
       "buffs": [6, 107, 115, 146, 158],
       "ability-id": 10,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -340,24 +180,7 @@
       "buffs": [6, 107, 115, 146, 158],
       "ability-id": 11,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -372,24 +195,7 @@
       "buffs": [6, 33, 48, 107, 115, 146, 158],
       "ability-id": 12,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -404,24 +210,7 @@
       "buffs": [33, 107, 115, 146],
       "ability-id": 13,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -436,24 +225,7 @@
       "buffs": [3, 6, 36, 107, 115, 158],
       "ability-id": 14,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -468,24 +240,7 @@
       "buffs": [6, 36, 107, 115, 158],
       "ability-id": 15,
       "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
+
       ]
     },
     {
@@ -501,23 +256,16 @@
       "ability-id": 16,
       "upgrades": [
         {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
+          "id":    "simple_dash",
+          "name":  "Simple Dash",
           "icon":  89,
           "value": 20
         },
         {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
+          "id":    "reset",
+          "name":  "Reset"
         }
+
       ]
     },
     {
@@ -531,26 +279,7 @@
       "respawn-time": 4,
       "buffs": [25, 29, 33, 36, 48, 107, 115, 146, 176],
       "ability-id": 17,
-      "upgrades": [
-        {
-          "id":    "bonus_health",
-          "name":  "Bonus Health",
-          "icon":  89,
-          "value": 20
-        },
-        {
-          "id":    "bonus_regen",
-          "name":  "Bonus Regeneration",
-          "icon":  0,
-          "value": 1
-        },
-        {
-          "id":    "bonus_def",
-          "name":  "Bonus Defense",
-          "icon":  0,
-          "value": 2
-        }
-      ]
+      "upgrades": []
     }
   ]
 }

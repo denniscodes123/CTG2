@@ -215,7 +215,7 @@ public class ClassUI : UIState
     {
         var playerManager = Main.LocalPlayer.GetModPlayer<PlayerManager>();
         playerManager.currentClass = cfg;
-        playerManager.currentUpgrade = cfg.Upgrades[0]; // Set default upgrade
+        //playerManager.currentUpgrade = cfg.Upgrades[0]; // Not needed
         
         playerManager.pickedClass = true;
         var mod = ModContent.GetInstance<CTG2.CTG2>();

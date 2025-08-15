@@ -29,6 +29,7 @@ using Terraria.Graphics.CameraModifiers;
 
 
 
+
 namespace CTG2
 {
     public enum MessageType : byte
@@ -114,6 +115,14 @@ namespace CTG2
         RequestAudioClientSide = 77,
         AudioClientSide = 78,
         UpdatePlayerKDR = 79,
+        RequestDictAddAndSync = 80,
+        SyncDict = 81,
+        RequestMakeMeAdmin = 82,
+        SendNewChatFlair = 83,
+        RegisterUuid = 84,
+        SyncUuidForPlayer=85,
+
+
     }
 
     public class CTG2 : Mod
@@ -121,6 +130,8 @@ namespace CTG2
         public static int requestedNpcIndex = 0;
         public static Random randomGenerator = new Random();
         public static ClientConfig config = new ClientConfig();
+        public Dictionary<string, PlayerData> PlayerDataDictionary= new Dictionary<string, PlayerData>();
+        public static readonly Dictionary<int, string> UuidByWhoAmI = new(); //for mapping
 
         public static ModKeybind ArcherDashKeybind;
         public static ModKeybind AdvancedBinocularsKeybind;
@@ -157,7 +168,7 @@ namespace CTG2
 
         public override void Load()
         {
-          
+
             //MusicLoader.AddMusic(this, "Assets/Music/clashroyaleOT");
             base.Load();
             // load client config in
@@ -244,12 +255,12 @@ namespace CTG2
                     Player player = Main.player[playerID];
                     if (!player.active)
                         break;
-                    
+
                     player.AddBuff(buffType, time);
                     NetMessage.SendData(MessageID.AddPlayerBuff, -1, -1, null, playerID, buffType, time);
 
                     break;
-		case (byte)MessageType.SetCurrentClass:
+                case (byte)MessageType.SetCurrentClass:
                     int play = reader.ReadInt32();
                     int classNum = reader.ReadInt32();
                     string className = "";
@@ -318,7 +329,7 @@ namespace CTG2
                             var cls = classes;
 
                             playerMnger.currentClass = cls;
-                            
+
                             var classPlayer = ppp.GetModPlayer<ClassSystem>();
                             classPlayer.setClass();
 
@@ -417,22 +428,22 @@ namespace CTG2
                     int target = reader.ReadInt32();
                     int requestedTeam = reader.ReadInt32();
 
-                        if (requestedTeam == -1) //If call is for pubsconfig (gives random team)
-                        {
+                    if (requestedTeam == -1) //If call is for pubsconfig (gives random team)
+                    {
                         int red = 0, blue = 0;
-                            foreach (Player p in Main.player)
-                            {
+                        foreach (Player p in Main.player)
+                        {
                             if (p.active && !p.dead && p.whoAmI != target)
-                                {
-                                    if (p.team == 1) red++;
-                                    else if (p.team == 3) blue++;
-                                }
-                                }
-                                requestedTeam = red < blue ? 1 : (blue < red ? 3 : (Main.rand.NextBool() ? 1 : 3));
-                            } 
+                            {
+                                if (p.team == 1) red++;
+                                else if (p.team == 3) blue++;
+                            }
+                        }
+                        requestedTeam = red < blue ? 1 : (blue < red ? 3 : (Main.rand.NextBool() ? 1 : 3));
+                    }
 
-                        ModContent.GetInstance<GameManager>().HandlePlayerTeamChange(target, requestedTeam);
-                        break;
+                    ModContent.GetInstance<GameManager>().HandlePlayerTeamChange(target, requestedTeam);
+                    break;
 
                 case (byte)MessageType.RequestEnterSpectator:
                     int spectatorPlayerIndex = reader.ReadInt32();
@@ -509,7 +520,7 @@ namespace CTG2
                     break;
                 case (byte)MessageType.UpdateBlueGemCarrier:
                     GameInfo.blueGemCarrier = reader.ReadString();
-                    GameInfo.blueGemCarrierName= reader.ReadString();
+                    GameInfo.blueGemCarrierName = reader.ReadString();
                     break;
                 case (byte)MessageType.UpdateRedGemCarrier:
                     GameInfo.redGemCarrier = reader.ReadString();
@@ -762,7 +773,7 @@ namespace CTG2
                 case (byte)MessageType.RequestAudioToClient:
                     string filepa = reader.ReadString();
                     int playerIndx = reader.ReadInt32();
-                    
+
                     var audMod = ModContent.GetInstance<CTG2>();
                     ModPacket audioPacket = audMod.GetPacket();
                     audioPacket.Write((byte)MessageType.RequestAudioToClientPacket);
@@ -860,7 +871,7 @@ namespace CTG2
                         //ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"sync called once"), Color.Orange);
                         break;
                     }
-                case(byte)MessageType.SyncPlayerArmor:
+                case (byte)MessageType.SyncPlayerArmor:
                     byte playerIDd = reader.ReadByte();
                     Player targetd = Main.player[playerIDd];
                     for (int i = 0; i < targetd.armor.Length; i++)
@@ -958,36 +969,36 @@ namespace CTG2
                         }
                         break;
                     }
-                    
-                case (byte)MessageType.RequestGamemodeChange:
-                {
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        string mode = reader.ReadString();
-                        //can add other gamemodes here later
-                            if (mode == "pubs") manager.pubsConfig = true;
-                            else {manager.pubsConfig = false; }
 
-                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Gamemode set to {mode}."), Color.Orange);
+                case (byte)MessageType.RequestGamemodeChange:
+                    {
+                        if (Main.netMode == NetmodeID.Server)
+                        {
+                            string mode = reader.ReadString();
+                            //can add other gamemodes here later
+                            if (mode == "pubs") manager.pubsConfig = true;
+                            else { manager.pubsConfig = false; }
+
+                            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral($"[GAME] Gamemode set to {mode}."), Color.Orange);
+                        }
+                        break;
                     }
-                    break;
-                }
                 case (byte)MessageType.RequestBanPlayer:
                     ProcessRequestBanPlayer(ref reader, whoAmI);
                     break;
 
                 case (byte)MessageType.DASH:
-                {
-                    byte plyNum1 = reader.ReadByte();
-                    Player ply1 = Main.player[plyNum1];
-                    DashPlayer3 dashPly = ply1.GetModPlayer<DashPlayer3>();
-                    dashPly.RecieveDash(ply1, reader);
-                    if (Main.netMode == 2)
                     {
-                        dashPly.SendDash(-1, whoAmI);
+                        byte plyNum1 = reader.ReadByte();
+                        Player ply1 = Main.player[plyNum1];
+                        DashPlayer3 dashPly = ply1.GetModPlayer<DashPlayer3>();
+                        dashPly.RecieveDash(ply1, reader);
+                        if (Main.netMode == 2)
+                        {
+                            dashPly.SendDash(-1, whoAmI);
+                        }
+                        break;
                     }
-                    break;
-                }
 
                 case (byte)MessageType.FORCE_JUMP:
                     byte plyNum2 = reader.ReadByte();
@@ -995,18 +1006,18 @@ namespace CTG2
                     ply2.GetModPlayer<WallJumpPlayer>().RecieveForceJump(ply2, reader, whoAmI);
                     break;
                 case (byte)MessageType.GRAB_KEYS:
-                {   
-                    byte plyNum3 = reader.ReadByte();
-                    Player ply3 = Main.player[plyNum3];
-                    WallJumpPlayer jumpPly = ply3.GetModPlayer<WallJumpPlayer>();
-                    jumpPly.RecieveGrabKeys(ply3, reader);
-                    if (Main.netMode == 2)
                     {
-                        jumpPly.SendGrabKeys(-1, whoAmI);
+                        byte plyNum3 = reader.ReadByte();
+                        Player ply3 = Main.player[plyNum3];
+                        WallJumpPlayer jumpPly = ply3.GetModPlayer<WallJumpPlayer>();
+                        jumpPly.RecieveGrabKeys(ply3, reader);
+                        if (Main.netMode == 2)
+                        {
+                            jumpPly.SendGrabKeys(-1, whoAmI);
+                        }
+                        break;
                     }
-                    break;
-                }
-                  
+
                 case (byte)MessageType.UpdateMusic:
                     // if (Main.netMode == NetmodeID.MultiplayerClient)
                     // {
@@ -1026,7 +1037,7 @@ namespace CTG2
 
                     //     // Update the static variable in our biome.
                     //         GameMusicBiome.ChangeMusic(newMusicId);
-                        
+
                     //     // Manually trigger the music fade. This is important!
                     //     // Just changing the biome's property won't work if the biome is already active.
                     //     if (Main.curMusic != newMusicId)
@@ -1035,14 +1046,119 @@ namespace CTG2
                     //     }
                     // }
                     break;
-                case (byte) MessageType.SyncBiomeMusic:
-                int newMusicId = reader.ReadInt32();
-                if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    //Main.newMusic = newMusicId;
-                }
+                case (byte)MessageType.SyncBiomeMusic:
+                    int newMusicId = reader.ReadInt32();
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        //Main.newMusic = newMusicId;
+                    }
 
-                break;
+                    break;
+                    
+                case (byte)MessageType.RequestDictAddAndSync:
+                    string uuid = reader.ReadString();
+                    if (!PlayerDataDictionary.ContainsKey(uuid)) //add and sync
+                    {
+                        PlayerData newPlayer = new PlayerData(uuid);
+                        PlayerDataDictionary.Add(uuid, newPlayer);
+                        ModPacket packet3 = ModContent.GetInstance<CTG2>().GetPacket();
+                        packet3.Write((byte)MessageType.SyncDict);
+                        packet3.Write(PlayerDataDictionary.Count);
+                        foreach (var kv in PlayerDataDictionary)
+                        {
+                            packet3.Write(kv.Key);          
+                            kv.Value.NetSend(packet3);      
+                        }
+                        packet3.Send(); //send new synced dictionary to all
+                    }
+                    else
+                    { //only sync dont add
+                        ModPacket packet4 = ModContent.GetInstance<CTG2>().GetPacket();
+                        packet4.Write((byte)MessageType.SyncDict);
+                        packet4.Write(PlayerDataDictionary.Count);
+                        foreach (var kv in PlayerDataDictionary)
+                        {
+                            packet4.Write(kv.Key);          
+                            kv.Value.NetSend(packet4);      
+                        }
+                        packet4.Send(toClient: whoAmI); //since player already existed just send current dictionary 
+                    }
+                    break;
+
+                case (byte)MessageType.SyncDict:
+                    int n = reader.ReadInt32();
+                    PlayerDataDictionary.Clear();
+                    for (int i = 0; i < n; i++) {
+                        string key = reader.ReadString();
+                        var val = PlayerData.NetReceive(reader);
+                        PlayerDataDictionary[key] = val;
+                    }
+                    Main.NewText("Received Dictionary Sync successfuly");
+                    break; 
+
+                case (byte)MessageType.RequestMakeMeAdmin:
+                {
+                    string uuid2 = reader.ReadString();
+
+                    if (!PlayerDataDictionary.TryGetValue(uuid2, out var pd)) {
+                        pd = new PlayerData(uuid2);
+                        PlayerDataDictionary[uuid2] = pd;
+                    }
+                    pd.setAdmin();
+
+                    var p = ModContent.GetInstance<CTG2>().GetPacket();
+                    p.Write((byte)MessageType.SyncDict);
+                    p.Write(PlayerDataDictionary.Count);
+                    foreach (var kv in PlayerDataDictionary) {
+                        p.Write(kv.Key);
+                        kv.Value.NetSend(p);
+                    }
+                    p.Send(); 
+                    break;
+                }
+                case (byte)MessageType.SendNewChatFlair:
+                {
+                    string uuid3 = reader.ReadString();
+                    int itemId = reader.ReadInt32();
+
+                    if (!PlayerDataDictionary.TryGetValue(uuid3, out var pd)) {
+                        pd = new PlayerData(uuid3);
+                        PlayerDataDictionary[uuid3] = pd;
+                    }
+                    pd.chatFlairItemId = itemId;
+                    var p = GetPacket();
+                    p.Write((byte)MessageType.SyncDict);
+                    p.Write(PlayerDataDictionary.Count);
+                    foreach (var kv in PlayerDataDictionary) {
+                        p.Write(kv.Key);
+                        kv.Value.NetSend(p);
+                    }
+                    p.Send();
+                    break;
+                }
+                case (byte)MessageType.RegisterUuid:
+                {
+                    string uuid4 = reader.ReadString();
+                    int idx = whoAmI;
+
+                    CTG2.UuidByWhoAmI[idx] = uuid4;
+                    if (!PlayerDataDictionary.TryGetValue(uuid4, out var pd))
+                        PlayerDataDictionary[uuid4] = new PlayerData(uuid4);
+
+                    var mp = GetPacket();
+                    mp.Write((byte)MessageType.SyncUuidForPlayer);
+                    mp.Write(idx);
+                    mp.Write(uuid4);
+                    mp.Send();
+                    break;
+                }
+                case (byte)MessageType.SyncUuidForPlayer:
+                {
+                    int idx = reader.ReadInt32();
+                    string uuid5 = reader.ReadString();
+                    UuidByWhoAmI[idx] = uuid5;
+                    break;
+                }
 
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
@@ -1050,19 +1166,19 @@ namespace CTG2
 
             }
         }
-		private static void ProcessRequestBanPlayer(ref BinaryReader reader, int playerNumber)
-		{
-				string playertoban = reader.ReadString();
-				for (int k = 0; k < 255; k++)
-				{
-					if (Main.player[k].active && Main.player[k].name.ToLower() == playertoban)
-					{
-						Netplay.AddBan(k);
-						NetMessage.SendData(2, k, -1, NetworkText.FromKey("CLI.BanMessage", new object[0]), 0, 0f, 0f, 0f, 0, 0, 0);
-					}
-				}
-			
-		}
+        private static void ProcessRequestBanPlayer(ref BinaryReader reader, int playerNumber)
+        {
+            string playertoban = reader.ReadString();
+            for (int k = 0; k < 255; k++)
+            {
+                if (Main.player[k].active && Main.player[k].name.ToLower() == playertoban)
+                {
+                    Netplay.AddBan(k);
+                    NetMessage.SendData(2, k, -1, NetworkText.FromKey("CLI.BanMessage", new object[0]), 0, 0f, 0f, 0f, 0, 0, 0);
+                }
+            }
+
+        }
 
 
         public void setRequestedNpcIndex(int index)
@@ -1104,3 +1220,4 @@ namespace CTG2
         }
     }
 }
+

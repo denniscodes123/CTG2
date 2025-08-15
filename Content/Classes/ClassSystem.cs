@@ -67,7 +67,8 @@ namespace ClassesNamespace
     {
         public GameClass playerClass = GameClass.None;
         public bool clearonce= true;
-        public bool applyHPonce= true;
+        public bool simpleDashSelected = false;
+        public bool applyHPonce = true;
         private string lastPlayerClass = "";
         private string lastUpgrade = "";
         private int bonusHP = 0;
@@ -261,43 +262,66 @@ namespace ClassesNamespace
         public void ApplyUpgrade(UpgradeConfig upgrade)
         {
             // reset all bonus stats
-            // bonusHP = 0;
-            // bonusRegen = 0;
-            // bonusDef = 0;
-            // bonusMoveSpeed = 0;
-            // var playerManager = Player.GetModPlayer<PlayerManager>();
-            // playerManager.currentUpgrade.Name = upgrade.Id;
+             simpleDashSelected = false;
+             bonusHP = 0;
+             bonusRegen = 0;
+             bonusDef = 0;
+             bonusMoveSpeed = 0;
+             var playerManager = Player.GetModPlayer<PlayerManager>();
+             playerManager.currentUpgrade.Name = upgrade.Id;
 
 
-            // switch (upgrade.Id)
-            // {
-            //     case "charge_bow":
-            //         Item newItem = new Item();
-            //         var itemType = 5553;
-            //         newItem.SetDefaults(itemType);
-            //         newItem.stack = 1;
-            //         newItem.prefix = 0;
-            //         Player.inventory[2] = newItem;
-            //         break;
-            //     case "bonus_regen":
-            //         bonusRegen += 2 * upgrade.Value;
-            //         break;
-            //     case "bonus_speed":
-            //         bonusMoveSpeed += upgrade.Value / 100f;
-            //         break;
-            //     case "bonus_health":
-            //         //if(applyHPonce)
-            //         bonusHP += upgrade.Value;
-            //         //applyHPonce = false;
-            //         break;
-            //     case "bonus_def":
-            //         bonusDef += upgrade.Value;
-            //         break;
-            //     default:
-            //         Main.NewText("upgrade id not found");
-            //         break;
-            // }
-            // lastUpgrade = upgrade.Id;
+            switch (upgrade.Id)
+             {
+                 case "cloudInAbottle":
+                    TrySwitchItems(5549, 53);
+                     break;
+                 case "bonus_regen":
+                     bonusRegen += 2 * upgrade.Value;
+                     break;
+                 case "bonus_speed":
+                     bonusMoveSpeed += upgrade.Value / 100f;
+                     break;
+                 case "bonus_health":
+                     bonusHP += upgrade.Value;
+                     break;
+                 case "bonus_def":
+                     bonusDef += upgrade.Value;
+                     break;
+                 case "simple_dash":
+                    simpleDashSelected = true; //we use this in abilities.cs 
+                    TrySwitchItems(ItemID.EoCShield, 5558);
+                    break;
+                 case "reset":
+                    TrySwitchItems(5558, ItemID.EoCShield);
+                    TrySwitchItems(53, 5549);
+                    break;
+                 default:
+                     Main.NewText("upgrade id not found");
+                     break;
+             }
+             lastUpgrade = upgrade.Id;
+        }
+
+        public void TrySwitchItems(int switchedOutItem, int switchedInItem) 
+        {
+            //alternative: IL so players cannot unequip accessories and then search for specific index (way better for run time)
+            for (int b = 0; b < Player.inventory.Length; b++)
+            {
+                if (Player.inventory[b].type == switchedOutItem)
+                {
+                    Item toSwitchTo = new Item(switchedInItem, 1, 0);
+                    Player.inventory[b] = toSwitchTo;
+                }
+            }
+            for (int c = 0; c < Player.armor.Length; c++)
+            {
+                if (Player.armor[c].type == switchedOutItem)
+                {
+                        Item toSwitchTo = new Item(switchedInItem, 1, 0);
+                        Player.armor[c] = toSwitchTo;
+                }
+            }
         }
 
         public void setClass()
@@ -307,7 +331,7 @@ namespace ClassesNamespace
             if (playerManager.currentClass.Inventory != lastPlayerClass && GameInfo.matchStage != 0) //make this run only during matchstages or defaults to archer.json and onenterworld can never be run
             {
                 for (int i = Player.buffType.Length - 1; i >= 0; i--)
-                    Player.DelBuff(i);  
+                    Player.DelBuff(i);
 
                 string selectedClass = playerManager.currentClass.Inventory;
                 using (var stream = Mod.GetFileStream($"Content/Classes/{selectedClass}.json"))

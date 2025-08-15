@@ -108,7 +108,7 @@ namespace CTG2.Content
                          Player.inventory[b].type == ItemID.CharmofMyths || Player.inventory[b].type == ItemID.WormScarf || Player.inventory[b].type == ItemID.FireGauntlet || Player.inventory[b].type == ItemID.FrozenTurtleShell ||
                          Player.inventory[b].type == ItemID.BlizzardinaBottle || Player.inventory[b].type == ItemID.EoCShield || Player.inventory[b].type == ItemID.Magiluminescence || Player.inventory[b].type == ItemID.DestroyerEmblem ||
                          Player.inventory[b].type == ItemID.DevilHorns || Player.inventory[b].type == ItemID.FlowerBoyShirt || Player.inventory[b].type == ItemID.FlowerBoyPants || Player.inventory[b].type == ItemID.LizardTail ||
-                         Player.inventory[b].type == ItemID.ApprenticeScarf || Player.inventory[b].type == ItemID.Yoraiz0rDarkness)
+                         Player.inventory[b].type == ItemID.ApprenticeScarf || Player.inventory[b].type == ItemID.Yoraiz0rDarkness || Player.inventory[b].type == 5558)
                 {
                     Item newItem = new Item();
                     newItem.TurnToAir();
@@ -125,6 +125,10 @@ namespace CTG2.Content
                 newItem.Prefix(itemData.Prefix);
 
                 Player.armor[c] = newItem;
+                if (Player.armor[c].type == ItemID.EoCShield && Player.GetModPlayer<ClassSystem>().simpleDashSelected) {
+                    Item simpledash = new Item(5558,1,0);
+                    Player.armor[c] = simpledash;
+                }
             }
 
             for (int d = 0; d < Player.miscEquips.Length; d++)
