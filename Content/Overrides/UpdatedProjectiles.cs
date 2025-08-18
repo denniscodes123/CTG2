@@ -203,14 +203,14 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.ClearBuff(BuffID.Poisoned);
         }
-        else if (info.DamageSource.SourceProjectileType == ProjectileID.CursedFlameFriendly)
-        {
-            Player.ClearBuff(BuffID.CursedInferno);
-        }
-        else if (info.DamageSource.SourceProjectileType == ProjectileID.CursedFlameHostile)
-        {
-            Player.ClearBuff(BuffID.CursedInferno);
-        }
+        // else if (info.DamageSource.SourceProjectileType == ProjectileID.CursedFlameFriendly)
+        // {
+        //     Player.ClearBuff(BuffID.CursedInferno);
+        // }
+        // else if (info.DamageSource.SourceProjectileType == ProjectileID.CursedFlameHostile)
+        // {
+        //     Player.ClearBuff(BuffID.CursedInferno);
+        // }
         else if (info.DamageSource.SourceProjectileType == 19) //flamebunny flamrang
         {
             Player.ClearBuff(24);
@@ -218,10 +218,6 @@ public class ModifyHurtModPlayer : ModPlayer
         else if (info.DamageSource.SourceProjectileType == 15) //flamebunny fof
         {
             Player.ClearBuff(24);
-        }
-        else if (info.DamageSource.SourceProjectileType == 480) //Hardcodedjman proj as fallback
-        {
-            Player.ClearBuff(BuffID.CursedInferno);
         }
         else if (info.DamageSource.SourceProjectileType == 280) //goldenshowerproj
         {
@@ -231,5 +227,9 @@ public class ModifyHurtModPlayer : ModPlayer
         {
             Player.ClearBuff(BuffID.Poisoned);
         }
+        //else if (info.DamageSource.SourceProjectileType == 480) //Hardcodedjman proj as fallbacks
+        //{
+        Player.ClearBuff(BuffID.CursedInferno); // clearing all cursed inferno for now (dont think anything besides jman uses this debuff and its and bugged rn)
+        //}
     }
 }
