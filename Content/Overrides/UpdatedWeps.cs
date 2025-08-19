@@ -277,17 +277,6 @@ namespace CTG2.Content.Items.ModifiedWeps
                 else
                     return false;
             }
-            else if (item.type == 1306)
-            {
-                if (Main.GameUpdateCount - sickleLastUsedCounter >= sickleDelay)
-                {
-                    sickleLastUsedCounter = Main.GameUpdateCount;
-
-                    return true;
-                }
-                else
-                    return false;
-            }
             else if (item.type == 4347)
             {
                 if (Main.GameUpdateCount - zapinatorLastUsedCounter >= zapinatorDelay)
