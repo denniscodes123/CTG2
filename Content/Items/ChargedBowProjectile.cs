@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Microsoft.Xna.Framework.Audio;
 using ReLogic.Utilities;
 using System;
+using System.IO;
 using CTG2.Content.Items;
 using Terraria.Chat;
 using Terraria.Localization;
@@ -17,25 +18,41 @@ using Terraria.Localization;
 public class ChargedBowProjectile : ModProjectile
 {
 	public override string Texture => "Terraria/Images/Projectile_294";
-	private float Rotation, c1, td, framesPulledBack, pullback, charge;
-	private int damage, t, t2, special;
-	private Color color = new (0, 0, 0);
-	private SpriteEffects sprite;
+	private float Rotation, c1, td, charge;
+	private int damage, t;
 	private bool load = false;
 	private bool recentlyFired = false;
-	private Item item;
 	private bool start;
 	private SlotId sound;
+	private bool released;
+	private int syncTimer;
+
 
 	SoundStyle bowSound = new SoundStyle("CTG2/Content/Items/BowSound");
 	SoundStyle bowSound2 = new SoundStyle("CTG2/Content/Items/BowSound2");
+
+
+	public override void SendExtraAI(BinaryWriter writer)
+	{
+		writer.Write(charge);
+		writer.Write(Rotation);
+		writer.Write(released);
+	}
+
+	public override void ReceiveExtraAI(BinaryReader reader)
+	{
+		charge = reader.ReadSingle();
+		Rotation = reader.ReadSingle();
+		released = reader.ReadBoolean();
+	}
+
 
 
 	public override void SetDefaults()
 	{
 		Projectile.friendly = true;
 		Projectile.DamageType = DamageClass.Ranged;
-		Projectile.timeLeft = 21;
+		Projectile.timeLeft = 2;
 		Projectile.tileCollide = false;
 		Projectile.aiStyle = 75;
 		Projectile.width = 10;
@@ -44,152 +61,211 @@ public class ChargedBowProjectile : ModProjectile
 		Projectile.penetrate = -1;
 	}
 
-	
-	public override bool PreDraw(ref Color lightColor) // graphics
+
+	public override bool PreDraw(ref Color lightColor)
 	{
-		if (load == false) // loads projectile on first iteration
+		Player player = Main.player[Projectile.owner];
+
+		// Load arrow texture once
+		if (!load)
 		{
 			Main.instance.LoadProjectile((int)Projectile.ai[1]);
 			load = true;
 		}
 
-		Player player = Main.player[Projectile.owner];
-		Vector2 directionToCursor = Main.MouseWorld - player.MountedCenter;
-		if (t2 != 1)
-			player.direction = (directionToCursor.X < 0) ? -1 : 1;
+		// Determine facing direction from rotation
+		player.direction = Math.Cos(Rotation) >= 0 ? 1 : -1;
 
-		if (player.channel)
-		{
-			if (player.direction == 1)
-			{
-				Rotation = Vector2.Normalize(Main.MouseWorld - player.MountedCenter).ToRotation();
-				sprite = SpriteEffects.None;
-			}
-			else // flips projectile other directon if facing other direction
-			{
-				Rotation = Vector2.Normalize(player.MountedCenter - Main.MouseWorld).ToRotation() + MathHelper.Pi;
-				sprite = SpriteEffects.FlipVertically;
-			}
-		}
+		SpriteEffects bowEffects =
+			player.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
 
-		if (charge < 40f) color = lightColor;
-		else // projectile blinking rate and logic when fully charged
+		// ----------------------
+		// COLOR / CHARGE GLOW
+		// ----------------------
+		Color drawColor = lightColor;
+
+		if (charge >= 40f)
 		{
 			td++;
-			Color highlight = Color.White; // 255, 255, 255
+			Color highlight = Color.White;
 			Color lowlight = new(150, 150, 150);
-			if (td <= 200)
-			{
-				color = Color.Lerp(color, highlight, 0.2f);
-			}
-			else
-			{
-				color = Color.Lerp(color, lowlight, 0.2f);
-			}
-			if (td > 400) td = 0;
+
+			drawColor = td <= 200
+				? Color.Lerp(drawColor, highlight, 0.2f)
+				: Color.Lerp(drawColor, lowlight, 0.2f);
+
+			if (td > 400)
+				td = 0;
 		}
-		
-		// bow
-		Texture2D texture = TextureAssets.Item[(int)Projectile.ai[0]].Value;
-		Rectangle rectangle = new(0, 0, texture.Width, texture.Height);
-		Vector2 origin = rectangle.Size() / 2f;
-		Vector2 position = player.MountedCenter + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f; // rotation based on cursor position
-		Main.EntitySpriteDraw(texture, position - Main.screenPosition, rectangle, lightColor, Rotation, origin, Projectile.scale, sprite); // draw bow sprite
 
-		// arrow
-		Texture2D arrowTexture = TextureAssets.Projectile[(int)Projectile.ai[1]].Value;
-		Rectangle arrowRectangle = new(0, 0, arrowTexture.Width, arrowTexture.Height);
-		Vector2 origin3 = arrowRectangle.Size() / 2f;
-		Vector2 arrowPos = player.MountedCenter + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 16f - new Vector2(pullback, 0).RotatedBy(Rotation); // rotation based on cursor position: second vector is drawback
+		// ----------------------
+		// DRAW BOW
+		// ----------------------
+		Texture2D bowTexture = TextureAssets.Item[(int)Projectile.ai[0]].Value;
+		Rectangle bowFrame = bowTexture.Bounds;
+		Vector2 bowOrigin = bowFrame.Size() / 2f;
 
-		int drawCharge = (int)(charge);
+		Vector2 bowPos =
+			player.MountedCenter +
+			Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f;
 
-		if (player.channel && drawCharge < 40) // arrow isn't fully pulled back
+		Main.EntitySpriteDraw(
+			bowTexture,
+			bowPos - Main.screenPosition,
+			bowFrame,
+			lightColor,
+			Rotation,
+			bowOrigin,
+			Projectile.scale,
+			bowEffects
+		);
+
+		// ----------------------
+		// DRAW ARROW (IF NOT RELEASED)
+		// ----------------------
+		if (!released)
 		{
-			framesPulledBack++;
+			Texture2D arrowTexture = TextureAssets.Projectile[(int)Projectile.ai[1]].Value;
+			Rectangle arrowFrame = arrowTexture.Bounds;
+			Vector2 arrowOrigin = arrowFrame.Size() / 2f;
 
-			if (framesPulledBack % 8 == 0 && (!Main.autoPause || (Main.autoPause && !Main.playerInventory))) // pullback animation changes every 8 frames
-				pullback = (float) 13.0 * Math.Min(framesPulledBack, 1300) / 1300; // formula to calculate how far to pull back the arrow
+			// Pullback amount derived purely from synced charge
+			float pullbackAmount = MathHelper.Lerp(0f, 13f, charge / 40f);
+
+			Vector2 arrowPos =
+				player.MountedCenter +
+				Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 16f -
+				new Vector2(pullbackAmount, 0f).RotatedBy(Rotation);
+
+			Main.EntitySpriteDraw(
+				arrowTexture,
+				arrowPos - Main.screenPosition,
+				arrowFrame,
+				drawColor,
+				Rotation + MathHelper.PiOver2,
+				arrowOrigin,
+				Projectile.scale,
+				SpriteEffects.None
+			);
 		}
-		else
-			framesPulledBack = 0; // reset pullback counter after releasing
-	
-		if (!recentlyFired)
-			Main.EntitySpriteDraw(arrowTexture, arrowPos - Main.screenPosition, arrowRectangle, color, Rotation + MathHelper.PiOver2,
-				origin3, Projectile.scale, SpriteEffects.None); // draw arrow sprite
 
 		return false;
 	}
 
 
-	public override void AI() // behavior
+	public override void AI()
 	{
 		Player player = Main.player[Projectile.owner];
 
+		Projectile.timeLeft = 2;
+		Projectile.position = player.MountedCenter;
+		Projectile.knockBack = player.HeldItem.knockBack;
 
-		Projectile.position = player.MountedCenter + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 10f; // locks projectile's position to player center
-
-		item = player.HeldItem;
-
-		Projectile.knockBack = item.knockBack; // knockback stays the same as base item
-
-		Vector2 position = player.Center + Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f; // spawns the arrow from aiming direction, not inside player
-		Vector2 speed = new Vector2(item.shootSpeed, 0).RotatedBy(Rotation) * (0.5f + (charge / 40) * 0.5f) * 1.8f; // calculates the direction and speed of the arrow based on charge: 2x to 4x
-
-		if (player.channel & charge < 40f) // if still charging
+		// ===============================
+		// OWNER ONLY: INPUT + SOUNDS
+		// ===============================
+		if (Projectile.owner == Main.myPlayer)
 		{
-			charge += (float) 1f; // how fast charge grows each frame: max 40
+			Vector2 aim = Main.MouseWorld - player.MountedCenter;
+			Rotation = aim.ToRotation();
 
-			if (!start) //plays bow draw sound at the beginning of charging
+			// -------------------------------
+			// CHARGING
+			// -------------------------------
+			if (player.channel && !released)
 			{
-				sound = SoundEngine.PlaySound(bowSound.WithVolumeScale(Main.soundVolume * 1.25f), player.Center);
+				charge = Math.Min(charge + 1f, 40f);
 
-				start = true;
-			}
-
-			if (charge >= 40f)
-			{
-				if (SoundEngine.TryGetActiveSound(sound, out var s)) // stops charging sound from playing after fully charged
-					s.Stop();
-
-				if (c1 == 0) // plays max mana sound after fully charged
+				// Start charging sound once
+				if (!start)
 				{
-					c1 = 1;
-					SoundEngine.PlaySound(SoundID.MaxMana);
+					sound = SoundEngine.PlaySound(
+						bowSound.WithVolumeScale(Main.soundVolume * 1.25f),
+						player.Center
+					);
+					start = true;
 				}
-				charge = 40f; // caps charge at 40
+
+				// Fully charged transition
+				if (charge >= 40f && c1 == 0f)
+				{
+					c1 = 1f;
+
+					if (SoundEngine.TryGetActiveSound(sound, out var s))
+						s.Stop();
+
+					SoundEngine.PlaySound(SoundID.MaxMana, player.Center);
+				}
 			}
+
+			// -------------------------------
+			// RELEASE
+			// -------------------------------
+			else if (!released)
+			{
+				released = true;
+				Projectile.netUpdate = true;
+
+				// Stop any charging sound
+				if (SoundEngine.TryGetActiveSound(sound, out var s))
+					s.Stop();
+			}
+
+			// Sync charging state periodically
+			if (++syncTimer % 3 == 0)
+				Projectile.netUpdate = true;
 		}
 
-		else if (!player.channel && t2 == 0) // if release bow
+		// ===============================
+		// FIRE ARROW (OWNER ONLY)
+		// ===============================
+		if (released && Projectile.owner == Main.myPlayer && !recentlyFired)
 		{
-			if (SoundEngine.TryGetActiveSound(sound, out var s)) // stops any sound from playing after fully charged
-				s.Stop();
+			Item item = player.HeldItem;
 
-			damage = (int) (item.damage * (0.5 + charge / 80)); // damage calculation for bow depending on charge
+			Vector2 speed =
+				new Vector2(item.shootSpeed, 0f)
+				.RotatedBy(Rotation)
+				* (0.5f + (charge / 40f) * 0.5f)
+				* 1.8f;
 
-			t2 = 1;
-			if (charge >= 40f && Projectile.ai[1] == ProjectileID.WoodenArrowFriendly) special = (int)Projectile.ai[0];
+			Vector2 spawnPos =
+				player.MountedCenter +
+				Vector2.One.RotatedBy(Rotation - MathHelper.PiOver4) * 9f;
 
-			if (Main.myPlayer == Projectile.owner)
-			{
-				Projectile arrow = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), position, speed, (int)Projectile.ai[1], damage, item.knockBack, Projectile.owner, 0, special); // generates projectile
-				item.GetGlobalItem<Charged>().PostShotUpdate();
-			}
+			Projectile arrow = Projectile.NewProjectileDirect(
+				Projectile.GetSource_FromThis(),
+				spawnPos,
+				speed,
+				(int)Projectile.ai[1],
+				(int)(item.damage * (0.5 + charge / 80f)),
+				item.knockBack,
+				Projectile.owner
+			);
 
-			SoundEngine.PlaySound(bowSound2.WithVolumeScale(Main.soundVolume * 2.5f), Projectile.position); // sound played when fired
+			arrow.extraUpdates = 1;
+			arrow.netUpdate = true;
+
+			SoundEngine.PlaySound(
+				bowSound2.WithVolumeScale(Main.soundVolume * 2.5f),
+				Projectile.position
+			);
 
 			recentlyFired = true;
 		}
 
-		if (t2 == 1)
+		// ===============================
+		// CLEANUP / LIFETIME
+		// ===============================
+		if (released)
 		{
-			player.direction = player.oldDirection;
-			t++;
-			if (t >= item.useTime)
+			if (Projectile.owner == Main.myPlayer)
 			{
-				Projectile.Kill(); // kills bow projectile after half the weapon's usetime has passed
-				recentlyFired = false;
+				t++;
+				if (t >= player.HeldItem.useTime)
+				{
+					Projectile.Kill();
+				}
 			}
 		}
 	}
