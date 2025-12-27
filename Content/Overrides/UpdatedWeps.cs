@@ -188,12 +188,12 @@ namespace CTG2.Content.Items.ModifiedWeps
                 case 5451: //jman drone
                     item.crit = 0;
                     item.shoot = 513;
-                    item.damage = 31;
+                    item.damage = 0;
                     item.shootSpeed = 2f;
                     item.useAnimation = 37;
                     item.useTime = 37;
                     item.knockBack = 4;
-                    item.scale = 1;
+                    item.scale = 0;
                     break;
 
                 case ItemID.Flamarang:
