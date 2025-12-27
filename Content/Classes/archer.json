@@ -31,6 +31,14 @@
       "Type": 0,
       "Stack": 0,
       "Prefix": 0,
+      "Slot": 3,
+      "Modded": false
+    },
+    {
+      "Name": "",
+      "Type": 0,
+      "Stack": 0,
+      "Prefix": 0,
       "Slot": 4,
       "Modded": false
     },
@@ -709,3 +717,4 @@
   ]
 
 }
+
