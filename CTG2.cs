@@ -120,9 +120,8 @@ namespace CTG2
         RequestMakeMeAdmin = 82,
         SendNewChatFlair = 83,
         RegisterUuid = 84,
-        SyncUuidForPlayer=85,
-
-
+        SyncUuidForPlayer = 85,
+        ClearInventory = 86
     }
 
     public class CTG2 : Mod
@@ -412,11 +411,40 @@ namespace CTG2
                 case (byte)MessageType.UpdateIsCaptured:
                     int gemType3 = reader.ReadInt32();
                     bool isCaptured = reader.ReadBoolean();
+
+                    // 1. Update the local state (this happens on Server or the receiving Clients)
+                    var manager3 = ModContent.GetInstance<GameManager>();
                     if (gemType3 == 1)
-                        ModContent.GetInstance<GameManager>().RedGem.IsCaptured = isCaptured;
+                        manager3.RedGem.IsCaptured = isCaptured;
                     else
-                        ModContent.GetInstance<GameManager>().BlueGem.IsCaptured = isCaptured;
+                        manager3.BlueGem.IsCaptured = isCaptured;
+
+                    // 2. If the Server received this from a client, it must tell all other clients
+                    if (Main.netMode == NetmodeID.Server) {
+                        ModPacket packet = GetPacket();
+                        packet.Write((byte)MessageType.UpdateIsCaptured);
+                        packet.Write(gemType3);
+                        packet.Write(isCaptured);
+                        // ignoreClient: whoAmI ensures we don't send the data back to the person who just sent it to us
+                        packet.Send(-1, whoAmI); 
+                    }
                     break;
+
+                case (byte)MessageType.ClearInventory:
+                    int playerIdxx = reader.ReadInt32();
+                    var manager4 = ModContent.GetInstance<GameManager>();
+
+                    manager4.ClearPlayerInventory(playerIdxx);
+
+                     if (Main.netMode == NetmodeID.Server) {
+                        ModPacket packet = GetPacket();
+                        packet.Write((byte)MessageType.ClearInventory);
+                        packet.Write(playerIdxx);
+                        // ignoreClient: whoAmI ensures we don't send the data back to the person who just sent it to us
+                        packet.Send(-1, whoAmI); 
+                    }
+                    break;
+
                 // mainly used for clown ability
                 case (byte)MessageType.RequestTeleport:
                     // teleport on server
