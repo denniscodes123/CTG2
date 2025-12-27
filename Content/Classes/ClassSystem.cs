@@ -80,6 +80,9 @@ namespace ClassesNamespace
         public int currentHP = 100;
         public int currentMana = 20;
 
+        bool givenBlocks = false;
+        bool givenBombs = false;
+
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {
             base.ModifyMaxStats(out health, out mana);
@@ -425,33 +428,28 @@ namespace ClassesNamespace
         public override void OnEquipmentLoadoutSwitched(int oldLoadoutIndex, int loadoutIndex)
         {
           
-                var savedLoadout = Player.Loadouts[0]; // Loadout 0
-                ApplyLoadout(0);
-                Player.CurrentLoadoutIndex = oldLoadoutIndex;
+            var savedLoadout = Player.Loadouts[0]; // Loadout 0
+            ApplyLoadout(0);
+            Player.CurrentLoadoutIndex = oldLoadoutIndex;
 
-                if (Main.myPlayer == Player.whoAmI)
-                {
-                    Main.NewText("You cannot switch loadouts in this game.", Color.Red);
-                }
-            
+            if (Main.myPlayer == Player.whoAmI)
+            {
+                Main.NewText("You cannot switch loadouts in this game.", Color.Red);
+            }
         }
         public void ApplyLoadout(int index)
         {
             var loadout = Player.Loadouts[index];
 
+            for (int i = 0; i < Player.armor.Length; i++)
+            {
+                Player.armor[i] = loadout.Armor[i].Clone();
+            }
 
-
-                    for (int i = 0; i < Player.armor.Length; i++)
-                    {
-                        Player.armor[i] = loadout.Armor[i].Clone();
-                    }
-
-
-                    for (int i = 0; i < Player.dye.Length; i++)
-                    {
-                        Player.dye[i] = loadout.Dye[i].Clone();
-                    }
-
+            for (int i = 0; i < Player.dye.Length; i++)
+            {
+                Player.dye[i] = loadout.Dye[i].Clone();
+            }
 
             if (Main.netMode == NetmodeID.Server)
             {
@@ -493,7 +491,7 @@ namespace ClassesNamespace
                 }
             }
             
-            if (gameTime != 0 && gameTime % 1200 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0) // miner bombs over time
+            if (gameTime != 0 && gameTime % 1200 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && !givenBombs) // miner bombs over time
             {
                 if (playerManager.currentClass?.Name == "Miner")
                 {
@@ -503,9 +501,14 @@ namespace ClassesNamespace
 
                     Player.GetItem(Player.whoAmI, bomb, GetItemSettings.InventoryEntityToPlayerInventorySettings);
                 }
+
+                givenBombs = true;
             }
 
-            if (gameTime == 60 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000) // initial blocks
+            if ((gameTime + 600) % 1200 == 0)
+                givenBombs = false;
+
+            if (gameTime == 60 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000 && !givenBlocks) // initial blocks
             {
                 Item dirt = new Item();
                 dirt.SetDefaults(ItemID.DirtBlock);
@@ -566,9 +569,11 @@ namespace ClassesNamespace
                 }
 
                 Player.GetItem(Player.whoAmI, dirt, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+
+                givenBlocks = true;
             }
 
-            if (gameTime != 0 && gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000) // blocks over time
+            if (gameTime != 0 && gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000 && !givenBlocks) // blocks over time
             {
                 Item dirt = new Item();
                 dirt.SetDefaults(ItemID.DirtBlock);
@@ -629,7 +634,12 @@ namespace ClassesNamespace
                 }
 
                 Player.GetItem(Player.whoAmI, dirt, GetItemSettings.InventoryEntityToPlayerInventorySettings);
+
+                givenBlocks = true;
             }
+
+            if ((gameTime + 900) % 1800 == 0)
+                givenBlocks = false;
             
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
