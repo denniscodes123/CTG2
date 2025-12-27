@@ -55,7 +55,6 @@ namespace CTG2
         RequestEnterSpectator = 18, // client → server
         RequestExitSpectator = 19,  // client → server  
         ServerSpectatorUpdate = 20,  // server → client
-
         EnterClassSelection = 21,
         ExitClassSelection = 22,
         UpdatePlayerTeam = 23,  // server → client
@@ -634,6 +633,8 @@ namespace CTG2
                     GameInfo.redAttempts = reader.ReadInt32();
                     GameInfo.blueFurthest = reader.ReadSingle();
                     GameInfo.redFurthest = reader.ReadSingle();
+                    GameInfo.blueGemCarrierName = reader.ReadString();
+                    GameInfo.redGemCarrierName = reader.ReadString();
                     break;
                 case (byte)MessageType.ServerSpectatorUpdate:
                     int playerIndex = reader.ReadInt32();
