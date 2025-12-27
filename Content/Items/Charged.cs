@@ -8,6 +8,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using CTG2.Content.Items;
 using CTG2.Content.ClientSide;
+using System.IO;
 
 
 public class Charged : GlobalItem
@@ -74,15 +75,21 @@ public class Charged : GlobalItem
                         velocity = outvelocity;
                     }
                 }
-                Projectile.NewProjectile(Entity.GetSource_NaturalSpawn(), position.X, position.Y, velocity.X, velocity.Y, ModContent.ProjectileType<ChargedBowProjectile>(),
-                    0, knockback, player.whoAmI, item.type, type);
+                Projectile.NewProjectile(
+                    source,
+                    position,
+                    velocity,
+                    ModContent.ProjectileType<ChargedBowProjectile>(),
+                    0,
+                    knockback,
+                    player.whoAmI,
+                    item.type,
+                    type
+                );
             }
-            // if (Main.GameUpdateCount - lastUsedCounter > useDelay - postShotDelay)
-            //     lastUsedCounter = Main.GameUpdateCount - useDelay + postShotDelay;
-
             return false;
         }
-        else return base.Shoot(item, player, source, position, velocity, type, damage, knockback);
+        return base.Shoot(item, player, source, position, velocity, type, damage, knockback);
     }
 
 
