@@ -370,18 +370,44 @@ namespace CTG2
                 case (byte)MessageType.UpdateIsHeld:
                     int gemType1 = reader.ReadInt32();
                     bool isHeld = reader.ReadBoolean();
+
+                    // 1. Update the local state (this happens on Server or the receiving Clients)
+                    var manager1 = ModContent.GetInstance<GameManager>();
                     if (gemType1 == 1)
-                        ModContent.GetInstance<GameManager>().RedGem.IsHeld = isHeld;
+                        manager1.RedGem.IsHeld = isHeld;
                     else
-                        ModContent.GetInstance<GameManager>().BlueGem.IsHeld = isHeld;
+                        manager1.BlueGem.IsHeld = isHeld;
+
+                    // 2. If the Server received this from a client, it must tell all other clients
+                    if (Main.netMode == NetmodeID.Server) {
+                        ModPacket packet = GetPacket();
+                        packet.Write((byte)MessageType.UpdateIsHeld);
+                        packet.Write(gemType1);
+                        packet.Write(isHeld);
+                        // ignoreClient: whoAmI ensures we don't send the data back to the person who just sent it to us
+                        packet.Send(-1, whoAmI); 
+                    }
                     break;
                 case (byte)MessageType.UpdateHeldBy:
                     int gemType2 = reader.ReadInt32();
                     int heldBy = reader.ReadInt32();
+
+                    // 1. Update the local state (this happens on Server or the receiving Clients)
+                    var manager2 = ModContent.GetInstance<GameManager>();
                     if (gemType2 == 1)
-                        ModContent.GetInstance<GameManager>().RedGem.HeldBy = heldBy;
+                        manager2.RedGem.HeldBy = heldBy;
                     else
-                        ModContent.GetInstance<GameManager>().BlueGem.HeldBy = heldBy;
+                        manager2.BlueGem.HeldBy = heldBy;
+
+                    // 2. If the Server received this from a client, it must tell all other clients
+                    if (Main.netMode == NetmodeID.Server) {
+                        ModPacket packet = GetPacket();
+                        packet.Write((byte)MessageType.UpdateHeldBy);
+                        packet.Write(gemType2);
+                        packet.Write(heldBy);
+                        // ignoreClient: whoAmI ensures we don't send the data back to the person who just sent it to us
+                        packet.Send(-1, whoAmI); 
+                    }
                     break;
                 case (byte)MessageType.UpdateIsCaptured:
                     int gemType3 = reader.ReadInt32();
@@ -1220,4 +1246,3 @@ namespace CTG2
         }
     }
 }
-
