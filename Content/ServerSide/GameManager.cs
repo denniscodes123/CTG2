@@ -514,7 +514,11 @@ public class GameManager : ModSystem
             player.statMana = player.statManaMax;
 
             // Clear all player inventory and equipment
-            ClearPlayerInventory(player);
+            //ClearPlayerInventory(player);
+            ModPacket clearInvPacket = mod.GetPacket();
+            clearInvPacket.Write((byte)MessageType.ClearInventory);
+            clearInvPacket.Write(player.whoAmI);
+            clearInvPacket.Send();
 
             Console.WriteLine($"GameManager: Reset player {player.whoAmI} state and teleported to spectator area");
         }
@@ -1348,8 +1352,9 @@ public class GameManager : ModSystem
         return MusicLoader.GetMusicSlot(Mod, "Assets/Music/clashroyaleOT");
     }
 
-    private void ClearPlayerInventory(Player player)
+    public void ClearPlayerInventory(int playerIdx)
     {
+        Player player = Main.player[playerIdx];
         // Clear main inventory
         for (int i = 0; i < player.inventory.Length; i++)
         {
@@ -1381,7 +1386,7 @@ public class GameManager : ModSystem
         }
 
         // Sync inventory changes to all clients
-        NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, player.whoAmI);
+        //NetMessage.SendData(MessageID.SyncPlayer, -1, -1, null, player.whoAmI);
 
         Console.WriteLine($"GameManager: Cleared inventory for player {player.whoAmI} ({player.name})");
     }
