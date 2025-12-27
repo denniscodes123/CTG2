@@ -31,6 +31,8 @@ public class GameManager : ModSystem
 
     private string blueGemCarrier = "At Base";
     private string redGemCarrier = "At Base";
+    private string blueCarrierName = "";
+    private string redCarrierName = "";
 
     bool hasStartedEarly = false;
 
@@ -352,6 +354,8 @@ public class GameManager : ModSystem
         redAttempts = 0;
         blueFurthest = 0;
         redFurthest = 0;
+        blueCarrierName = "";
+        redCarrierName = "";
 
         resetEndGame = true;
         endGameCalled = true;
@@ -435,6 +439,8 @@ public class GameManager : ModSystem
         packet.Write(redAttempts);
         packet.Write(blueFurthest);
         packet.Write(redFurthest);
+        packet.Write(blueCarrierName);
+        packet.Write(redCarrierName);
         packet.Send();
 
         // Handle all active players
