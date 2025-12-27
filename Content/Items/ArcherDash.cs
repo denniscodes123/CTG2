@@ -41,81 +41,87 @@ namespace CTG2.Content.Items
 
 		public override void ResetEffects() {
 			// Reset our equipped flag. If the accessory is equipped somewhere, ExampleShield.UpdateAccessory will be called and set the flag before PreUpdateMovement
-			DashAccessoryEquipped = false;
+			if (Player.whoAmI == Main.myPlayer)
+			{
+				DashAccessoryEquipped = false;
 
-			if (recentlyEnded && DashTimer == 0) {
-				Vector2 newVelocity = Player.velocity;
-				if (newVelocity != Vector2.Zero) {
-					newVelocity.Normalize();
-					newVelocity *= 4f;
-					Player.gravity = 0.4f;
-					Player.velocity = newVelocity;
+				if (recentlyEnded && DashTimer == 0) {
+					Vector2 newVelocity = Player.velocity;
+					if (newVelocity != Vector2.Zero) {
+						newVelocity.Normalize();
+						newVelocity *= 4f;
+						Player.gravity = 0.4f;
+						Player.velocity = newVelocity;
+					}
+					recentlyEnded = false;
+					DashVelocity = 14f;
 				}
-				recentlyEnded = false;
-				DashVelocity = 14f;
+
+
+				dashKeybindActive = CTG2.ArcherDashKeybind.JustPressed;
+
+				if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.Item35, Player.Center);
+
+				lastDashDelay = DashDelay;
 			}
-
-
-			dashKeybindActive = CTG2.ArcherDashKeybind.JustPressed;
-
-			if (DashDelay == 0 && lastDashDelay != 0) SoundEngine.PlaySound(SoundID.Item35, Player.Center);
-
-			lastDashDelay = DashDelay;
 		}
 
 
 		public override void PreUpdateMovement() {
 
-			Vector2 newVelocity = Player.velocity;
-
-			if (dashKeybindActive && DashDelay == 0 && DashAccessoryEquipped) {
-
-				// Get the player's position
-        		Vector2 playerPosition = Main.player[Main.myPlayer].Center;
-
-				// Get the mouse cursor position
-				Vector2 cursorPosition = Main.MouseWorld;
-
-				// Find the vector from the player to the cursor
-				Vector2 directionToCursor = cursorPosition - playerPosition;
-
-				// Normalize the vector
-				if (directionToCursor.Length() > 0 && Player.velocity.Length() < DashVelocity) {
-					directionToCursor.Normalize();
-					newVelocity = directionToCursor * DashVelocity;
-					Player.gravity = 0f;
-					recentlyEnded = true;
-				}
-				else return;
-
-				// Start our dash
-				DashDelay = DashCooldown;
-				DashTimer = DashDuration;
-				Player.velocity = newVelocity;
-			}
-
-			if (DashDelay > 0) DashDelay--;
-
-			Player.eocDash = DashTimer;
-
-			if (DashTimer > 0) // If dash is active
+			if (Player.whoAmI == Main.myPlayer)
 			{
-				if (DashTimer < 10) {
-					DashVelocity -= 1f;
-					if (Player.velocity != Vector2.Zero) {
-						Vector2 decVelocity = Player.velocity;
-						decVelocity.Normalize();
-						decVelocity *= DashVelocity;
-						Player.velocity = decVelocity;
+				Vector2 newVelocity = Player.velocity;
+
+				if (dashKeybindActive && DashDelay == 0 && DashAccessoryEquipped) {
+
+					// Get the player's position
+					Vector2 playerPosition = Main.player[Main.myPlayer].Center;
+
+					// Get the mouse cursor position
+					Vector2 cursorPosition = Main.MouseWorld;
+
+					// Find the vector from the player to the cursor
+					Vector2 directionToCursor = cursorPosition - playerPosition;
+
+					// Normalize the vector
+					if (directionToCursor.Length() > 0 && Player.velocity.Length() < DashVelocity) {
+						directionToCursor.Normalize();
+						newVelocity = directionToCursor * DashVelocity;
+						Player.gravity = 0f;
+						recentlyEnded = true;
 					}
+					else return;
+
+					// Start our dash
+					DashDelay = DashCooldown;
+					DashTimer = DashDuration;
+					Player.velocity = newVelocity;
 				}
 
-				// Afterimage effect
-				Player.armorEffectDrawShadowEOCShield = true;
-				DashTimer--;
+				if (DashDelay > 0) DashDelay--;
+
+				Player.eocDash = DashTimer;
+
+				if (DashTimer > 0) // If dash is active
+				{
+					if (DashTimer < 10) {
+						DashVelocity -= 1f;
+						if (Player.velocity != Vector2.Zero) {
+							Vector2 decVelocity = Player.velocity;
+							decVelocity.Normalize();
+							decVelocity *= DashVelocity;
+							Player.velocity = decVelocity;
+						}
+					}
+
+					// Afterimage effect
+					Player.armorEffectDrawShadowEOCShield = true;
+					DashTimer--;
+				}
+				else
+					Player.armorEffectDrawShadowEOCShield = false;
 			}
-			else
-				Player.armorEffectDrawShadowEOCShield = false;
 		}
 	}
 }
