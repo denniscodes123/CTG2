@@ -708,6 +708,7 @@ namespace CTG2
                         //Main.NewText($"CLIENT: Ignoring state update packet - not for local player", Color.Orange);
                     }
                     break;
+
                 case (byte)MessageType.UpdatePlayerKDR:
                     int statePlayerIdxx = reader.ReadInt32();
                     int newKills = reader.ReadInt32();
