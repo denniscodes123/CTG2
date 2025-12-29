@@ -855,7 +855,7 @@ namespace CTG2.Content
                         break;
 
                     case 12: //not finished
-                        SetCooldown(14);
+                        SetCooldown(27);
                         ClownOnUse();
 
                         break;
