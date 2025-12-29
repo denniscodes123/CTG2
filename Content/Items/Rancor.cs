@@ -10,7 +10,7 @@ namespace CTG2.Content.Items
 		{
 	  		Item.CloneDefaults(ItemID.TendonBow);
 	     
-			Item.damage = 42;
+			Item.damage = 39;
 			Item.DamageType = DamageClass.Ranged;
 			Item.width = 18;
 			Item.height = 40;
