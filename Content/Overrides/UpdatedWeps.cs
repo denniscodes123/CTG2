@@ -26,7 +26,7 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint bananarangDelay = 55;
         private uint bananarangLastUsedCounter = 0;
 
-        private uint ThornChakramDelay = 18;
+        private uint ThornChakramDelay = 30;
         private uint ThornChakramLastUsedCounter = 0;
 
         private uint blowgunDelay = 40;
@@ -207,7 +207,7 @@ namespace CTG2.Content.Items.ModifiedWeps
                     break;
 
                 case 3836: //ghastly glaive
-                    item.damage = 34;
+                    item.damage = 35;
                     break;
 
                 case 220:
@@ -242,8 +242,6 @@ namespace CTG2.Content.Items.ModifiedWeps
             if (item.type == ItemID.NebulaArcanum)
             {
                 Vector2 finalVelocity = velocity;
-
-
 
                 Projectile.NewProjectile(source, position, velocity, ProjectileID.NebulaArcanum, damage, knockback, player.whoAmI);
                 return false;
