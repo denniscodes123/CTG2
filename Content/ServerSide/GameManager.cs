@@ -479,7 +479,6 @@ public class GameManager : ModSystem
             player.respawnTimer = 0;
 
             // Reset ability attributes
-            player.GetModPlayer<Abilities>().class7HitCounter = 0;
             player.GetModPlayer<Abilities>().cooldown = 0;
             player.GetModPlayer<Abilities>().class4BuffTimer = 0;
             player.GetModPlayer<Abilities>().class4PendingBuffs = false;
@@ -492,6 +491,32 @@ public class GameManager : ModSystem
             player.GetModPlayer<Abilities>().class12ClosestPlayer = null;
             player.GetModPlayer<Abilities>().class15AbilityTimer = -1;
             player.GetModPlayer<Abilities>().mutantState = 1;
+            
+            ModPacket abilityPacket = mod.GetPacket();
+            abilityPacket.Write((byte)MessageType.SyncAbilityAttributes);
+            abilityPacket.Write(player.whoAmI);
+            abilityPacket.Write(0);
+            abilityPacket.Write(0);
+            abilityPacket.Write(false);
+            abilityPacket.Write(-1);
+            abilityPacket.Write(0);
+            abilityPacket.Write(0);
+            abilityPacket.Write(false);
+            abilityPacket.Write(-1);
+            abilityPacket.Write(99999);
+            abilityPacket.Write(-1);
+            abilityPacket.Write(1);
+            abilityPacket.Send(toClient: player.whoAmI);
+
+            // Reset classsystem attributes
+            player.GetModPlayer<ClassSystem>().blockCounter = 1800;
+            player.GetModPlayer<ClassSystem>().bombCounter = 1200;
+
+            ModPacket classSystemPacket = mod.GetPacket();
+            classSystemPacket.Write((byte)MessageType.SyncClassSystemAttributes);
+            classSystemPacket.Write(1800);
+            classSystemPacket.Write(1200);
+            classSystemPacket.Send(toClient: player.whoAmI);
 
             // Remove from spectator tracking if they were spectating
             if (playerSpectatorStatus.GetValueOrDefault(player.whoAmI, false))
