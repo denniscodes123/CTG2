@@ -591,8 +591,6 @@ namespace ClassesNamespace
 
                 blockCounter += 1800;
             }
-
-            Main.NewText(gameTime + ", " + blockCounter, Color.Red);
             
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
