@@ -29,6 +29,9 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint ThornChakramDelay = 30;
         private uint ThornChakramLastUsedCounter = 0;
 
+        private uint flamarangDelay = 15;
+        private uint flamarangLastUsedCounter = 0;
+
         private uint blowgunDelay = 40;
         private uint blowgunLastUsedCounter = 0;
 
@@ -104,9 +107,9 @@ namespace CTG2.Content.Items.ModifiedWeps
                     break;
 
                 case ItemID.ThornChakram:
-                    item.damage = 39;
-                    item.useTime = 22;
-                    item.useAnimation = 22;
+                    item.damage = 37;
+                    item.useTime = 14;
+                    item.useAnimation = 14;
                     item.crit = 0;
                     item.shootSpeed = 13f;
                     break; //change proj later
@@ -269,6 +272,17 @@ namespace CTG2.Content.Items.ModifiedWeps
                 if (Main.GameUpdateCount - ThornChakramLastUsedCounter >= ThornChakramDelay)
                 {
                     ThornChakramLastUsedCounter = Main.GameUpdateCount;
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (item.type == ItemID.Flamarang)
+            {
+                if (Main.GameUpdateCount - flamarangLastUsedCounter >= flamarangDelay)
+                {
+                    flamarangLastUsedCounter = Main.GameUpdateCount;
 
                     return true;
                 }
