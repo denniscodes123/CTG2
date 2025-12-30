@@ -120,7 +120,9 @@ namespace CTG2
         SendNewChatFlair = 83,
         RegisterUuid = 84,
         SyncUuidForPlayer = 85,
-        ClearInventory = 86
+        ClearInventory = 86,
+        SyncAbilityAttributes = 87,
+        SyncClassSystemAttributes = 88
     }
 
     public class CTG2 : Mod
@@ -635,7 +637,54 @@ namespace CTG2
                     GameInfo.redFurthest = reader.ReadSingle();
                     GameInfo.blueGemCarrierName = reader.ReadString();
                     GameInfo.redGemCarrierName = reader.ReadString();
+
                     break;
+                case (byte)MessageType.SyncAbilityAttributes:
+                    int playerindd = reader.ReadInt32();
+                    int cooldown = reader.ReadInt32();
+                    int class4BuffTimer = reader.ReadInt32();
+                    bool class4PendingBuffs = reader.ReadBoolean();
+                    int class6ReleaseTimer = reader.ReadInt32();
+                    int class7HitCounter = reader.ReadInt32();
+                    int class8HP = reader.ReadInt32();
+                    bool psychicActive = reader.ReadBoolean();
+                    int class12SwapTimer = reader.ReadInt32();
+                    int class12ClosestDist = reader.ReadInt32();
+                    int class15AbilityTimer = reader.ReadInt32();
+                    int mutantState = reader.ReadInt32();
+
+                    if (playerindd == Main.myPlayer)
+                    {
+                        var abils = Main.player[playerindd].GetModPlayer<Abilities>();
+
+                        abils.cooldown = cooldown;
+                        abils.class4BuffTimer = class4BuffTimer;
+                        abils.class4PendingBuffs = class4PendingBuffs;
+                        abils.class6ReleaseTimer = class6ReleaseTimer;
+                        abils.class7HitCounter = class7HitCounter;
+                        abils.class8HP = class8HP;
+                        abils.psychicActive = psychicActive;
+                        abils.class12SwapTimer = class12SwapTimer;
+                        abils.class12ClosestDist = class12ClosestDist;
+                        abils.class15AbilityTimer = class15AbilityTimer;
+                        abils.mutantState = mutantState;
+                    }
+                    break;
+                case (byte)MessageType.SyncClassSystemAttributes:
+                    int playerIndd = reader.ReadInt32();
+                    int blockCounter = reader.ReadInt32();
+                    int bombCounter = reader.ReadInt32();
+
+                    if (playerIndd == Main.myPlayer)
+                    {
+                        var sys = Main.player[playerIndd].GetModPlayer<ClassSystem>();
+
+                        sys.blockCounter = 0;
+                        sys.bombCounter = 0;
+                    }
+
+                    break;
+            
                 case (byte)MessageType.ServerSpectatorUpdate:
                     int playerIndex = reader.ReadInt32();
                     bool isSpectator = reader.ReadBoolean();
