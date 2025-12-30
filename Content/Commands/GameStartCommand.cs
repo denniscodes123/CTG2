@@ -14,6 +14,8 @@ using Microsoft.Xna.Framework.Graphics;
 using CTG2.Content;
 using System.Linq;
 using System.Security.Policy;
+using CTG2.Content.ServerSide;
+using CTG2.Content.ClientSide;
 
 
 
@@ -32,6 +34,12 @@ namespace CTG2.Content
             if (!modPlayer.IsAdmin)
             {
                 caller.Reply("You must be an admin to use this command.", Color.Red);
+                return;
+            }
+
+            if (GameInfo.matchStage != 0 && GameInfo.matchStage != 3)
+            {
+                caller.Reply("You must end the current game to start a new game.", Color.Red);
                 return;
             }
             
