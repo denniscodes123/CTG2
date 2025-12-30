@@ -310,9 +310,9 @@ namespace ClassesNamespace
 
             switch (upgrade.Id)
              {
-                 case "cloudInAbottle":
-                    TrySwitchItems(5549, 53);
-                     break;
+                 // case "cloudInAbottle":
+                    // TrySwitchItems(5549, 53);
+                     // break;
                  case "bonus_regen":
                      bonusRegen += 2 * upgrade.Value;
                      break;
@@ -325,10 +325,10 @@ namespace ClassesNamespace
                  case "bonus_def":
                      bonusDef += upgrade.Value;
                      break;
-                 case "simple_dash":
-                    simpleDashSelected = true; //we use this in abilities.cs 
-                    TrySwitchItems(ItemID.EoCShield, 5558);
-                    break;
+                 // case "simple_dash":
+                    // simpleDashSelected = true; //we use this in abilities.cs 
+                    // TrySwitchItems(ItemID.EoCShield, 5558);
+                    // break;
                  case "reset":
                     TrySwitchItems(5558, ItemID.EoCShield);
                     TrySwitchItems(53, 5549);
