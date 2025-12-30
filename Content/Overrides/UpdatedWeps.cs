@@ -29,7 +29,7 @@ namespace CTG2.Content.Items.ModifiedWeps
         private uint ThornChakramDelay = 30;
         private uint ThornChakramLastUsedCounter = 0;
 
-        private uint flamarangDelay = 15;
+        private uint flamarangDelay = 30;
         private uint flamarangLastUsedCounter = 0;
 
         private uint blowgunDelay = 40;
