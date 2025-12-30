@@ -80,8 +80,8 @@ namespace ClassesNamespace
         public int currentHP = 100;
         public int currentMana = 20;
 
-        private bool givenBlocks;
-        private bool givenBombs;
+        public int blockCounter = 1800;
+        public int bombCounter = 1200;
 
         public override void ModifyMaxStats(out StatModifier health, out StatModifier mana)
         {
@@ -520,82 +520,15 @@ namespace ClassesNamespace
                 }
             }
             
-            if (gameTime != 0 && gameTime % 1200 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && !givenBombs) // miner bombs over time
+            if (gameTime >= bombCounter && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0) // miner bombs over time
             {
                 if (playerManager.currentClass?.Name == "Miner")
                     giveItemDirect(ItemID.StickyBomb, 1);
 
-                givenBombs = true;
+                bombCounter += 1200;
             }
 
-            if ((gameTime + 600) % 1200 == 0)
-                givenBombs = false;
-
-            if (gameTime == 60 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000 && !givenBlocks) // initial blocks
-            {
-                int stack = 0;
-
-                switch (playerManager.currentClass?.Name)
-                {
-                    case "Archer":
-                        stack = 100;
-                        break;
-                    case "Ninja":
-                        stack = 100;
-                        break;
-                    case "Beast":
-                        stack = 100;
-                        break;
-                    case "Gladiator":
-                        stack = 100;
-                        break;
-                    case "Paladin":
-                        stack = 100;
-                        break;
-                    case "Jungle Man":
-                        stack = 100;
-                        break;
-                    case "Black Mage":
-                        stack = 100;
-                        break;
-                    case "Psychic":
-                        stack = 100;
-                        break;
-                    case "White Mage":
-                        stack = 100;
-                        break;
-                    case "Miner":
-                        stack = 100;
-                        break;
-                    case "Fish":
-                        stack = 100;
-                        break;
-                    case "Clown":
-                        stack = 100;
-                        break;
-                    case "Flame Bunny":
-                        stack = 100;
-                        break;
-                    case "Tiki Priest":
-                        stack = 100;
-                        break;
-                    case "Tree":
-                        stack = 100;
-                        break;
-                    case "Mutant":
-                        stack = 100;
-                        break;
-                    case "Leech":
-                        stack = 100;
-                        break;
-                }
-
-                giveItemDirect(ItemID.DirtBlock, stack);
-
-                givenBlocks = true;
-            }
-
-            if (gameTime != 0 && gameTime % 1800 == 0 && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 18000 && !givenBlocks) // blocks over time
+            if (gameTime >= blockCounter && playerManager.playerState == PlayerManager.PlayerState.Active && Player.team != 0 && gameTime <= 19000) // blocks over time
             {
                 int stack = 0;
 
@@ -656,11 +589,10 @@ namespace ClassesNamespace
 
                 giveItemDirect(ItemID.DirtBlock, stack);
 
-                givenBlocks = true;
+                blockCounter += 1800;
             }
 
-            if ((gameTime + 900) % 1800 == 0)
-                givenBlocks = false;
+            Main.NewText(gameTime + ", " + blockCounter, Color.Red);
             
             if (Main.GameUpdateCount % 240 != 0) //replace dye after removal every 4 seconds
                 return;
