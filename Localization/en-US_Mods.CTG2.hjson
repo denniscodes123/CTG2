@@ -151,6 +151,11 @@ Configs: {
 			Label: Selected Track: 0=None, 1=Clash, 2=Mystery
 			Tooltip: ""
 		}
+
+		IsVanillaDashEnabled: {
+			Tooltip: When enabled, the vanilla double-tap dash works as normal. When disabled, only the Dash keybind triggers dashes.
+			Label: Enable vanilla double-tap dash
+		}
 	}
 }
 
