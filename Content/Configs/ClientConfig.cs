@@ -19,7 +19,10 @@ namespace CTG2.Content.Configs
         [Label("Selected Track: 0=None, 1=Clash, 2=Mystery")]
         public int SelectedMusicIndex { get; set; } = 0;
 
-
+        [Label("Enable vanilla double-tap dash")]
+        [Tooltip("When enabled, the vanilla double-tap dash works as normal. When disabled, only the Dash keybind triggers dashes.")]
+        [DefaultValue(true)]
+        public bool IsVanillaDashEnabled;
 
     }
 }

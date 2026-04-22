@@ -1,31 +1,29 @@
-using System;
-using Terraria.ModLoader;
-using System.IO;
-using System.Text.Json;
 using ClassesNamespace;
-using Terraria;
 using CTG2.Content;
 using CTG2.Content.Classes;
 using CTG2.Content.ClientSide;
-using CTG2.Content.ServerSide;
 using CTG2.Content.Commands;
+using CTG2.Content.ServerSide;
+using DirectDashMod.Players;
+using Humanizer;
 using Microsoft.Xna.Framework;
-using Terraria.ID;
-using System.Collections.Generic;
-using Terraria.Chat;
-using Terraria.Localization;
-using Terraria.Audio;
-using Terraria.GameContent;
 using Microsoft.Xna.Framework.Audio;
 using MonoMod.Cil;
-using Humanizer;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
-using DirectDashMod.Players;
-
-
+using System.Text.Json;
+using Terraria;
+using Terraria.Audio;
+using Terraria.Chat;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.Graphics.CameraModifiers;
+using Terraria.ID;
+using Terraria.Localization;
+using Terraria.ModLoader;
 
 
 
@@ -122,7 +120,8 @@ namespace CTG2
         SyncUuidForPlayer = 85,
         ClearInventory = 86,
         SyncAbilityAttributes = 87,
-        SyncClassSystemAttributes = 88
+        SyncClassSystemAttributes = 88,
+        Dash = 89
     }
 
     public class CTG2 : Mod
@@ -136,6 +135,7 @@ namespace CTG2
         public static ModKeybind ArcherDashKeybind;
         public static ModKeybind AdvancedBinocularsKeybind;
         public static ModKeybind Ability1Keybind;
+        public static ModKeybind DashKeybind { get; private set; }
         //public static int BiomeMusicId = 0; // client side 
 
         // static methods
@@ -190,6 +190,7 @@ namespace CTG2
             ArcherDashKeybind = KeybindLoader.RegisterKeybind(this, "ArcherDash", "LeftShift");
             AdvancedBinocularsKeybind = KeybindLoader.RegisterKeybind(this, "AdvancedBinoculars", "MouseRight");
             Ability1Keybind = KeybindLoader.RegisterKeybind(this, "Ability 1", "R");
+            DashKeybind = KeybindLoader.RegisterKeybind(this, "Dash", "F");
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -1264,7 +1265,9 @@ namespace CTG2
                     UuidByWhoAmI[idx] = uuid5;
                     break;
                 }
-
+                case (byte)MessageType.Dash:
+                    DashInputSystem.HandlePacket(reader, whoAmI);
+                    break;
                 default:
                     Logger.WarnFormat("CTG2: Unknown Message type: {0}", msgType);
                     break;
